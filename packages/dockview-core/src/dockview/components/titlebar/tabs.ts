@@ -4,6 +4,7 @@ import {
     isChildEntirelyVisibleWithinParent,
     OverflowObserver,
     removeClasses,
+    toggleClass,
 } from '../../../dom';
 import { addDisposableListener, Emitter, Event } from '../../../events';
 import {
@@ -21,6 +22,13 @@ import { DockviewHeaderDirection } from '../../options';
 import { Tab } from '../tab/tab';
 import { TabDragEvent, TabDropIndexEvent } from './tabsContainer';
 
+interface TabAnimationState {
+    sourceTabId: string;
+    sourceIndex: number;
+    tabPositions: Map<string, DOMRect>;
+    currentInsertionIndex: number | null;
+}
+
 export class Tabs extends CompositeDisposable {
     private readonly _element: HTMLElement;
     private readonly _tabsList: HTMLElement;
@@ -31,6 +39,7 @@ export class Tabs extends CompositeDisposable {
     private selectedIndex = -1;
     private _showTabsOverflowControl = false;
     private _direction: DockviewHeaderDirection = 'horizontal';
+    private _animState: TabAnimationState | null = null;
 
     private readonly _onTabDragStart = new Emitter<TabDragEvent>();
     readonly onTabDragStart: Event<TabDragEvent> = this._onTabDragStart.event;
@@ -158,7 +167,116 @@ export class Tabs extends CompositeDisposable {
                     this.accessor.doSetGroupActive(this.group);
                 }
             }),
+            addDisposableListener(this._tabsList, 'dragover', (event) => {
+                if (!this._animState) {
+                    // Check for external drag from another group
+                    if (
+                        this.accessor.options.tabReorderMode !== 'slide' ||
+                        this.accessor.options.disableDnd
+                    ) {
+                        return;
+                    }
+                    const data = getPanelData();
+                    if (
+                        data &&
+                        data.panelId &&
+                        data.groupId !== this.group.id
+                    ) {
+                        this._animState = {
+                            sourceTabId: data.panelId,
+                            sourceIndex: -1,
+                            tabPositions: this.snapshotTabPositions(),
+                            currentInsertionIndex: null,
+                        };
+                    } else {
+                        return;
+                    }
+                }
+                this.handleDragOver(event);
+            }, true),
+            addDisposableListener(this._tabsList, 'dragleave', (event) => {
+                if (!this._animState) {
+                    return;
+                }
+                // Only handle if leaving the container itself, not moving between children
+                if (
+                    event.relatedTarget &&
+                    this._tabsList.contains(event.relatedTarget as HTMLElement)
+                ) {
+                    return;
+                }
+                this.resetTabTransforms();
+                if (this._animState) {
+                    if (this._animState.sourceIndex === -1) {
+                        // External drag left — clear state entirely
+                        // (no dragend will fire on this tab list)
+                        this._animState = null;
+                    } else {
+                        this._animState.currentInsertionIndex = null;
+                    }
+                }
+            }, true),
+            addDisposableListener(this._tabsList, 'dragend', () => {
+                // Only fires for cancel (not after successful drop, since
+                // source tab is removed from DOM and doesn't bubble)
+                this.resetDragAnimation();
+            }),
+            addDisposableListener(
+                this._tabsList,
+                'drop',
+                (event) => {
+                    if (
+                        this.accessor.options.tabReorderMode !== 'slide' ||
+                        !this._animState ||
+                        this._animState.currentInsertionIndex === null
+                    ) {
+                        return;
+                    }
+
+                    event.stopPropagation();
+                    event.preventDefault();
+
+                    const animState = this._animState;
+                    this._animState = null;
+
+                    const insertionIndex =
+                        animState.currentInsertionIndex as number;
+                    const sourceIndex = animState.sourceIndex;
+                    // After the source tab is removed, indices after it shift
+                    // down by one, so adjust the target index accordingly.
+                    const adjustedIndex =
+                        insertionIndex -
+                        (sourceIndex !== -1 && sourceIndex < insertionIndex
+                            ? 1
+                            : 0);
+
+                    // No-op: drop at the same position, nothing to animate
+                    if (adjustedIndex === sourceIndex) {
+                        this.resetTabTransforms();
+                        return;
+                    }
+
+                    // Snapshot current visual positions (with margins still applied)
+                    // before resetting transforms, so FLIP starts from what the
+                    // user currently sees — not from a teleported state.
+                    const firstPositions = this.snapshotTabPositions();
+                    this.resetTabTransforms();
+                    this._onDrop.fire({ event, index: adjustedIndex });
+                    this.runFlipAnimation(
+                        firstPositions,
+                        animState.sourceTabId,
+                        animState.sourceIndex === -1,
+                        {
+                            from: Math.min(sourceIndex, adjustedIndex),
+                            to: Math.max(sourceIndex, adjustedIndex),
+                        }
+                    );
+                },
+                true
+            ),
             Disposable.from(() => {
+                this.resetDragAnimation();
+
                 for (const { value, disposable } of this._tabs) {
                     disposable.dispose();
                     value.dispose();
@@ -214,6 +332,17 @@ export class Tabs extends CompositeDisposable {
         const disposable = new CompositeDisposable(
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
+
+                if (this.accessor.options.tabReorderMode === 'slide') {
+                    this._animState = {
+                        sourceTabId: panel.id,
+                        sourceIndex: this._tabs.findIndex(
+                            (x) => x.value === tab
+                        ),
+                        tabPositions: this.snapshotTabPositions(),
+                        currentInsertionIndex: null,
+                    };
+                }
             }),
             tab.onPointerDown((event) => {
                 if (event.defaultPrevented) {
@@ -257,10 +386,43 @@ export class Tabs extends CompositeDisposable {
                 }
             }),
             tab.onDrop((event) => {
-                this._onDrop.fire({
-                    event: event.nativeEvent,
-                    index: this._tabs.findIndex((x) => x.value === tab),
-                });
+                const animState = this._animState;
+                this._animState = null;
+
+                const dropIndex = this._tabs.findIndex((x) => x.value === tab);
+
+                if (animState) {
+                    const firstPositions = this.snapshotTabPositions();
+                    this.resetTabTransforms();
+
+                    this._onDrop.fire({
+                        event: event.nativeEvent,
+                        index: dropIndex,
+                    });
+
+                    this.runFlipAnimation(
+                        firstPositions,
+                        animState.sourceTabId,
+                        animState.sourceIndex === -1,
+                        animState.sourceIndex !== -1
+                            ? {
+                                  from: Math.min(
+                                      animState.sourceIndex,
+                                      dropIndex
+                                  ),
+                                  to: Math.max(
+                                      animState.sourceIndex,
+                                      dropIndex
+                                  ),
+                              }
+                            : undefined
+                    );
+                } else {
+                    this._onDrop.fire({
+                        event: event.nativeEvent,
+                        index: dropIndex,
+                    });
+                }
             }),
             tab.onWillShowOverlay((event) => {
                 this._onWillShowOverlay.fire(
@@ -278,9 +440,20 @@ export class Tabs extends CompositeDisposable {
         const value: IValueDisposable<Tab> = { value: tab, disposable };
 
         this.addTab(value, index);
+
+        // If a tab was added during active drag, refresh positions
+        if (this._animState) {
+            this._animState.tabPositions = this.snapshotTabPositions();
+            this.applyDragOverTransforms();
+        }
     }
 
     delete(id: string): void {
+        if (this._animState?.sourceTabId === id) {
+            this.resetTabTransforms();
+            this._animState = null;
+        }
+
         const index = this.indexOf(id);
         const tabToRemove = this._tabs.splice(index, 1)[0];
 
@@ -289,6 +462,12 @@ export class Tabs extends CompositeDisposable {
         disposable.dispose();
         value.dispose();
         value.element.remove();
+
+        // If a non-source tab was removed during active drag, refresh positions
+        if (this._animState) {
+            this._animState.tabPositions = this.snapshotTabPositions();
+            this.applyDragOverTransforms();
+        }
     }
 
     private addTab(
@@ -335,5 +514,203 @@ export class Tabs extends CompositeDisposable {
         for (const tab of this._tabs) {
             tab.value.updateDragAndDropState();
         }
+    }
+
+    private snapshotTabPositions(): Map<string, DOMRect> {
+        const positions = new Map<string, DOMRect>();
+        for (const tab of this._tabs) {
+            positions.set(
+                tab.value.panel.id,
+                tab.value.element.getBoundingClientRect()
+            );
+        }
+        return positions;
+    }
+
+    private getAverageTabWidth(): number {
+        if (this._tabs.length === 0) {
+            return 0;
+        }
+        let totalWidth = 0;
+        for (const tab of this._tabs) {
+            totalWidth += tab.value.element.getBoundingClientRect().width;
+        }
+        return totalWidth / this._tabs.length;
+    }
+
+    private handleDragOver(event: DragEvent): void {
+        if (!this._animState) {
+            return;
+        }
+
+        const mouseX = event.clientX;
+        let insertionIndex: number | null = null;
+
+        for (let i = 0; i < this._tabs.length; i++) {
+            const tab = this._tabs[i].value;
+            if (tab.panel.id === this._animState.sourceTabId) {
+                continue;
+            }
+            const rect = tab.element.getBoundingClientRect();
+            const midpoint = rect.left + rect.width / 2;
+
+            if (mouseX < midpoint) {
+                insertionIndex = i;
+                break;
+            }
+            insertionIndex = i + 1;
+        }
+
+        if (insertionIndex === this._animState.currentInsertionIndex) {
+            return;
+        }
+
+        this._animState.currentInsertionIndex = insertionIndex;
+        this.applyDragOverTransforms();
+    }
+
+    private applyDragOverTransforms(): void {
+        if (
+            !this._animState ||
+            this._animState.currentInsertionIndex === null
+        ) {
+            this.resetTabTransforms();
+            return;
+        }
+
+        const insertionIndex = this._animState.currentInsertionIndex;
+        const sourceRect = this._animState.tabPositions.get(
+            this._animState.sourceTabId
+        );
+        const gapWidth = sourceRect
+            ? sourceRect.width
+            : this.getAverageTabWidth();
+
+        // Find the first non-source tab at insertionIndex to receive the gap margin
+        let gapApplied = false;
+
+        for (let i = 0; i < this._tabs.length; i++) {
+            const tab = this._tabs[i].value;
+            if (tab.panel.id === this._animState.sourceTabId) {
+                continue;
+            }
+
+            if (!gapApplied && i >= insertionIndex) {
+                tab.element.style.marginLeft = `${gapWidth}px`;
+                toggleClass(tab.element, 'dv-tab--shifting', true);
+                gapApplied = true;
+            } else {
+                // Keep shifting class while margin animates back to 0,
+                // then remove both once the transition ends
+                if (tab.element.style.marginLeft) {
+                    tab.element.style.marginLeft = '0px';
+                    toggleClass(tab.element, 'dv-tab--shifting', true);
+                    const onEnd = () => {
+                        tab.element.style.removeProperty('margin-left');
+                        toggleClass(tab.element, 'dv-tab--shifting', false);
+                        tab.element.removeEventListener('transitionend', onEnd);
+                    };
+                    tab.element.addEventListener('transitionend', onEnd);
+                } else {
+                    toggleClass(tab.element, 'dv-tab--shifting', false);
+                }
+            }
+        }
+    }
+
+    private resetTabTransforms(): void {
+        for (const tab of this._tabs) {
+            tab.value.element.style.removeProperty('margin-left');
+            tab.value.element.style.removeProperty('transform');
+            toggleClass(tab.value.element, 'dv-tab--shifting', false);
+        }
+    }
+
+    private resetDragAnimation(): void {
+        this.resetTabTransforms();
+        this._animState = null;
+
+        for (const tab of this._tabs) {
+            toggleClass(tab.value.element, 'dv-tab--dragging', false);
+        }
+    }
+
+    private runFlipAnimation(
+        firstPositions: Map<string, DOMRect>,
+        sourceTabId: string,
+        isCrossGroup: boolean = false,
+        animRange?: { from: number; to: number }
+    ): void {
+        let hasAnimation = false;
+
+        for (let i = 0; i < this._tabs.length; i++) {
+            const tab = this._tabs[i];
+            const panelId = tab.value.panel.id;
+
+            if (panelId === sourceTabId) {
+                if (isCrossGroup) {
+                    // Newly inserted tab: slide in from the right
+                    const rect = tab.value.element.getBoundingClientRect();
+                    tab.value.element.style.transform = `translateX(${rect.width}px)`;
+                    toggleClass(tab.value.element, 'dv-tab--shifting', true);
+                    hasAnimation = true;
+                }
+                continue;
+            }
+
+            // Skip tabs outside the affected range (they don't logically move)
+            if (
+                animRange !== undefined &&
+                (i < animRange.from || i > animRange.to)
+            ) {
+                continue;
+            }
+
+            const firstRect = firstPositions.get(panelId);
+            if (!firstRect) {
+                continue;
+            }
+
+            const lastRect = tab.value.element.getBoundingClientRect();
+            const deltaX = firstRect.left - lastRect.left;
+
+            if (Math.abs(deltaX) < 1) {
+                continue;
+            }
+
+            tab.value.element.style.transform = `translateX(${deltaX}px)`;
+            toggleClass(tab.value.element, 'dv-tab--shifting', true);
+            hasAnimation = true;
+        }
+
+        if (!hasAnimation) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            for (const tab of this._tabs) {
+                if (tab.value.element.style.transform) {
+                    tab.value.element.style.transform = '';
+                }
+            }
+
+            const onTransitionEnd = (event: TransitionEvent) => {
+                if (event.propertyName === 'transform') {
+                    this._tabsList.removeEventListener(
+                        'transitionend',
+                        onTransitionEnd
+                    );
+                    for (const tab of this._tabs) {
+                        toggleClass(
+                            tab.value.element,
+                            'dv-tab--shifting',
+                            false
+                        );
+                    }
+                }
+            };
+
+            this._tabsList.addEventListener('transitionend', onTransitionEnd);
+        });
     }
 }

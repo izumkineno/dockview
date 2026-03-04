@@ -20,6 +20,15 @@ const components = {
 
 const Component = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
+    const [tabReorderMode, setTabReorderMode] = React.useState<
+        'swap' | 'slide'
+    >('swap');
+
+    const toggleMode = () => {
+        const next = tabReorderMode === 'swap' ? 'slide' : 'swap';
+        setTabReorderMode(next);
+        api?.updateOptions({ tabReorderMode: next });
+    };
 
     React.useEffect(() => {
         if (!api) {
@@ -70,12 +79,28 @@ const Component = (props: { theme?: string }) => {
     };
 
     return (
-        <DockviewReact
-            className={`${props.theme || 'dockview-theme-abyss'}`}
-            onReady={onReady}
-            components={components}
-            disableFloatingGroups={true}
-        />
+        <div
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
+            <div style={{ padding: '4px 8px' }}>
+                <button onClick={toggleMode}>
+                    {`tabReorderMode: '${tabReorderMode}'`}
+                </button>
+            </div>
+            <div style={{ flexGrow: 1 }}>
+                <DockviewReact
+                    className={`${props.theme || 'dockview-theme-abyss'}`}
+                    onReady={onReady}
+                    components={components}
+                    tabReorderMode={tabReorderMode}
+                    disableFloatingGroups={true}
+                />
+            </div>
+        </div>
     );
 };
 

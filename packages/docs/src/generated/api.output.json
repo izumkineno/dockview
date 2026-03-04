@@ -22788,6 +22788,26 @@
                 "code": ""
             },
             {
+                "name": "onDragEnd",
+                "code": "Event<DragEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "DragEvent",
+                            "source": "typescript"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDragStart",
                 "code": "Event<DragEvent>",
                 "kind": "property",
@@ -25355,6 +25375,37 @@
                 },
                 "flags": {
                     "isOptional": true
+                }
+            },
+            {
+                "name": "tabReorderMode",
+                "code": "'swap' | 'slide'",
+                "kind": "property",
+                "type": {
+                    "type": "union",
+                    "value": "'swap' | 'slide'"
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Controls tab reorder behavior during drag-and-drop.\n\n- `'swap'` (default): Tabs swap positions instantly on drop (classic behavior).\n- `'slide'`: Tabs slide smoothly to make room for the dragged tab (Chrome-like)."
+                        }
+                    ],
+                    "blockTags": [
+                        {
+                            "tag": "@default",
+                            "content": [
+                                {
+                                    "kind": "code",
+                                    "text": "```ts\n'swap'\n```"
+                                }
+                            ]
+                        }
+                    ]
                 }
             },
             {

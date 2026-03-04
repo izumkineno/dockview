@@ -61,6 +61,9 @@ export class Tab extends CompositeDisposable {
     private readonly _onDragStart = new Emitter<DragEvent>();
     readonly onDragStart = this._onDragStart.event;
 
+    private readonly _onDragEnd = new Emitter<DragEvent>();
+    readonly onDragEnd = this._onDragEnd.event;
+
     readonly onWillShowOverlay: Event<WillShowOverlayEvent>;
 
     public get element(): HTMLElement {
@@ -100,6 +103,12 @@ export class Tab extends CompositeDisposable {
                 const data = getPanelData();
 
                 if (data && this.accessor.id === data.viewId) {
+                    if (
+                        this.accessor.options.tabReorderMode === 'slide' &&
+                        data.groupId === this.group.id
+                    ) {
+                        return false;
+                    }
                     return true;
                 }
 
@@ -118,6 +127,7 @@ export class Tab extends CompositeDisposable {
             this._onPointDown,
             this._onDropped,
             this._onDragStart,
+            this._onDragEnd,
             this.dragHandler.onDragStart((event) => {
                 if (event.dataTransfer) {
                     const style = getComputedStyle(this.element);
@@ -136,7 +146,20 @@ export class Tab extends CompositeDisposable {
                         x: 30,
                     });
                 }
+
                 this._onDragStart.fire(event);
+
+                if (this.accessor.options.tabReorderMode === 'slide') {
+                    // Delay collapse to next frame so the browser
+                    // captures the full drag image first
+                    requestAnimationFrame(() => {
+                        toggleClass(this.element, 'dv-tab--dragging', true);
+                    });
+                }
+            }),
+            addDisposableListener(this._element, 'dragend', (event) => {
+                toggleClass(this.element, 'dv-tab--dragging', false);
+                this._onDragEnd.fire(event);
             }),
             this.dragHandler,
             addDisposableListener(this._element, 'pointerdown', (event) => {

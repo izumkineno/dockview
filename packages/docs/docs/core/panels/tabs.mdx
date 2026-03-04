@@ -439,6 +439,62 @@ const api = createDockview(parentElement, {
     typescript={attachNativeDockview}
 />
 
+## Tab Reorder Mode
+
+Controls how tabs animate when reordered via drag-and-drop.
+
+| Mode | Behavior |
+|------|----------|
+| `'swap'` (default) | Tabs swap positions instantly on drop — the original behavior. |
+| `'slide'` | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
+
+<CodeRunner id="dockview/tabview" height={300}/>
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['tabReorderMode']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+  <DocRef declaration="IDockviewVueProps" methods={['tabReorderMode']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+  <DocRef declaration="IDockviewAngularProps" methods={['tabReorderMode']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['tabReorderMode']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='React'>
+```tsx
+return <DockviewReactComponent tabReorderMode="slide" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```html
+<dockview-vue tabReorderMode="slide" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```html
+<dv-dockview [tabReorderMode]="'slide'"></dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+```ts
+const api = createDockview(parentElement, {
+    tabReorderMode: 'slide',
+});
+
+// or toggle at runtime
+api.updateOptions({ tabReorderMode: 'slide' });
+```
+</FrameworkSpecific>
+
 ## Tab Height
 
 Tab height can be controlled through CSS.

@@ -78,6 +78,13 @@ export interface DockviewOptions {
      * This is only applied to the tab header section. Defaults to `custom`.
      */
     scrollbars?: 'native' | 'custom';
+    /**
+     * Controls tab reorder behavior during drag-and-drop.
+     *
+     * - `'swap'` (default): Tabs swap positions instantly on drop (classic behavior).
+     * - `'slide'`: Tabs slide smoothly to make room for the dragged tab (Chrome-like).
+     */
+    tabReorderMode?: 'swap' | 'slide';
 }
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
@@ -127,6 +134,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
+        tabReorderMode: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
