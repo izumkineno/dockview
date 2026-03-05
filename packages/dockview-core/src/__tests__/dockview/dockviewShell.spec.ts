@@ -572,6 +572,81 @@ describe('ShellManager', () => {
         });
     });
 
+    describe('gap adjustment', () => {
+        test('gap is added to collapsedSize for all four positions', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                {
+                    top: { id: 'top' },
+                    bottom: { id: 'bottom' },
+                    left: { id: 'left' },
+                    right: { id: 'right' },
+                },
+                {
+                    top: makeGroup(),
+                    bottom: makeGroup(),
+                    left: makeGroup(),
+                    right: makeGroup(),
+                },
+                layoutGrid,
+                10,
+                44
+            );
+            // gap=10, defaultCollapsedSize=44 → each collapsedSize = 44 + 10 = 54
+            expect((shell as any)._topView.collapsedSize).toBe(54);
+            expect((shell as any)._bottomView.collapsedSize).toBe(54);
+            expect((shell as any)._leftView.collapsedSize).toBe(54);
+            expect((shell as any)._rightView.collapsedSize).toBe(54);
+            shell.dispose();
+        });
+
+        test('gap is added on top of per-panel collapsedSize override', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left', collapsedSize: 60 } },
+                { left: makeGroup() },
+                layoutGrid,
+                10,
+                44
+            );
+            // per-panel 60 + gap 10 = 70
+            expect((shell as any)._leftView.collapsedSize).toBe(70);
+            shell.dispose();
+        });
+
+        test('gap is added to minimumSize when explicitly provided', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left', minimumSize: 100 } },
+                { left: makeGroup() },
+                layoutGrid,
+                10,
+                44
+            );
+            // minimumSize 100 + gap 10 = 110
+            expect((shell as any)._leftView.minimumSize).toBe(110);
+            shell.dispose();
+        });
+
+        test('minimumSize is NOT adjusted when not explicitly provided', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { top: { id: 'top' } },
+                { top: makeGroup() },
+                layoutGrid,
+                10,
+                44
+            );
+            // no minimumSize provided → defaults to collapsedSize + 50 = 54 + 50 = 104
+            expect((shell as any)._topView.minimumSize).toBe(104);
+            shell.dispose();
+        });
+    });
+
     describe('dispose', () => {
         test('removes the shell element from the container', () => {
             const shell = makeShell(

@@ -321,6 +321,19 @@ class MiddleColumnView implements IView, IDisposable {
     }
 }
 
+function adjustedOpts(
+    base: FixedPanelViewOptions,
+    defaultCollapsed: number,
+    gap: number
+): FixedPanelViewOptions {
+    const effectiveCollapsed = (base.collapsedSize ?? defaultCollapsed) + gap;
+    const result: FixedPanelViewOptions = { ...base, collapsedSize: effectiveCollapsed };
+    if (base.minimumSize !== undefined) {
+        result.minimumSize = base.minimumSize + gap;
+    }
+    return result;
+}
+
 export class ShellManager implements IDisposable {
     private readonly _outerSplitview: Splitview;
     private readonly _middleColumn: MiddleColumnView;
@@ -361,42 +374,49 @@ export class ShellManager implements IDisposable {
         // Create fixed panel views for configured positions.
         // Per-panel collapsedSize takes precedence; theme defaultCollapsedSize
         // is used as the fallback so spaced themes can show their taller header.
+        // When gap > 0 the splitview inserts a margin between views, so each
+        // FixedPanelView's collapsed/minimum sizes are increased by gap so the
+        // panel "owns" the adjacent gap space rather than leaving it floating.
         if (config.top && groups.top) {
             this._topView = new FixedPanelView(
-                {
-                    collapsedSize: defaultCollapsedSize,
-                    ...config.top,
-                },
+                adjustedOpts(
+                    { collapsedSize: defaultCollapsedSize, ...config.top },
+                    defaultCollapsedSize,
+                    gap
+                ),
                 groups.top,
                 'vertical'
             );
         }
         if (config.bottom && groups.bottom) {
             this._bottomView = new FixedPanelView(
-                {
-                    collapsedSize: defaultCollapsedSize,
-                    ...config.bottom,
-                },
+                adjustedOpts(
+                    { collapsedSize: defaultCollapsedSize, ...config.bottom },
+                    defaultCollapsedSize,
+                    gap
+                ),
                 groups.bottom,
                 'vertical'
             );
         }
         if (config.left && groups.left) {
             this._leftView = new FixedPanelView(
-                {
-                    collapsedSize: defaultCollapsedSize,
-                    ...config.left,
-                },
+                adjustedOpts(
+                    { collapsedSize: defaultCollapsedSize, ...config.left },
+                    defaultCollapsedSize,
+                    gap
+                ),
                 groups.left,
                 'horizontal'
             );
         }
         if (config.right && groups.right) {
             this._rightView = new FixedPanelView(
-                {
-                    collapsedSize: defaultCollapsedSize,
-                    ...config.right,
-                },
+                adjustedOpts(
+                    { collapsedSize: defaultCollapsedSize, ...config.right },
+                    defaultCollapsedSize,
+                    gap
+                ),
                 groups.right,
                 'horizontal'
             );
