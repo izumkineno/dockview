@@ -451,47 +451,47 @@ Controls how tabs animate when reordered via drag-and-drop.
 <CodeRunner id="dockview/tabview" height={300}/>
 
 <FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['tabReorderMode']} />
+  <DocRef declaration="IDockviewReactProps" methods={['smoothTabReorder']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['tabReorderMode']} />
+  <DocRef declaration="IDockviewVueProps" methods={['smoothTabReorder']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['tabReorderMode']} />
+  <DocRef declaration="IDockviewAngularProps" methods={['smoothTabReorder']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions" methods={['tabReorderMode']} />
+  <DocRef declaration="DockviewComponentOptions" methods={['smoothTabReorder']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='React'>
 ```tsx
-return <DockviewReactComponent tabReorderMode="slide" />
+return <DockviewReactComponent smoothTabReorder={true} />
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
 ```html
-<dockview-vue tabReorderMode="slide" />
+<dockview-vue :smoothTabReorder="true" />
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
 ```html
-<dv-dockview [tabReorderMode]="'slide'"></dv-dockview>
+<dv-dockview [smoothTabReorder]="true"></dv-dockview>
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
 ```ts
 const api = createDockview(parentElement, {
-    tabReorderMode: 'slide',
+    smoothTabReorder: true,
 });
 
 // or toggle at runtime
-api.updateOptions({ tabReorderMode: 'slide' });
+api.updateOptions({ smoothTabReorder: true });
 ```
 </FrameworkSpecific>
 

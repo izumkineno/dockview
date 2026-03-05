@@ -85,7 +85,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() locked?: boolean;
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
-    @Input() tabReorderMode?: 'swap' | 'slide';
+    @Input() smoothTabReorder?: boolean;
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();

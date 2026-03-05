@@ -25378,12 +25378,12 @@
                 }
             },
             {
-                "name": "tabReorderMode",
-                "code": "'swap' | 'slide'",
+                "name": "smoothTabReorder",
+                "code": "boolean",
                 "kind": "property",
                 "type": {
-                    "type": "union",
-                    "value": "'swap' | 'slide'"
+                    "type": "intrinsic",
+                    "value": "boolean"
                 },
                 "flags": {
                     "isOptional": true
@@ -25392,7 +25392,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "Controls tab reorder behavior during drag-and-drop.\n\n- `'swap'` (default): Tabs swap positions instantly on drop (classic behavior).\n- `'slide'`: Tabs slide smoothly to make room for the dragged tab (Chrome-like)."
+                            "text": "When `true`, tabs animate smoothly during drag-and-drop reorder: tabs slide apart to reveal the insertion gap, then animate to their final positions on drop (Chrome-like behavior).\n\nDefaults to `false`."
                         }
                     ],
                     "blockTags": [
@@ -25401,7 +25401,7 @@
                             "content": [
                                 {
                                     "kind": "code",
-                                    "text": "```ts\n'swap'\n```"
+                                    "text": "```ts\nfalse\n```"
                                 }
                             ]
                         }
