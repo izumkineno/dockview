@@ -60,6 +60,11 @@ const DemoPage: React.FC = () => {
                     dockview.dev
                 </a>
                 <div className={styles.spacer} />
+                <div className={styles.tip}>
+                    <span className={styles.kbd}>Shift</span>
+                    <span>+ click a tab to float it</span>
+                </div>
+                <div className={styles.spacer} />
                 <a
                     href={CODESANDBOX_URL}
                     target="_blank"

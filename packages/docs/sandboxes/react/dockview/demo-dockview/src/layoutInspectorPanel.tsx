@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { DockviewApi } from 'dockview';
+import { usePanelColors } from './panelTheme';
 
 export const LayoutInspectorPanel: React.FC<{ api: DockviewApi }> = ({
     api,
 }) => {
+    const c = usePanelColors();
     const [json, setJson] = React.useState<string>('');
     const [copied, setCopied] = React.useState(false);
 
@@ -34,7 +36,7 @@ export const LayoutInspectorPanel: React.FC<{ api: DockviewApi }> = ({
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                background: '#0d1117',
+                background: c.bg,
             }}
         >
             <div
@@ -43,13 +45,13 @@ export const LayoutInspectorPanel: React.FC<{ api: DockviewApi }> = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '6px 10px',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: `1px solid ${c.border}`,
                     flexShrink: 0,
                 }}
             >
                 <span
                     style={{
-                        color: 'rgba(255,255,255,0.4)',
+                        color: c.textMuted,
                         fontSize: 11,
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em',
@@ -62,8 +64,8 @@ export const LayoutInspectorPanel: React.FC<{ api: DockviewApi }> = ({
                     onClick={onCopy}
                     style={{
                         background: 'none',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        color: copied ? '#4ade80' : 'rgba(255,255,255,0.4)',
+                        border: `1px solid ${c.border}`,
+                        color: copied ? c.green : c.textMuted,
                         cursor: 'pointer',
                         padding: '2px 8px',
                         borderRadius: 3,
@@ -79,9 +81,10 @@ export const LayoutInspectorPanel: React.FC<{ api: DockviewApi }> = ({
                 <pre
                     style={{
                         margin: 0,
+                        background: 'transparent',
                         fontSize: 11,
                         fontFamily: 'monospace',
-                        color: '#94a3b8',
+                        color: c.textSecondary,
                         lineHeight: 1.6,
                         whiteSpace: 'pre-wrap',
                         wordBreak: 'break-all',

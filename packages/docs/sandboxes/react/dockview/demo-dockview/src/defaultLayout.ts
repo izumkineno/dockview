@@ -6,7 +6,7 @@ export const nextId = (() => {
 })();
 
 export function defaultConfig(api: DockviewApi) {
-    // Left column: watchlist (top) + price alert (bottom)
+    // Left column: watchlist (full height)
     const watchlist = api.addPanel({
         id: 'watchlist',
         component: 'watchlist',
@@ -14,12 +14,13 @@ export function defaultConfig(api: DockviewApi) {
         renderer: 'always',
     });
 
+    // Price alert as a floating panel
     const pricealert = api.addPanel({
         id: 'pricealert',
         component: 'pricealert',
         title: 'Price Alert',
         renderer: 'always',
-        position: { referencePanel: watchlist, direction: 'below' },
+        floating: { width: 360, height: 280, x: 60, y: 140 },
     });
 
     // Centre column: order book (top) + orders grid (bottom)

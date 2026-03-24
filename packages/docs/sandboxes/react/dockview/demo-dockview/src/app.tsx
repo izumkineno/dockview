@@ -23,6 +23,7 @@ import { MarketProvider } from './marketContext';
 import { WatchlistPanel } from './watchlistPanel';
 import { PriceAlertPanel } from './priceAlertPanel';
 import { PositionSummaryPanel } from './positionSummaryPanel';
+import { PanelColorsContext, DARK_COLORS, LIGHT_COLORS, LIGHT_THEME_NAMES } from './panelTheme';
 
 export const ApiContext = React.createContext<DockviewApi | undefined>(
     undefined
@@ -361,6 +362,11 @@ const DockviewDemo = (props: {
         setApi(event.api);
     };
 
+    const panelColors = React.useMemo(
+        () => LIGHT_THEME_NAMES.has(props.theme?.name ?? '') ? LIGHT_COLORS : DARK_COLORS,
+        [props.theme]
+    );
+
     const [watermark, setWatermark] = React.useState<boolean>(false);
 
     const [gapCheck, setGapCheck] = React.useState<boolean>(false);
@@ -407,6 +413,7 @@ const DockviewDemo = (props: {
                         display: 'flex',
                     }}
                 >
+                    <PanelColorsContext.Provider value={panelColors}>
                     <MarketProvider>
                     <ApiContext.Provider value={api}>
                     <DebugContext.Provider value={debug}>
@@ -429,6 +436,7 @@ const DockviewDemo = (props: {
                     </DebugContext.Provider>
                     </ApiContext.Provider>
                     </MarketProvider>
+                    </PanelColorsContext.Provider>
                 </div>
 
                 {showLogs && (

@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useMarket, useMarketDispatch, WATCHLIST_TICKERS } from './marketContext';
+import { usePanelColors } from './panelTheme';
 
-const Sparkline: React.FC<{ prices: number[]; up: boolean }> = ({ prices, up }) => {
+const Sparkline: React.FC<{ prices: number[]; color: string }> = ({ prices, color }) => {
     const W = 56;
     const H = 20;
     if (prices.length < 2) return <div style={{ width: W, height: H }} />;
@@ -20,7 +21,7 @@ const Sparkline: React.FC<{ prices: number[]; up: boolean }> = ({ prices, up }) 
             <polyline
                 points={pts}
                 fill="none"
-                stroke={up ? '#4ade80' : '#f87171'}
+                stroke={color}
                 strokeWidth="1.5"
                 strokeLinejoin="round"
             />
@@ -37,6 +38,7 @@ function fmtPrice(price: number): string {
 }
 
 export const WatchlistPanel: React.FC = () => {
+    const c = usePanelColors();
     const { selectedTicker, prices, histories } = useMarket();
     const dispatch = useMarketDispatch();
 
@@ -46,8 +48,8 @@ export const WatchlistPanel: React.FC = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                background: '#0d1117',
-                color: '#e2e8f0',
+                background: c.bg,
+                color: c.text,
                 userSelect: 'none',
             }}
         >
@@ -55,11 +57,11 @@ export const WatchlistPanel: React.FC = () => {
             <div
                 style={{
                     padding: '6px 12px',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: `1px solid ${c.border}`,
                     fontSize: 11,
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
-                    color: 'rgba(255,255,255,0.4)',
+                    color: c.textMuted,
                     flexShrink: 0,
                 }}
             >
@@ -74,10 +76,10 @@ export const WatchlistPanel: React.FC = () => {
                     gap: '0 8px',
                     padding: '4px 12px',
                     fontSize: 10,
-                    color: 'rgba(255,255,255,0.25)',
+                    color: c.textFaint,
                     textTransform: 'uppercase',
                     letterSpacing: '0.06em',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    borderBottom: `1px solid ${c.borderSubtle}`,
                     flexShrink: 0,
                 }}
             >
@@ -109,19 +111,19 @@ export const WatchlistPanel: React.FC = () => {
                                 padding: '7px 12px',
                                 alignItems: 'center',
                                 cursor: 'pointer',
-                                borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                borderBottom: `1px solid ${c.bgSubtle}`,
                                 background: isSelected
-                                    ? 'rgba(96,165,250,0.08)'
+                                    ? c.blueBg
                                     : 'transparent',
                                 borderLeft: isSelected
-                                    ? '2px solid #60a5fa'
+                                    ? `2px solid ${c.blue}`
                                     : '2px solid transparent',
                                 transition: 'background 0.15s',
                             }}
                             onMouseEnter={(e) => {
                                 if (!isSelected) {
                                     (e.currentTarget as HTMLElement).style.background =
-                                        'rgba(255,255,255,0.04)';
+                                        c.surface;
                                 }
                             }}
                             onMouseLeave={(e) => {
@@ -136,7 +138,7 @@ export const WatchlistPanel: React.FC = () => {
                                     fontSize: 12,
                                     fontWeight: 600,
                                     fontFamily: 'monospace',
-                                    color: isSelected ? '#60a5fa' : '#e2e8f0',
+                                    color: isSelected ? c.blue : c.text,
                                 }}
                             >
                                 {ticker}
@@ -145,7 +147,7 @@ export const WatchlistPanel: React.FC = () => {
                                 style={{
                                     fontSize: 12,
                                     fontFamily: 'monospace',
-                                    color: up ? '#4ade80' : '#f87171',
+                                    color: up ? c.green : c.red,
                                     textAlign: 'right',
                                 }}
                             >
@@ -155,14 +157,14 @@ export const WatchlistPanel: React.FC = () => {
                                 style={{
                                     fontSize: 11,
                                     fontFamily: 'monospace',
-                                    color: up ? '#4ade80' : '#f87171',
+                                    color: up ? c.green : c.red,
                                     textAlign: 'right',
                                     minWidth: 52,
                                 }}
                             >
                                 {up ? '+' : ''}{changePct.toFixed(2)}%
                             </span>
-                            <Sparkline prices={history.slice(-30)} up={up} />
+                            <Sparkline prices={history.slice(-30)} color={up ? c.green : c.red} />
                         </div>
                     );
                 })}

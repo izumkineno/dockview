@@ -9,6 +9,7 @@ import {
     RowClickedEvent,
 } from 'ag-grid-community';
 import { useMarket, useMarketDispatch, WATCHLIST_TICKERS } from './marketContext';
+import { usePanelColors } from './panelTheme';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -119,6 +120,7 @@ const watchlistSet = new Set<string>(WATCHLIST_TICKERS);
 
 export const OrdersPanel: React.FC = () => {
     const { selectedTicker } = useMarket();
+    const { isDark } = usePanelColors();
     const dispatch = useMarketDispatch();
 
     const onRowClicked = React.useCallback(
@@ -143,7 +145,7 @@ export const OrdersPanel: React.FC = () => {
 
     return (
         <div
-            className="ag-theme-alpine-dark"
+            className={isDark ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}
             style={{ height: '100%', width: '100%' }}
         >
             <AgGridReact

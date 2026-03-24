@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { DockviewApi } from 'dockview';
+import { usePanelColors } from './panelTheme';
 
 type LogEntry = {
     id: number;
@@ -22,6 +23,7 @@ const categoryColor = (cat: LogEntry['category']) => {
 };
 
 export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
+    const c = usePanelColors();
     const [entries, setEntries] = React.useState<LogEntry[]>([]);
 
     React.useEffect(() => {
@@ -75,7 +77,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                background: '#0d1117',
+                background: c.bg,
                 fontFamily: 'monospace',
                 fontSize: 12,
             }}
@@ -86,14 +88,14 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '6px 10px',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: `1px solid ${c.border}`,
                     flexShrink: 0,
                 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <span
                         style={{
-                            color: 'rgba(255,255,255,0.4)',
+                            color: c.textMuted,
                             fontSize: 11,
                             textTransform: 'uppercase',
                             letterSpacing: '0.08em',
@@ -120,8 +122,8 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                     onClick={() => setEntries([])}
                     style={{
                         background: 'none',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        color: 'rgba(255,255,255,0.4)',
+                        border: `1px solid ${c.border}`,
+                        color: c.textMuted,
                         cursor: 'pointer',
                         padding: '2px 8px',
                         borderRadius: 3,
@@ -137,7 +139,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                     <div
                         style={{
                             padding: '12px 10px',
-                            color: 'rgba(255,255,255,0.2)',
+                            color: c.textFaint,
                             fontSize: 11,
                         }}
                     >
@@ -156,7 +158,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                     >
                         <span
                             style={{
-                                color: 'rgba(255,255,255,0.25)',
+                                color: c.textFaint,
                                 fontSize: 10,
                                 flexShrink: 0,
                                 width: 72,
@@ -176,7 +178,7 @@ export const EventLogPanel: React.FC<{ api: DockviewApi }> = ({ api }) => {
                         >
                             {entry.category}
                         </span>
-                        <span style={{ color: '#e2e8f0' }}>{entry.text}</span>
+                        <span style={{ color: c.text }}>{entry.text}</span>
                     </div>
                 ))}
             </div>

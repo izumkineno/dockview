@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useMarket, Trade } from './marketContext';
+import { usePanelColors } from './panelTheme';
 
 const TICK = 0.5;
 const LEVELS = 14;
@@ -45,7 +46,7 @@ function fmtPrice(price: number): string {
     });
 }
 
-const Sparkline: React.FC<{ prices: number[] }> = ({ prices }) => {
+const Sparkline: React.FC<{ prices: number[]; color: string }> = ({ prices, color }) => {
     const W = 100;
     const H = 32;
     if (prices.length < 2) return <div style={{ width: W, height: H }} />;
@@ -59,13 +60,12 @@ const Sparkline: React.FC<{ prices: number[] }> = ({ prices }) => {
             return `${x.toFixed(1)},${y.toFixed(1)}`;
         })
         .join(' ');
-    const up = prices[prices.length - 1] >= prices[0];
     return (
         <svg width={W} height={H}>
             <polyline
                 points={pts}
                 fill="none"
-                stroke={up ? '#4ade80' : '#f87171'}
+                stroke={color}
                 strokeWidth="1.5"
                 strokeLinejoin="round"
             />
@@ -78,9 +78,10 @@ const BookRow: React.FC<{
     maxTotal: number;
     side: 'ask' | 'bid';
 }> = ({ level, maxTotal, side }) => {
+    const c = usePanelColors();
     const pct = Math.min((level.total / maxTotal) * 100, 100);
-    const color = side === 'ask' ? '#f87171' : '#4ade80';
-    const bg = side === 'ask' ? 'rgba(248,113,113,0.10)' : 'rgba(74,222,128,0.10)';
+    const color = side === 'ask' ? c.red : c.green;
+    const bg = side === 'ask' ? c.redBg : c.greenBg;
     return (
         <div
             style={{
@@ -105,10 +106,10 @@ const BookRow: React.FC<{
                 }}
             />
             <span style={{ flex: 1, color, zIndex: 1 }}>{fmtPrice(level.price)}</span>
-            <span style={{ width: 72, textAlign: 'right', zIndex: 1, color: '#cbd5e1' }}>
+            <span style={{ width: 72, textAlign: 'right', zIndex: 1, color: c.textSecondary }}>
                 {level.size.toFixed(4)}
             </span>
-            <span style={{ width: 72, textAlign: 'right', zIndex: 1, color: 'rgba(255,255,255,0.35)' }}>
+            <span style={{ width: 72, textAlign: 'right', zIndex: 1, color: c.textFaint }}>
                 {level.total.toFixed(3)}
             </span>
         </div>
@@ -116,12 +117,13 @@ const BookRow: React.FC<{
 };
 
 const TradeRow: React.FC<{ trade: Trade }> = ({ trade }) => {
+    const c = usePanelColors();
     const [flash, setFlash] = React.useState(true);
     React.useEffect(() => {
         const t = setTimeout(() => setFlash(false), 400);
         return () => clearTimeout(t);
     }, []);
-    const color = trade.side === 'buy' ? '#4ade80' : '#f87171';
+    const color = trade.side === 'buy' ? c.green : c.red;
     const time = new Date(trade.ms).toISOString().slice(11, 19);
     return (
         <div
@@ -132,15 +134,15 @@ const TradeRow: React.FC<{ trade: Trade }> = ({ trade }) => {
                 fontFamily: 'monospace',
                 background: flash
                     ? trade.side === 'buy'
-                        ? 'rgba(74,222,128,0.07)'
-                        : 'rgba(248,113,113,0.07)'
+                        ? c.greenBg
+                        : c.redBg
                     : 'transparent',
                 transition: 'background 0.4s',
             }}
         >
-            <span style={{ color: 'rgba(255,255,255,0.3)', width: 64 }}>{time}</span>
+            <span style={{ color: c.textMuted, width: 64 }}>{time}</span>
             <span style={{ color, flex: 1 }}>{fmtPrice(trade.price)}</span>
-            <span style={{ width: 70, textAlign: 'right', color: '#cbd5e1' }}>
+            <span style={{ width: 70, textAlign: 'right', color: c.textSecondary }}>
                 {trade.size.toFixed(4)}
             </span>
         </div>
@@ -148,6 +150,7 @@ const TradeRow: React.FC<{ trade: Trade }> = ({ trade }) => {
 };
 
 export const OrderBookPanel: React.FC = () => {
+    const c = usePanelColors();
     const { selectedTicker, prices, histories, trades } = useMarket();
     const mid = prices[selectedTicker] ?? 0;
     const history = histories[selectedTicker] ?? [mid];
@@ -167,7 +170,7 @@ export const OrderBookPanel: React.FC = () => {
     const open = history[0] ?? mid;
     const change = mid - open;
     const changePct = ((change / open) * 100).toFixed(2);
-    const changeColor = change >= 0 ? '#4ade80' : '#f87171';
+    const changeColor = change >= 0 ? c.green : c.red;
 
     const decimals = mid > 1000 ? 1 : 2;
 
@@ -177,8 +180,8 @@ export const OrderBookPanel: React.FC = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                background: '#0b0f19',
-                color: '#e2e8f0',
+                background: c.bgAlt,
+                color: c.text,
                 overflow: 'hidden',
                 userSelect: 'none',
             }}
@@ -187,7 +190,7 @@ export const OrderBookPanel: React.FC = () => {
             <div
                 style={{
                     padding: '10px 12px 8px',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: `1px solid ${c.border}`,
                     display: 'flex',
                     alignItems: 'flex-start',
                     gap: 12,
@@ -195,7 +198,7 @@ export const OrderBookPanel: React.FC = () => {
                 }}
             >
                 <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>
+                    <div style={{ fontSize: 11, color: c.textMuted, marginBottom: 2 }}>
                         {selectedTicker}
                     </div>
                     <div
@@ -203,7 +206,7 @@ export const OrderBookPanel: React.FC = () => {
                             fontSize: 22,
                             fontWeight: 700,
                             fontFamily: 'monospace',
-                            color: priceUp ? '#4ade80' : '#f87171',
+                            color: priceUp ? c.green : c.red,
                             letterSpacing: '-0.5px',
                             lineHeight: 1,
                         }}
@@ -214,7 +217,7 @@ export const OrderBookPanel: React.FC = () => {
                         {change >= 0 ? '+' : ''}{fmt(change, decimals)} ({change >= 0 ? '+' : ''}{changePct}%)
                     </div>
                 </div>
-                <Sparkline prices={history} />
+                <Sparkline prices={history} color={priceUp ? c.green : c.red} />
             </div>
 
             {/* Column headers */}
@@ -223,8 +226,8 @@ export const OrderBookPanel: React.FC = () => {
                     display: 'flex',
                     padding: '4px 8px',
                     fontSize: 10,
-                    color: 'rgba(255,255,255,0.3)',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    color: c.textMuted,
+                    borderBottom: `1px solid ${c.borderSubtle}`,
                     flexShrink: 0,
                     fontFamily: 'monospace',
                 }}
@@ -257,15 +260,15 @@ export const OrderBookPanel: React.FC = () => {
                     padding: '3px 8px',
                     fontSize: 10,
                     fontFamily: 'monospace',
-                    color: 'rgba(255,255,255,0.3)',
-                    background: 'rgba(255,255,255,0.03)',
-                    borderTop: '1px solid rgba(255,255,255,0.05)',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    color: c.textMuted,
+                    background: c.bgSubtle,
+                    borderTop: `1px solid ${c.borderSubtle}`,
+                    borderBottom: `1px solid ${c.borderSubtle}`,
                     flexShrink: 0,
                 }}
             >
                 <span>Spread</span>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>${fmt(spread)}</span>
+                <span style={{ color: c.text }}>${fmt(spread)}</span>
                 <span>({((spread / mid) * 100).toFixed(3)}%)</span>
             </div>
 
@@ -277,12 +280,12 @@ export const OrderBookPanel: React.FC = () => {
             </div>
 
             {/* Recent trades */}
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }}>
+            <div style={{ borderTop: `1px solid ${c.border}`, flexShrink: 0 }}>
                 <div
                     style={{
                         padding: '4px 8px 2px',
                         fontSize: 10,
-                        color: 'rgba(255,255,255,0.3)',
+                        color: c.textMuted,
                         display: 'flex',
                         fontFamily: 'monospace',
                     }}

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useMarket } from './marketContext';
 import { rowData } from './ordersPanel';
+import { usePanelColors } from './panelTheme';
 
 function fmtPrice(price: number): string {
     const decimals = price > 1000 ? 1 : 2;
@@ -15,6 +16,7 @@ function fmtCcy(n: number): string {
 }
 
 export const PositionSummaryPanel: React.FC = () => {
+    const c = usePanelColors();
     const { selectedTicker, prices } = useMarket();
 
     // Normalize ticker for matching: watchlist uses e.g. 'AAPL', orders use 'AAPL'
@@ -48,21 +50,21 @@ export const PositionSummaryPanel: React.FC = () => {
 
     const rows: { label: string; value: React.ReactNode }[] = currentPrice !== null && stats !== null
         ? [
-              { label: 'Current price', value: <span style={{ color: '#e2e8f0' }}>{fmtPrice(currentPrice)}</span> },
-              { label: 'Filled orders', value: <span style={{ color: '#e2e8f0' }}>{filledOrders.length}</span> },
-              { label: 'Buy qty', value: <span style={{ color: '#4ade80' }}>{stats.buyQty.toLocaleString()}</span> },
-              { label: 'Sell qty', value: <span style={{ color: '#f87171' }}>{stats.sellQty.toLocaleString()}</span> },
-              { label: 'Net position', value: <span style={{ color: stats.netQty >= 0 ? '#4ade80' : '#f87171' }}>{stats.netQty >= 0 ? '+' : ''}{stats.netQty.toLocaleString()}</span> },
-              { label: 'Avg buy price', value: <span style={{ color: '#94a3b8' }}>${fmtCcy(stats.avgBuy)}</span> },
-              { label: 'Avg sell price', value: <span style={{ color: '#94a3b8' }}>${fmtCcy(stats.avgSell)}</span> },
-              { label: 'Total notional', value: <span style={{ color: '#94a3b8' }}>${fmtCcy(stats.totalNotional)}</span> },
+              { label: 'Current price', value: <span style={{ color: c.text }}>{fmtPrice(currentPrice)}</span> },
+              { label: 'Filled orders', value: <span style={{ color: c.text }}>{filledOrders.length}</span> },
+              { label: 'Buy qty', value: <span style={{ color: c.green }}>{stats.buyQty.toLocaleString()}</span> },
+              { label: 'Sell qty', value: <span style={{ color: c.red }}>{stats.sellQty.toLocaleString()}</span> },
+              { label: 'Net position', value: <span style={{ color: stats.netQty >= 0 ? c.green : c.red }}>{stats.netQty >= 0 ? '+' : ''}{stats.netQty.toLocaleString()}</span> },
+              { label: 'Avg buy price', value: <span style={{ color: c.textSecondary }}>${fmtCcy(stats.avgBuy)}</span> },
+              { label: 'Avg sell price', value: <span style={{ color: c.textSecondary }}>${fmtCcy(stats.avgSell)}</span> },
+              { label: 'Total notional', value: <span style={{ color: c.textSecondary }}>${fmtCcy(stats.totalNotional)}</span> },
               {
                   label: 'Unrealised P&L',
                   value: stats.pnl !== null
-                      ? <span style={{ color: stats.pnl >= 0 ? '#4ade80' : '#f87171', fontWeight: 700 }}>
+                      ? <span style={{ color: stats.pnl >= 0 ? c.green : c.red, fontWeight: 700 }}>
                             {stats.pnl >= 0 ? '+' : ''}${fmtCcy(stats.pnl)}
                         </span>
-                      : <span style={{ color: 'rgba(255,255,255,0.2)' }}>—</span>,
+                      : <span style={{ color: c.textFaint }}>—</span>,
               },
           ]
         : [];
@@ -73,8 +75,8 @@ export const PositionSummaryPanel: React.FC = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                background: '#0d1117',
-                color: '#e2e8f0',
+                background: c.bg,
+                color: c.text,
                 fontFamily: 'monospace',
                 fontSize: 12,
             }}
@@ -83,23 +85,23 @@ export const PositionSummaryPanel: React.FC = () => {
             <div
                 style={{
                     padding: '6px 12px',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: `1px solid ${c.border}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     flexShrink: 0,
                 }}
             >
-                <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.4)' }}>
+                <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: c.textMuted }}>
                     Positions
                 </span>
-                <span style={{ color: '#60a5fa', fontSize: 11 }}>{selectedTicker}</span>
+                <span style={{ color: c.blue, fontSize: 11 }}>{selectedTicker}</span>
             </div>
 
             {/* Content */}
             <div style={{ flex: 1, overflow: 'auto' }}>
                 {stats === null || currentPrice === null ? (
-                    <div style={{ padding: '20px 14px', color: 'rgba(255,255,255,0.2)', fontSize: 11, textAlign: 'center' }}>
+                    <div style={{ padding: '20px 14px', color: c.textFaint, fontSize: 11, textAlign: 'center' }}>
                         {currentPrice === null
                             ? 'No price data for selected ticker'
                             : `No filled orders for ${selectedTicker}`}
@@ -111,14 +113,14 @@ export const PositionSummaryPanel: React.FC = () => {
                             <div
                                 style={{
                                     padding: '14px',
-                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    borderBottom: `1px solid ${c.borderSubtle}`,
                                     flexShrink: 0,
                                 }}
                             >
-                                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                <div style={{ fontSize: 10, color: c.textMuted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                                     Unrealised P&amp;L
                                 </div>
-                                <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.5px', color: stats.pnl >= 0 ? '#4ade80' : '#f87171' }}>
+                                <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.5px', color: stats.pnl >= 0 ? c.green : c.red }}>
                                     {stats.pnl >= 0 ? '+' : ''}${fmtCcy(stats.pnl)}
                                 </div>
                             </div>
@@ -133,10 +135,10 @@ export const PositionSummaryPanel: React.FC = () => {
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     padding: '5px 14px',
-                                    borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                    borderBottom: `1px solid ${c.borderSubtle}`,
                                 }}
                             >
-                                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>{row.label}</span>
+                                <span style={{ color: c.textMuted, fontSize: 11 }}>{row.label}</span>
                                 <span>{row.value}</span>
                             </div>
                         ))}

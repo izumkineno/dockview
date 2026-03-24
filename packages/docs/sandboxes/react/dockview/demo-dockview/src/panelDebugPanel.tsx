@@ -1,14 +1,16 @@
 import * as React from 'react';
 import { IDockviewPanelProps } from 'dockview';
 import { usePanelApiMetadata } from './debugPanel';
+import { usePanelColors } from './panelTheme';
 
 const ValueDisplay: React.FC<{ value: unknown }> = ({ value }) => {
+    const c = usePanelColors();
     if (value === undefined || value === null) {
-        return <span style={{ color: 'rgba(255,255,255,0.2)' }}>—</span>;
+        return <span style={{ color: c.textFaint }}>—</span>;
     }
     if (typeof value === 'boolean') {
         return (
-            <span style={{ color: value ? '#4ade80' : '#f87171' }}>
+            <span style={{ color: value ? c.green : c.red }}>
                 {String(value)}
             </span>
         );
@@ -17,47 +19,48 @@ const ValueDisplay: React.FC<{ value: unknown }> = ({ value }) => {
         const obj = value as Record<string, unknown>;
         if ('height' in obj && 'width' in obj) {
             return (
-                <span style={{ color: '#94a3b8' }}>
+                <span style={{ color: c.textSecondary }}>
                     {obj.width as number}
-                    <span style={{ color: 'rgba(255,255,255,0.2)', margin: '0 2px' }}>×</span>
+                    <span style={{ color: c.textFaint, margin: '0 2px' }}>×</span>
                     {obj.height as number}
                 </span>
             );
         }
         if ('type' in obj) {
-            return <span style={{ color: '#60a5fa' }}>{String(obj.type)}</span>;
+            return <span style={{ color: c.blue }}>{String(obj.type)}</span>;
         }
         return (
-            <span style={{ color: '#94a3b8' }}>{JSON.stringify(value)}</span>
+            <span style={{ color: c.textSecondary }}>{JSON.stringify(value)}</span>
         );
     }
-    return <span style={{ color: '#e2e8f0' }}>{String(value)}</span>;
+    return <span style={{ color: c.text }}>{String(value)}</span>;
 };
 
-const CountBadge: React.FC<{ count: number }> = ({ count }) => (
-    <span
-        style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 20,
-            height: 16,
-            padding: '0 5px',
-            borderRadius: 8,
-            fontSize: 10,
-            fontFamily: 'monospace',
-            background:
-                count > 0
-                    ? 'rgba(96, 165, 250, 0.15)'
-                    : 'rgba(255,255,255,0.05)',
-            color: count > 0 ? '#60a5fa' : 'rgba(255,255,255,0.2)',
-        }}
-    >
-        {count}
-    </span>
-);
+const CountBadge: React.FC<{ count: number }> = ({ count }) => {
+    const c = usePanelColors();
+    return (
+        <span
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: 20,
+                height: 16,
+                padding: '0 5px',
+                borderRadius: 8,
+                fontSize: 10,
+                fontFamily: 'monospace',
+                background: count > 0 ? c.blueBg : c.bgSubtle,
+                color: count > 0 ? c.blue : c.textFaint,
+            }}
+        >
+            {count}
+        </span>
+    );
+};
 
 export const PanelDebugPanel: React.FC<IDockviewPanelProps> = (props) => {
+    const c = usePanelColors();
     const metadata = usePanelApiMetadata(props.api);
 
     const rows: {
@@ -83,8 +86,8 @@ export const PanelDebugPanel: React.FC<IDockviewPanelProps> = (props) => {
                     }
                     style={{
                         background: 'none',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        color: 'rgba(255,255,255,0.4)',
+                        border: `1px solid ${c.border}`,
+                        color: c.textMuted,
                         cursor: 'pointer',
                         padding: '1px 6px',
                         borderRadius: 3,
@@ -111,8 +114,8 @@ export const PanelDebugPanel: React.FC<IDockviewPanelProps> = (props) => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                background: '#0d1117',
-                color: '#e2e8f0',
+                background: c.bg,
+                color: c.text,
                 fontFamily: 'monospace',
                 fontSize: 12,
             }}
@@ -121,7 +124,7 @@ export const PanelDebugPanel: React.FC<IDockviewPanelProps> = (props) => {
             <div
                 style={{
                     padding: '8px 12px',
-                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    borderBottom: `1px solid ${c.border}`,
                     flexShrink: 0,
                     display: 'flex',
                     alignItems: 'baseline',
@@ -133,12 +136,12 @@ export const PanelDebugPanel: React.FC<IDockviewPanelProps> = (props) => {
                         fontSize: 11,
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em',
-                        color: 'rgba(255,255,255,0.4)',
+                        color: c.textMuted,
                     }}
                 >
                     Panel API
                 </span>
-                <span style={{ color: '#60a5fa', fontSize: 11 }}>
+                <span style={{ color: c.blue, fontSize: 11 }}>
                     {props.api.id}
                 </span>
             </div>
@@ -150,9 +153,9 @@ export const PanelDebugPanel: React.FC<IDockviewPanelProps> = (props) => {
                     gridTemplateColumns: '1fr auto auto',
                     gap: '0 12px',
                     padding: '5px 12px',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    borderBottom: `1px solid ${c.borderSubtle}`,
                     fontSize: 10,
-                    color: 'rgba(255,255,255,0.25)',
+                    color: c.textFaint,
                     textTransform: 'uppercase',
                     letterSpacing: '0.06em',
                     flexShrink: 0,
@@ -174,10 +177,10 @@ export const PanelDebugPanel: React.FC<IDockviewPanelProps> = (props) => {
                             gap: '0 12px',
                             padding: '5px 12px',
                             alignItems: 'center',
-                            borderBottom: '1px solid rgba(255,255,255,0.03)',
+                            borderBottom: `1px solid ${c.borderSubtle}`,
                         }}
                     >
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>
+                        <span style={{ color: c.textMuted }}>
                             {row.key}
                         </span>
                         <div

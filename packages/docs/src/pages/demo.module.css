@@ -53,3 +53,29 @@
     background: var(--ifm-hover-overlay);
     text-decoration: none;
 }
+
+.tip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75em;
+    color: var(--ifm-navbar-link-color);
+    white-space: nowrap;
+    user-select: none;
+    background: var(--ifm-hover-overlay);
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 6px;
+    padding: 3px 10px 3px 8px;
+}
+
+.kbd {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--ifm-toc-border-color);
+    background: var(--ifm-hover-overlay);
+    font-family: monospace;
+    font-size: 1em;
+    line-height: 1.7;
+}
