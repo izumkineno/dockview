@@ -78,8 +78,8 @@ export class FixedPanelView implements IView {
 
     private _isCollapsed = false;
     private _lastExpandedSize: number;
-    private readonly _collapsedSize: number;
-    private readonly _expandedMinimumSize: number;
+    private _collapsedSize: number;
+    private _expandedMinimumSize: number;
     private readonly _expandedMaximumSize: number;
 
     get minimumSize(): number {
@@ -168,6 +168,19 @@ export class FixedPanelView implements IView {
 
     setVisible(_visible: boolean): void {
         // visibility is managed by the parent splitview
+    }
+
+    /**
+     * Apply new effective collapsed and expanded-minimum sizes after a theme
+     * or gap change. The caller (ShellManager) is responsible for computing
+     * the correct values from the original config and the new gap.
+     */
+    updateCollapsedSize(
+        newCollapsedSize: number,
+        newExpandedMinimumSize: number
+    ): void {
+        this._collapsedSize = newCollapsedSize;
+        this._expandedMinimumSize = newExpandedMinimumSize;
     }
 
     dispose(): void {
@@ -315,6 +328,10 @@ class MiddleColumnView implements IView, IDisposable {
         }
     }
 
+    updateMargin(gap: number): void {
+        this._splitview.margin = gap;
+    }
+
     dispose(): void {
         this._onDidChange.dispose();
         this._splitview.dispose();
@@ -324,12 +341,12 @@ class MiddleColumnView implements IView, IDisposable {
 function adjustedOpts(
     base: FixedPanelViewOptions,
     defaultCollapsed: number,
-    gap: number
+    gapAdd: number
 ): FixedPanelViewOptions {
-    const effectiveCollapsed = (base.collapsedSize ?? defaultCollapsed) + gap;
+    const effectiveCollapsed = (base.collapsedSize ?? defaultCollapsed) + gapAdd;
     const result: FixedPanelViewOptions = { ...base, collapsedSize: effectiveCollapsed };
     if (base.minimumSize !== undefined) {
-        result.minimumSize = base.minimumSize + gap;
+        result.minimumSize = base.minimumSize + gapAdd;
     }
     return result;
 }
@@ -351,6 +368,11 @@ export class ShellManager implements IDisposable {
 
     private readonly _disposables = new CompositeDisposable();
 
+    // Retained for updateTheme() recalculations.
+    private readonly _config: FixedPanelsConfig;
+    private _currentWidth = 0;
+    private _currentHeight = 0;
+
     constructor(
         container: HTMLElement,
         dockviewElement: HTMLElement,
@@ -365,24 +387,30 @@ export class ShellManager implements IDisposable {
         gap = 0,
         defaultCollapsedSize = 35
     ) {
+        this._config = config;
         this._shellElement = document.createElement('div');
         this._shellElement.className = 'dv-shell';
         this._shellElement.style.height = '100%';
         this._shellElement.style.width = '100%';
         container.appendChild(this._shellElement);
 
-        // Create fixed panel views for configured positions.
-        // Per-panel collapsedSize takes precedence; theme defaultCollapsedSize
-        // is used as the fallback so spaced themes can show their taller header.
-        // When gap > 0 the splitview inserts a margin between views, so each
-        // FixedPanelView's collapsed/minimum sizes are increased by gap so the
-        // panel "owns" the adjacent gap space rather than leaving it floating.
+        // The splitview margin creates gaps by reducing each view's DOM size by
+        // gap * (n-1) / n, where n is the number of visible views. To make the
+        // collapsed panel's DOM exactly equal to the tab bar height/width, we
+        // add gap * (n-1) / n (not the full gap) to collapsedSize.
+        // n is computed from configured (not runtime-visible) views; this is a
+        // good approximation since hidden panels only cause ~gap/n² drift.
+        const outerN = 1 + (config.left ? 1 : 0) + (config.right ? 1 : 0);
+        const innerN = 1 + (config.top ? 1 : 0) + (config.bottom ? 1 : 0);
+        const outerGapAdd = outerN > 1 ? (gap * (outerN - 1)) / outerN : 0;
+        const innerGapAdd = innerN > 1 ? (gap * (innerN - 1)) / innerN : 0;
+
         if (config.top && groups.top) {
             this._topView = new FixedPanelView(
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.top },
                     defaultCollapsedSize,
-                    gap
+                    innerGapAdd
                 ),
                 groups.top,
                 'vertical'
@@ -393,7 +421,7 @@ export class ShellManager implements IDisposable {
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.bottom },
                     defaultCollapsedSize,
-                    gap
+                    innerGapAdd
                 ),
                 groups.bottom,
                 'vertical'
@@ -404,7 +432,7 @@ export class ShellManager implements IDisposable {
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.left },
                     defaultCollapsedSize,
-                    gap
+                    outerGapAdd
                 ),
                 groups.left,
                 'horizontal'
@@ -415,7 +443,7 @@ export class ShellManager implements IDisposable {
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.right },
                     defaultCollapsedSize,
-                    gap
+                    outerGapAdd
                 ),
                 groups.right,
                 'horizontal'
@@ -483,6 +511,8 @@ export class ShellManager implements IDisposable {
         this._disposables.addDisposables(
             watchElementResize(this._shellElement, (entry) => {
                 const { width, height } = entry.contentRect;
+                this._currentWidth = width;
+                this._currentHeight = height;
                 this.layout(width, height);
             }),
             this._outerSplitview,
@@ -504,6 +534,88 @@ export class ShellManager implements IDisposable {
     layout(width: number, height: number): void {
         // Outer splitview is HORIZONTAL: layout(size=width, orthogonalSize=height)
         this._outerSplitview.layout(width, height);
+    }
+
+    /**
+     * Called when the active theme changes. Updates splitview margins and
+     * fixed-panel collapsed sizes so the layout matches the new theme's gap
+     * and tab-strip dimensions.
+     */
+    updateTheme(gap: number, defaultCollapsedSize: number): void {
+        const outerN =
+            1 +
+            (this._config.left ? 1 : 0) +
+            (this._config.right ? 1 : 0);
+        const innerN =
+            1 +
+            (this._config.top ? 1 : 0) +
+            (this._config.bottom ? 1 : 0);
+        const outerGapAdd =
+            outerN > 1 ? (gap * (outerN - 1)) / outerN : 0;
+        const innerGapAdd =
+            innerN > 1 ? (gap * (innerN - 1)) / innerN : 0;
+
+        // Update splitview margins.
+        this._outerSplitview.margin = gap;
+        this._middleColumn.updateMargin(gap);
+
+        // Recompute effective collapsed sizes from the original config values.
+        // ShellManager owns the config, so it computes the final adjusted values
+        // and passes them directly to each view.
+        const updateView = (
+            view: FixedPanelView,
+            baseCfg: FixedPanelViewOptions,
+            gapAdd: number
+        ) => {
+            const baseCS = baseCfg.collapsedSize ?? defaultCollapsedSize;
+            const newCS = baseCS + gapAdd;
+            const baseMS = baseCfg.minimumSize;
+            const newMS =
+                baseMS !== undefined ? baseMS + gapAdd : newCS + 50;
+            view.updateCollapsedSize(newCS, newMS);
+        };
+
+        if (this._topView && this._config.top) {
+            updateView(this._topView, this._config.top, innerGapAdd);
+        }
+        if (this._bottomView && this._config.bottom) {
+            updateView(this._bottomView, this._config.bottom, innerGapAdd);
+        }
+        if (this._leftView && this._config.left) {
+            updateView(this._leftView, this._config.left, outerGapAdd);
+        }
+        if (this._rightView && this._config.right) {
+            updateView(this._rightView, this._config.right, outerGapAdd);
+        }
+
+        // Resize currently-collapsed panels to their new collapsed size so
+        // they immediately match the new theme's tab-strip dimensions.
+        if (this._leftView?.isCollapsed && this._leftIndex !== undefined) {
+            this._outerSplitview.resizeView(
+                this._leftIndex,
+                this._leftView.collapsedSize
+            );
+        }
+        if (this._rightView?.isCollapsed && this._rightIndex !== undefined) {
+            this._outerSplitview.resizeView(
+                this._rightIndex,
+                this._rightView.collapsedSize
+            );
+        }
+        if (this._topView?.isCollapsed) {
+            this._middleColumn.resizeView('top', this._topView.collapsedSize);
+        }
+        if (this._bottomView?.isCollapsed) {
+            this._middleColumn.resizeView(
+                'bottom',
+                this._bottomView.collapsedSize
+            );
+        }
+
+        // Re-run layout with the current shell dimensions.
+        if (this._currentWidth > 0 && this._currentHeight > 0) {
+            this.layout(this._currentWidth, this._currentHeight);
+        }
     }
 
     hasFixedPanel(position: FixedPanelPosition): boolean {

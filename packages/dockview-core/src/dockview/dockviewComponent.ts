@@ -3149,6 +3149,10 @@ export class DockviewComponent
         this._shellThemeClassnames?.setClassNames(theme.className);
 
         this.gridview.margin = theme.gap ?? 0;
+        this._shellManager?.updateTheme(
+            theme.gap ?? 0,
+            theme.fixedPanelCollapsedSize ?? 35
+        );
 
         switch (theme.dndOverlayMounting) {
             case 'absolute':

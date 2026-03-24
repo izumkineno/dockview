@@ -3,12 +3,19 @@
     --dv-border-radius: 20px;
     --dv-tab-margin: 0.5rem 0.25rem;
     --dv-tabs-and-actions-container-height: 44px;
-    // The splitview gap added to left/right collapsedSize so the panel
-    // "owns" the adjacent gap space. Used in CSS to widen the header.
-    --dv-panel-gap: 10px;
 
     --dv-border-radius: 20px;
     box-sizing: border-box;
+
+    // When the dockview element is embedded inside a shell, the shell wrapper
+    // already carries the outer padding. Suppress it on the inner dockview
+    // element so the layout engine's pixel-exact gridview dimensions don't
+    // overflow the content box and trigger scrollbars.
+    // .dv-shell is only present in shell mode, so this rule is inherently
+    // scoped to shell mode and has no effect on standalone (non-shell) usage.
+    .dv-shell & {
+        padding: 0;
+    }
 
     .dv-resize-container:has(> .dv-groupview) {
         border-radius: 8px;
@@ -78,29 +85,4 @@
         }
     }
 
-    // Collapsed left/right fixed panels have their collapsedSize increased by
-    // --dv-panel-gap so the panel element absorbs the adjacent splitview gap.
-    // Extend the header to fill the full panel element width, then add inner
-    // padding equal to --dv-panel-gap so the tab pills remain at their
-    // intended visual width (--dv-tabs-and-actions-container-height - margins).
-    .dv-fixed-panel.dv-fixed-collapsed {
-        .dv-tabs-and-actions-container.dv-groupview-header-vertical {
-            width: calc(
-                var(--dv-tabs-and-actions-container-height) +
-                    var(--dv-panel-gap, 0px)
-            );
-        }
-
-        &.dv-groupview-header-left {
-            .dv-tabs-and-actions-container.dv-groupview-header-vertical {
-                padding-right: var(--dv-panel-gap, 0px);
-            }
-        }
-
-        &.dv-groupview-header-right {
-            .dv-tabs-and-actions-container.dv-groupview-header-vertical {
-                padding-left: var(--dv-panel-gap, 0px);
-            }
-        }
-    }
 }

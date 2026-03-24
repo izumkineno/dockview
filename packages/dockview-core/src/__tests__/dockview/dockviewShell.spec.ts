@@ -574,6 +574,7 @@ describe('ShellManager', () => {
 
     describe('gap adjustment', () => {
         test('gap is added to collapsedSize for all four positions', () => {
+            // All 4 positions: outerN=3, innerN=3, gapAdd = gap*(n-1)/n = 10*2/3
             const shell = new ShellManager(
                 container,
                 dockviewElement,
@@ -593,15 +594,16 @@ describe('ShellManager', () => {
                 10,
                 44
             );
-            // gap=10, defaultCollapsedSize=44 → each collapsedSize = 44 + 10 = 54
-            expect((shell as any)._topView.collapsedSize).toBe(54);
-            expect((shell as any)._bottomView.collapsedSize).toBe(54);
-            expect((shell as any)._leftView.collapsedSize).toBe(54);
-            expect((shell as any)._rightView.collapsedSize).toBe(54);
+            const expected = 44 + (10 * 2) / 3; // ≈ 50.667
+            expect((shell as any)._topView.collapsedSize).toBeCloseTo(expected, 5);
+            expect((shell as any)._bottomView.collapsedSize).toBeCloseTo(expected, 5);
+            expect((shell as any)._leftView.collapsedSize).toBeCloseTo(expected, 5);
+            expect((shell as any)._rightView.collapsedSize).toBeCloseTo(expected, 5);
             shell.dispose();
         });
 
         test('gap is added on top of per-panel collapsedSize override', () => {
+            // Only left configured: outerN=2, outerGapAdd = 10*1/2 = 5
             const shell = new ShellManager(
                 container,
                 dockviewElement,
@@ -611,12 +613,13 @@ describe('ShellManager', () => {
                 10,
                 44
             );
-            // per-panel 60 + gap 10 = 70
-            expect((shell as any)._leftView.collapsedSize).toBe(70);
+            // per-panel 60 + gapAdd 5 = 65
+            expect((shell as any)._leftView.collapsedSize).toBe(65);
             shell.dispose();
         });
 
         test('gap is added to minimumSize when explicitly provided', () => {
+            // Only left configured: outerN=2, outerGapAdd = 5
             const shell = new ShellManager(
                 container,
                 dockviewElement,
@@ -626,12 +629,13 @@ describe('ShellManager', () => {
                 10,
                 44
             );
-            // minimumSize 100 + gap 10 = 110
-            expect((shell as any)._leftView.minimumSize).toBe(110);
+            // minimumSize 100 + gapAdd 5 = 105
+            expect((shell as any)._leftView.minimumSize).toBe(105);
             shell.dispose();
         });
 
         test('minimumSize is NOT adjusted when not explicitly provided', () => {
+            // Only top configured: innerN=2, innerGapAdd = 10*1/2 = 5
             const shell = new ShellManager(
                 container,
                 dockviewElement,
@@ -641,8 +645,8 @@ describe('ShellManager', () => {
                 10,
                 44
             );
-            // no minimumSize provided → defaults to collapsedSize + 50 = 54 + 50 = 104
-            expect((shell as any)._topView.minimumSize).toBe(104);
+            // no minimumSize provided → defaults to collapsedSize + 50 = 49 + 50 = 99
+            expect((shell as any)._topView.minimumSize).toBe(99);
             shell.dispose();
         });
     });
@@ -657,6 +661,188 @@ describe('ShellManager', () => {
             expect(container.contains(shellEl)).toBe(true);
             shell.dispose();
             expect(container.contains(shellEl)).toBe(false);
+        });
+    });
+
+    describe('updateTheme', () => {
+        test('switching gap=0→10 updates collapsed sizes on all panels', () => {
+            // Only left+right configured: outerN=3, outerGapAdd = 10*2/3
+            // Only bottom configured:     innerN=2, innerGapAdd = 10*1/2 = 5
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                {
+                    left: { id: 'left' },
+                    right: { id: 'right' },
+                    bottom: { id: 'bottom' },
+                },
+                {
+                    left: makeGroup(),
+                    right: makeGroup(),
+                    bottom: makeGroup(),
+                },
+                layoutGrid,
+                0,   // initial gap
+                35   // initial defaultCollapsedSize
+            );
+
+            shell.updateTheme(10, 44);
+
+            const outerGapAdd = (10 * 2) / 3; // ≈ 6.667
+            const innerGapAdd = (10 * 1) / 2; // = 5
+
+            expect((shell as any)._leftView.collapsedSize).toBeCloseTo(
+                44 + outerGapAdd,
+                5
+            );
+            expect((shell as any)._rightView.collapsedSize).toBeCloseTo(
+                44 + outerGapAdd,
+                5
+            );
+            expect((shell as any)._bottomView.collapsedSize).toBe(44 + innerGapAdd);
+            shell.dispose();
+        });
+
+        test('switching gap=10→0 resets collapsed sizes to the default', () => {
+            // Only left configured: outerN=2, outerGapAdd = 10*1/2 = 5 initially
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left' } },
+                { left: makeGroup() },
+                layoutGrid,
+                10,  // initial gap
+                44   // initial defaultCollapsedSize
+            );
+
+            // initial collapsed size = 44 + 5 = 49
+            expect((shell as any)._leftView.collapsedSize).toBe(49);
+
+            shell.updateTheme(0, 35);
+
+            // After theme switch: gap=0 → gapAdd=0, defaultCollapsedSize=35
+            expect((shell as any)._leftView.collapsedSize).toBe(35);
+            shell.dispose();
+        });
+
+        test('per-panel collapsedSize override is respected after updateTheme', () => {
+            // Only left with explicit collapsedSize; outerN=2
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left', collapsedSize: 40 } },
+                { left: makeGroup() },
+                layoutGrid,
+                0,
+                35
+            );
+
+            shell.updateTheme(10, 44); // outerGapAdd = 10*1/2 = 5
+
+            // original collapsedSize=40, gapAdd=5 → 45
+            expect((shell as any)._leftView.collapsedSize).toBe(45);
+            shell.dispose();
+        });
+
+        test('per-panel minimumSize is adjusted by new gapAdd after updateTheme', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left', minimumSize: 100 } },
+                { left: makeGroup() },
+                layoutGrid,
+                0,
+                35
+            );
+
+            shell.updateTheme(10, 44); // outerGapAdd = 5
+
+            // minimumSize 100 + gapAdd 5 = 105
+            expect((shell as any)._leftView.minimumSize).toBe(105);
+            shell.dispose();
+        });
+
+        test('minimumSize defaults to collapsedSize+50 when not provided after updateTheme', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { bottom: { id: 'bottom' } },
+                { bottom: makeGroup() },
+                layoutGrid,
+                0,
+                35
+            );
+
+            shell.updateTheme(10, 44); // innerN=2, innerGapAdd=5
+
+            // collapsedSize = 44+5 = 49, minimumSize = 49+50 = 99
+            expect((shell as any)._bottomView.collapsedSize).toBe(49);
+            expect((shell as any)._bottomView.minimumSize).toBe(99);
+            shell.dispose();
+        });
+
+        test('updateTheme updates the outer splitview margin', () => {
+            const shell = makeShell(
+                { left: { id: 'left' } },
+                { left: makeGroup() }
+            );
+
+            shell.updateTheme(10, 44);
+
+            expect((shell as any)._outerSplitview.margin).toBe(10);
+            shell.dispose();
+        });
+
+        test('updateTheme updates the inner (middle column) splitview margin', () => {
+            const shell = makeShell(
+                { bottom: { id: 'bottom' } },
+                { bottom: makeGroup() }
+            );
+
+            shell.updateTheme(10, 44);
+
+            expect(
+                (shell as any)._middleColumn._splitview.margin
+            ).toBe(10);
+            shell.dispose();
+        });
+
+        test('a currently-collapsed panel keeps isCollapsed=true after updateTheme', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left' } },
+                { left: makeGroup() },
+                layoutGrid,
+                0,
+                35
+            );
+            shell.setFixedPanelCollapsed('left', true);
+            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
+
+            shell.updateTheme(10, 44);
+
+            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
+            shell.dispose();
+        });
+
+        test('updateTheme is idempotent — calling twice with same args gives same result', () => {
+            const shell = new ShellManager(
+                container,
+                dockviewElement,
+                { left: { id: 'left' } },
+                { left: makeGroup() },
+                layoutGrid,
+                0,
+                35
+            );
+
+            shell.updateTheme(10, 44);
+            const sizeAfterFirst = (shell as any)._leftView.collapsedSize;
+
+            shell.updateTheme(10, 44);
+            expect((shell as any)._leftView.collapsedSize).toBe(sizeAfterFirst);
+            shell.dispose();
         });
     });
 });
