@@ -343,8 +343,12 @@ function adjustedOpts(
     defaultCollapsed: number,
     gapAdd: number
 ): FixedPanelViewOptions {
-    const effectiveCollapsed = (base.collapsedSize ?? defaultCollapsed) + gapAdd;
-    const result: FixedPanelViewOptions = { ...base, collapsedSize: effectiveCollapsed };
+    const effectiveCollapsed =
+        (base.collapsedSize ?? defaultCollapsed) + gapAdd;
+    const result: FixedPanelViewOptions = {
+        ...base,
+        collapsedSize: effectiveCollapsed,
+    };
     if (base.minimumSize !== undefined) {
         result.minimumSize = base.minimumSize + gapAdd;
     }
@@ -543,17 +547,11 @@ export class ShellManager implements IDisposable {
      */
     updateTheme(gap: number, defaultCollapsedSize: number): void {
         const outerN =
-            1 +
-            (this._config.left ? 1 : 0) +
-            (this._config.right ? 1 : 0);
+            1 + (this._config.left ? 1 : 0) + (this._config.right ? 1 : 0);
         const innerN =
-            1 +
-            (this._config.top ? 1 : 0) +
-            (this._config.bottom ? 1 : 0);
-        const outerGapAdd =
-            outerN > 1 ? (gap * (outerN - 1)) / outerN : 0;
-        const innerGapAdd =
-            innerN > 1 ? (gap * (innerN - 1)) / innerN : 0;
+            1 + (this._config.top ? 1 : 0) + (this._config.bottom ? 1 : 0);
+        const outerGapAdd = outerN > 1 ? (gap * (outerN - 1)) / outerN : 0;
+        const innerGapAdd = innerN > 1 ? (gap * (innerN - 1)) / innerN : 0;
 
         // Update splitview margins.
         this._outerSplitview.margin = gap;
@@ -570,8 +568,7 @@ export class ShellManager implements IDisposable {
             const baseCS = baseCfg.collapsedSize ?? defaultCollapsedSize;
             const newCS = baseCS + gapAdd;
             const baseMS = baseCfg.minimumSize;
-            const newMS =
-                baseMS !== undefined ? baseMS + gapAdd : newCS + 50;
+            const newMS = baseMS !== undefined ? baseMS + gapAdd : newCS + 50;
             view.updateCollapsedSize(newCS, newMS);
         };
 

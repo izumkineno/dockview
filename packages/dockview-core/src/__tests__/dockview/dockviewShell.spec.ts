@@ -595,10 +595,22 @@ describe('ShellManager', () => {
                 44
             );
             const expected = 44 + (10 * 2) / 3; // ≈ 50.667
-            expect((shell as any)._topView.collapsedSize).toBeCloseTo(expected, 5);
-            expect((shell as any)._bottomView.collapsedSize).toBeCloseTo(expected, 5);
-            expect((shell as any)._leftView.collapsedSize).toBeCloseTo(expected, 5);
-            expect((shell as any)._rightView.collapsedSize).toBeCloseTo(expected, 5);
+            expect((shell as any)._topView.collapsedSize).toBeCloseTo(
+                expected,
+                5
+            );
+            expect((shell as any)._bottomView.collapsedSize).toBeCloseTo(
+                expected,
+                5
+            );
+            expect((shell as any)._leftView.collapsedSize).toBeCloseTo(
+                expected,
+                5
+            );
+            expect((shell as any)._rightView.collapsedSize).toBeCloseTo(
+                expected,
+                5
+            );
             shell.dispose();
         });
 
@@ -682,8 +694,8 @@ describe('ShellManager', () => {
                     bottom: makeGroup(),
                 },
                 layoutGrid,
-                0,   // initial gap
-                35   // initial defaultCollapsedSize
+                0, // initial gap
+                35 // initial defaultCollapsedSize
             );
 
             shell.updateTheme(10, 44);
@@ -699,7 +711,9 @@ describe('ShellManager', () => {
                 44 + outerGapAdd,
                 5
             );
-            expect((shell as any)._bottomView.collapsedSize).toBe(44 + innerGapAdd);
+            expect((shell as any)._bottomView.collapsedSize).toBe(
+                44 + innerGapAdd
+            );
             shell.dispose();
         });
 
@@ -711,8 +725,8 @@ describe('ShellManager', () => {
                 { left: { id: 'left' } },
                 { left: makeGroup() },
                 layoutGrid,
-                10,  // initial gap
-                44   // initial defaultCollapsedSize
+                10, // initial gap
+                44 // initial defaultCollapsedSize
             );
 
             // initial collapsed size = 44 + 5 = 49
@@ -801,9 +815,7 @@ describe('ShellManager', () => {
 
             shell.updateTheme(10, 44);
 
-            expect(
-                (shell as any)._middleColumn._splitview.margin
-            ).toBe(10);
+            expect((shell as any)._middleColumn._splitview.margin).toBe(10);
             shell.dispose();
         });
 
