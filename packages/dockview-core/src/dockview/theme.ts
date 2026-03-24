@@ -41,6 +41,9 @@ export const themeLight: DockviewTheme = {
 export const themeVisualStudio: DockviewTheme = {
     name: 'visualStudio',
     className: 'dockview-theme-vs',
+    // --dv-tabs-and-actions-container-height is 20px, but the VS theme applies
+    // box-sizing: content-box + border-bottom: 2px, so the rendered strip is 22px.
+    fixedPanelCollapsedSize: 22,
 };
 
 export const themeAbyss: DockviewTheme = {
