@@ -11,11 +11,22 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import './app.scss';
 import { defaultConfig } from './defaultLayout';
-import { GridActions } from './gridActions';
-import { PanelActions } from './panelActions';
-import { GroupActions } from './groupActions';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
 import { Table, usePanelApiMetadata } from './debugPanel';
+import { SettingsModal } from './settingsModal';
+import { OrdersPanel } from './ordersPanel';
+import { OrderBookPanel } from './orderBookPanel';
+import { EventLogPanel } from './eventLogPanel';
+import { LayoutInspectorPanel } from './layoutInspectorPanel';
+import { PanelDebugPanel } from './panelDebugPanel';
+import { MarketProvider } from './marketContext';
+import { WatchlistPanel } from './watchlistPanel';
+import { PriceAlertPanel } from './priceAlertPanel';
+import { PositionSummaryPanel } from './positionSummaryPanel';
+
+export const ApiContext = React.createContext<DockviewApi | undefined>(
+    undefined
+);
 
 const DebugContext = React.createContext<boolean>(false);
 
@@ -141,6 +152,45 @@ const components = {
             />
         );
     },
+    vesselfinder: (props: IDockviewPanelProps) => {
+        const srcdoc = `<!DOCTYPE html>
+<html><head><style>html,body{margin:0;padding:0;height:100%;overflow:hidden;}</style></head>
+<body>
+<script>var width="100%";var height="100%";var latitude="51.5";var longitude="-0.12";var zoom="8";var names=false;</script>
+<script src="https://www.vesselfinder.com/aismap.js"></script>
+</body></html>`;
+        return (
+            <iframe
+                onMouseDown={() => {
+                    if (!props.api.isActive) {
+                        props.api.setActive();
+                    }
+                }}
+                srcDoc={srcdoc}
+                style={{
+                    border: 'none',
+                    width: '100%',
+                    height: '100%',
+                }}
+            />
+        );
+    },
+    debuginfo: (props: IDockviewPanelProps) => <PanelDebugPanel {...props} />,
+    orders: () => <OrdersPanel />,
+    orderbook: () => <OrderBookPanel />,
+    watchlist: () => <WatchlistPanel />,
+    pricealert: () => <PriceAlertPanel />,
+    positionsummary: () => <PositionSummaryPanel />,
+    eventlog: () => {
+        const api = React.useContext(ApiContext);
+        if (!api) return null;
+        return <EventLogPanel api={api} />;
+    },
+    layoutinspector: () => {
+        const api = React.useContext(ApiContext);
+        if (!api) return null;
+        return <LayoutInspectorPanel api={api} />;
+    },
     shadowDom: (props: IDockviewPanelProps) => {
         const ref = React.useRef<HTMLDivElement>(null);
 
@@ -196,7 +246,11 @@ const WatermarkComponent = () => {
 
 const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
 
-const DockviewDemo = (props: { theme?: DockviewTheme }) => {
+const DockviewDemo = (props: {
+    theme?: DockviewTheme;
+    showSettings?: boolean;
+    onCloseSettings?: () => void;
+}) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
     >([]);
@@ -293,18 +347,6 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
         ];
 
         const loadLayout = () => {
-            const state = localStorage.getItem('dv-demo-state');
-
-            if (state) {
-                try {
-                    api.fromJSON(JSON.parse(state));
-                    return;
-                } catch {
-                    localStorage.removeItem('dv-demo-state');
-                }
-                return;
-            }
-
             defaultConfig(api);
         };
 
@@ -345,81 +387,12 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
-                padding: '8px',
                 backgroundColor: 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
                 position: 'relative',
                 ...css,
             }}
         >
-            <div>
-                <GridActions
-                    api={api}
-                    toggleCustomWatermark={() => setWatermark(!watermark)}
-                    hasCustomWatermark={watermark}
-                />
-                {api && (
-                    <PanelActions
-                        api={api}
-                        panels={panels}
-                        activePanel={activePanel}
-                    />
-                )}
-                {api && (
-                    <GroupActions
-                        api={api}
-                        groups={groups}
-                        activeGroup={activeGroup}
-                    />
-                )}
-                {/* <div>
-                    <button
-                        onClick={() => {
-                            setGapCheck(!gapCheck);
-                        }}
-                    >
-                        {gapCheck ? 'Disable Gap Check' : 'Enable Gap Check'}
-                    </button>
-                </div> */}
-            </div>
-            <div
-                className="action-container"
-                style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    padding: '4px',
-                }}
-            >
-                <button
-                    onClick={() => {
-                        setDebug(!debug);
-                    }}
-                >
-                    <span className="material-symbols-outlined">
-                        engineering
-                    </span>
-                </button>
-                {showLogs && (
-                    <button
-                        onClick={() => {
-                            setLogLines([]);
-                        }}
-                    >
-                        <span className="material-symbols-outlined">undo</span>
-                    </button>
-                )}
-                <button
-                    onClick={() => {
-                        setShowLogs(!showLogs);
-                    }}
-                >
-                    <span style={{ paddingRight: '4px' }}>
-                        {`${showLogs ? 'Hide' : 'Show'} Events Log`}
-                    </span>
-                    <span className="material-symbols-outlined">terminal</span>
-                </button>
-            </div>
             <div
                 style={{
                     flexGrow: 1,
@@ -434,6 +407,8 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                         display: 'flex',
                     }}
                 >
+                    <MarketProvider>
+                    <ApiContext.Provider value={api}>
                     <DebugContext.Provider value={debug}>
                         <ThemeContext.Provider value={props.theme}>
                             <DockviewReact
@@ -452,6 +427,8 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                             />
                         </ThemeContext.Provider>
                     </DebugContext.Provider>
+                    </ApiContext.Provider>
+                    </MarketProvider>
                 </div>
 
                 {showLogs && (
@@ -480,7 +457,6 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                                             fontSize: '13px',
                                             display: 'flex',
                                             alignItems: 'center',
-
                                             backgroundColor:
                                                 line.backgroundColor,
                                         }}
@@ -534,6 +510,23 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                     </div>
                 )}
             </div>
+
+            <SettingsModal
+                open={props.showSettings ?? false}
+                onClose={props.onCloseSettings ?? (() => {})}
+                api={api}
+                panels={panels}
+                groups={groups}
+                activePanel={activePanel}
+                activeGroup={activeGroup}
+                hasCustomWatermark={watermark}
+                toggleCustomWatermark={() => setWatermark(!watermark)}
+                debug={debug}
+                onToggleDebug={() => setDebug(!debug)}
+                showLogs={showLogs}
+                onToggleShowLogs={() => setShowLogs(!showLogs)}
+                onClearLogs={() => setLogLines([])}
+            />
         </div>
     );
 };
