@@ -104,7 +104,7 @@ export class Tab extends CompositeDisposable {
 
                 if (data && this.accessor.id === data.viewId) {
                     if (
-                        this.accessor.options.smoothTabReorder &&
+                        this.accessor.options.tabAnimation === 'smooth' &&
                         data.groupId === this.group.id
                     ) {
                         return false;
@@ -149,7 +149,7 @@ export class Tab extends CompositeDisposable {
 
                 this._onDragStart.fire(event);
 
-                if (this.accessor.options.smoothTabReorder) {
+                if (this.accessor.options.tabAnimation === 'smooth') {
                     // Delay collapse to next frame so the browser
                     // captures the full drag image first
                     requestAnimationFrame(() => {

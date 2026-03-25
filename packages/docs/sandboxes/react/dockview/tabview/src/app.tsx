@@ -20,12 +20,12 @@ const components = {
 
 const Component = (props: { theme?: string }) => {
     const [api, setApi] = React.useState<DockviewApi>();
-    const [smoothTabReorder, setSmoothTabReorder] = React.useState(false);
+    const [tabAnimation, setTabAnimation] = React.useState<'smooth' | 'default'>('default');
 
     const toggleMode = () => {
-        const next = !smoothTabReorder;
-        setSmoothTabReorder(next);
-        api?.updateOptions({ smoothTabReorder: next });
+        const next = tabAnimation === 'smooth' ? 'default' : 'smooth';
+        setTabAnimation(next);
+        api?.updateOptions({ tabAnimation: next });
     };
 
     React.useEffect(() => {
@@ -93,7 +93,7 @@ const Component = (props: { theme?: string }) => {
                 }}
             >
                 <button onClick={toggleMode}>
-                    {`smoothTabReorder: ${smoothTabReorder}`}
+                    {`tabAnimation: ${tabAnimation}`}
                 </button>
             </div>
             <div style={{ flexGrow: 1 }}>
@@ -101,7 +101,7 @@ const Component = (props: { theme?: string }) => {
                     className={`${props.theme || 'dockview-theme-abyss'}`}
                     onReady={onReady}
                     components={components}
-                    smoothTabReorder={smoothTabReorder}
+                    tabAnimation={tabAnimation}
                     disableFloatingGroups={true}
                 />
             </div>

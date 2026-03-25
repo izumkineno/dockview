@@ -25378,12 +25378,21 @@
                 }
             },
             {
-                "name": "smoothTabReorder",
-                "code": "boolean",
+                "name": "tabAnimation",
+                "code": "\"smooth\" | \"default\"",
                 "kind": "property",
                 "type": {
-                    "type": "intrinsic",
-                    "value": "boolean"
+                    "type": "union",
+                    "value": [
+                        {
+                            "type": "literal",
+                            "value": "smooth"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "default"
+                        }
+                    ]
                 },
                 "flags": {
                     "isOptional": true
@@ -25392,7 +25401,7 @@
                     "summary": [
                         {
                             "kind": "text",
-                            "text": "When `true`, tabs animate smoothly during drag-and-drop reorder: tabs slide apart to reveal the insertion gap, then animate to their final positions on drop (Chrome-like behavior).\n\nDefaults to `false`."
+                            "text": "Controls tab drag-and-drop reorder animation style.\n\n- `\"smooth\"`: tabs animate smoothly during drag-and-drop reorder — tabs slide apart to reveal the insertion gap, then animate to their final positions on drop (Chrome-like behavior).\n- `\"default\"`: standard tab reorder behavior without animation.\n\nDefaults to `\"default\"`."
                         }
                     ],
                     "blockTags": [
@@ -25401,7 +25410,7 @@
                             "content": [
                                 {
                                     "kind": "code",
-                                    "text": "```ts\nfalse\n```"
+                                    "text": "```ts\n\"default\"\n```"
                                 }
                             ]
                         }

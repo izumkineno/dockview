@@ -79,14 +79,20 @@ export interface DockviewOptions {
      */
     scrollbars?: 'native' | 'custom';
     /**
-     * When `true`, tabs animate smoothly during drag-and-drop reorder:
-     * tabs slide apart to reveal the insertion gap, then animate to their
-     * final positions on drop (Chrome-like behavior).
+     * Controls tab drag-and-drop reorder animation style.
      *
-     * Defaults to `false`.
+     * - `"smooth"`: tabs animate smoothly during drag-and-drop reorder —
+     *   tabs slide apart to reveal the insertion gap, then animate to their
+     *   final positions on drop (Chrome-like behavior).
+     * - `"default"`: standard tab reorder behavior without animation.
+     *
+     * Defaults to `"default"`.
      */
-    smoothTabReorder?: boolean;
+    tabAnimation?: TabAnimation;
 }
+
+export type TabAnimation = 'smooth' | 'default';
+export const DEFAULT_TAB_ANIMATION: TabAnimation = 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
     nativeEvent: DragEvent;
@@ -135,7 +141,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
-        smoothTabReorder: undefined,
+        tabAnimation: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

@@ -7,6 +7,7 @@ import { ITabRenderer } from '../../../../dockview/types';
 import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
 import { fireEvent } from '@testing-library/dom';
 import * as dataTransfer from '../../../../dnd/dataTransfer';
+import { TabAnimation } from '../../../../dockview/options';
 
 function makeDOMRect(
     x: number,
@@ -45,14 +46,14 @@ function createMockPanel(id: string): IDockviewPanel {
 
 function createTabs(
     options: {
-        smoothTabReorder?: boolean;
+        tabAnimation?: TabAnimation;
         disableDnd?: boolean;
     } = {}
 ): { tabs: Tabs; accessor: DockviewComponent; group: DockviewGroupPanel } {
     const accessor = fromPartial<DockviewComponent>({
         id: 'test-accessor',
         options: {
-            smoothTabReorder: options.smoothTabReorder,
+            tabAnimation: options.tabAnimation,
             disableDnd: options.disableDnd,
         },
     });
@@ -117,7 +118,7 @@ describe('tabs - animation', () => {
 
     describe('animation state initialization', () => {
         test('dragstart initializes animation state when animation enabled', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -139,8 +140,8 @@ describe('tabs - animation', () => {
             expect(state.currentInsertionIndex).toBeNull();
         });
 
-        test('dragstart does not initialize state when smoothTabReorder is false', () => {
-            const { tabs } = createTabs({ smoothTabReorder: false });
+        test('dragstart does not initialize state when tabAnimation is default', () => {
+            const { tabs } = createTabs({ tabAnimation: 'default' });
             const panel = createMockPanel('panel-a');
 
             tabs.openPanel(panel, 0);
@@ -168,7 +169,7 @@ describe('tabs - animation', () => {
 
     describe('source tab collapse', () => {
         test('dragstart adds dv-tab--dragging class when animation enabled', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panel = createMockPanel('panel-a');
 
             tabs.openPanel(panel, 0);
@@ -186,8 +187,8 @@ describe('tabs - animation', () => {
             ).toBeTruthy();
         });
 
-        test('dragstart does not add dv-tab--dragging class when smoothTabReorder is false', () => {
-            const { tabs } = createTabs({ smoothTabReorder: false });
+        test('dragstart does not add dv-tab--dragging class when tabAnimation is default', () => {
+            const { tabs } = createTabs({ tabAnimation: 'default' });
             const panel = createMockPanel('panel-a');
 
             tabs.openPanel(panel, 0);
@@ -203,7 +204,7 @@ describe('tabs - animation', () => {
 
     describe('drag cancellation', () => {
         test('dragend resets animation state and removes dragging class', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -231,7 +232,7 @@ describe('tabs - animation', () => {
         });
 
         test('dragend removes shifting classes and transforms from all tabs', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -271,7 +272,7 @@ describe('tabs - animation', () => {
 
     describe('FLIP animation', () => {
         test('runFlipAnimation applies inverse transforms for moved tabs', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');
@@ -313,7 +314,7 @@ describe('tabs - animation', () => {
         });
 
         test('runFlipAnimation removes transforms in requestAnimationFrame', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -343,7 +344,7 @@ describe('tabs - animation', () => {
         });
 
         test('no animation when no tabs moved (drop at original position)', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -373,7 +374,7 @@ describe('tabs - animation', () => {
 
     describe('resetTabTransforms', () => {
         test('clears all transforms and shifting classes', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -403,7 +404,7 @@ describe('tabs - animation', () => {
 
     describe('dispose cleanup', () => {
         test('dispose during active drag clears animation state', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -425,7 +426,7 @@ describe('tabs - animation', () => {
 
     describe('delete cleanup', () => {
         test('deleting source tab during cross-group move clears animation state', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -446,7 +447,7 @@ describe('tabs - animation', () => {
         });
 
         test('deleting non-source tab does not clear animation state', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');
@@ -472,7 +473,7 @@ describe('tabs - animation', () => {
 
     describe('handleDragOver', () => {
         test('updates currentInsertionIndex based on cursor position', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');
@@ -505,7 +506,7 @@ describe('tabs - animation', () => {
 
     describe('dragover gap transforms', () => {
         test('tabs after insertion index shift right by source tab width', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');
@@ -555,7 +556,7 @@ describe('tabs - animation', () => {
         });
 
         test('gap moves when cursor moves to different position', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');
@@ -597,7 +598,7 @@ describe('tabs - animation', () => {
         });
 
         test('same insertion index skips transform update', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -631,7 +632,7 @@ describe('tabs - animation', () => {
 
     describe('cross-group animation (US3)', () => {
         test('external dragover initializes animation state with sourceIndex -1', () => {
-            const { tabs, group } = createTabs({ smoothTabReorder: true });
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -665,8 +666,8 @@ describe('tabs - animation', () => {
             spy.mockRestore();
         });
 
-        test('external dragover does not initialize state when smoothTabReorder is false', () => {
-            const { tabs } = createTabs({ smoothTabReorder: false });
+        test('external dragover does not initialize state when tabAnimation is default', () => {
+            const { tabs } = createTabs({ tabAnimation: 'default' });
             const panel = createMockPanel('panel-a');
             tabs.openPanel(panel, 0);
 
@@ -689,7 +690,7 @@ describe('tabs - animation', () => {
         });
 
         test('external dragover uses average tab width for gap', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -719,7 +720,7 @@ describe('tabs - animation', () => {
         });
 
         test('dragleave fully clears state for external drags', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             tabs.openPanel(panelA, 0);
 
@@ -751,7 +752,7 @@ describe('tabs - animation', () => {
         });
 
         test('same-group dragover does not trigger external detection', () => {
-            const { tabs, group } = createTabs({ smoothTabReorder: true });
+            const { tabs, group } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             tabs.openPanel(panelA, 0);
 
@@ -776,7 +777,7 @@ describe('tabs - animation', () => {
         });
 
         test('cross-group FLIP animates newly inserted tab with slide-in', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
             const panelC = createMockPanel('panel-c');
@@ -813,7 +814,7 @@ describe('tabs - animation', () => {
         });
 
         test('cross-group FLIP does NOT animate source tab for same-group drops', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -842,7 +843,7 @@ describe('tabs - animation', () => {
 
     describe('dragleave', () => {
         test('resets transforms and insertion index when cursor leaves container', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 
@@ -875,7 +876,7 @@ describe('tabs - animation', () => {
         });
 
         test('does not reset when moving between child elements', () => {
-            const { tabs } = createTabs({ smoothTabReorder: true });
+            const { tabs } = createTabs({ tabAnimation: 'smooth' });
             const panelA = createMockPanel('panel-a');
             const panelB = createMockPanel('panel-b');
 

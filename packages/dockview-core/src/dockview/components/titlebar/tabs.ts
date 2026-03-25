@@ -171,7 +171,7 @@ export class Tabs extends CompositeDisposable {
                 if (!this._animState) {
                     // Check for external drag from another group
                     if (
-                        !this.accessor.options.smoothTabReorder ||
+                        this.accessor.options.tabAnimation !== 'smooth' ||
                         this.accessor.options.disableDnd
                     ) {
                         return;
@@ -226,7 +226,7 @@ export class Tabs extends CompositeDisposable {
                 'drop',
                 (event) => {
                     if (
-                        !this.accessor.options.smoothTabReorder ||
+                        this.accessor.options.tabAnimation !== 'smooth' ||
                         !this._animState ||
                         this._animState.currentInsertionIndex === null
                     ) {
@@ -333,7 +333,7 @@ export class Tabs extends CompositeDisposable {
             tab.onDragStart((event) => {
                 this._onTabDragStart.fire({ nativeEvent: event, panel });
 
-                if (this.accessor.options.smoothTabReorder) {
+                if (this.accessor.options.tabAnimation === 'smooth') {
                     this._animState = {
                         sourceTabId: panel.id,
                         sourceIndex: this._tabs.findIndex(

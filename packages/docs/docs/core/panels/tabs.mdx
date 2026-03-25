@@ -445,53 +445,53 @@ Controls how tabs animate when reordered via drag-and-drop.
 
 | Mode | Behavior |
 |------|----------|
-| `'swap'` (default) | Tabs swap positions instantly on drop — the original behavior. |
-| `'slide'` | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
+| `'default'` | Tabs swap positions instantly on drop — the original behavior. |
+| `'smooth'` | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
 
 <CodeRunner id="dockview/tabview" height={300}/>
 
 <FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['smoothTabReorder']} />
+  <DocRef declaration="IDockviewReactProps" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['smoothTabReorder']} />
+  <DocRef declaration="IDockviewVueProps" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['smoothTabReorder']} />
+  <DocRef declaration="IDockviewAngularProps" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions" methods={['smoothTabReorder']} />
+  <DocRef declaration="DockviewComponentOptions" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='React'>
 ```tsx
-return <DockviewReactComponent smoothTabReorder={true} />
+return <DockviewReactComponent tabAnimation="smooth" />
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
 ```html
-<dockview-vue :smoothTabReorder="true" />
+<dockview-vue tabAnimation="smooth" />
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
 ```html
-<dv-dockview [smoothTabReorder]="true"></dv-dockview>
+<dv-dockview tabAnimation="smooth"></dv-dockview>
 ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
 ```ts
 const api = createDockview(parentElement, {
-    smoothTabReorder: true,
+    tabAnimation: 'smooth',
 });
 
 // or toggle at runtime
-api.updateOptions({ smoothTabReorder: true });
+api.updateOptions({ tabAnimation: 'smooth' });
 ```
 </FrameworkSpecific>
 
