@@ -167,55 +167,67 @@ export class Tabs extends CompositeDisposable {
                     this.accessor.doSetGroupActive(this.group);
                 }
             }),
-            addDisposableListener(this._tabsList, 'dragover', (event) => {
-                if (!this._animState) {
-                    // Check for external drag from another group
+            addDisposableListener(
+                this._tabsList,
+                'dragover',
+                (event) => {
+                    if (!this._animState) {
+                        // Check for external drag from another group
+                        if (
+                            this.accessor.options.tabAnimation !== 'smooth' ||
+                            this.accessor.options.disableDnd
+                        ) {
+                            return;
+                        }
+                        const data = getPanelData();
+                        if (
+                            data &&
+                            data.panelId &&
+                            data.groupId !== this.group.id
+                        ) {
+                            this._animState = {
+                                sourceTabId: data.panelId,
+                                sourceIndex: -1,
+                                tabPositions: this.snapshotTabPositions(),
+                                currentInsertionIndex: null,
+                            };
+                        } else {
+                            return;
+                        }
+                    }
+                    this.handleDragOver(event);
+                },
+                true
+            ),
+            addDisposableListener(
+                this._tabsList,
+                'dragleave',
+                (event) => {
+                    if (!this._animState) {
+                        return;
+                    }
+                    // Only handle if leaving the container itself, not moving between children
                     if (
-                        this.accessor.options.tabAnimation !== 'smooth' ||
-                        this.accessor.options.disableDnd
+                        event.relatedTarget &&
+                        this._tabsList.contains(
+                            event.relatedTarget as HTMLElement
+                        )
                     ) {
                         return;
                     }
-                    const data = getPanelData();
-                    if (
-                        data &&
-                        data.panelId &&
-                        data.groupId !== this.group.id
-                    ) {
-                        this._animState = {
-                            sourceTabId: data.panelId,
-                            sourceIndex: -1,
-                            tabPositions: this.snapshotTabPositions(),
-                            currentInsertionIndex: null,
-                        };
-                    } else {
-                        return;
+                    this.resetTabTransforms();
+                    if (this._animState) {
+                        if (this._animState.sourceIndex === -1) {
+                            // External drag left — clear state entirely
+                            // (no dragend will fire on this tab list)
+                            this._animState = null;
+                        } else {
+                            this._animState.currentInsertionIndex = null;
+                        }
                     }
-                }
-                this.handleDragOver(event);
-            }, true),
-            addDisposableListener(this._tabsList, 'dragleave', (event) => {
-                if (!this._animState) {
-                    return;
-                }
-                // Only handle if leaving the container itself, not moving between children
-                if (
-                    event.relatedTarget &&
-                    this._tabsList.contains(event.relatedTarget as HTMLElement)
-                ) {
-                    return;
-                }
-                this.resetTabTransforms();
-                if (this._animState) {
-                    if (this._animState.sourceIndex === -1) {
-                        // External drag left — clear state entirely
-                        // (no dragend will fire on this tab list)
-                        this._animState = null;
-                    } else {
-                        this._animState.currentInsertionIndex = null;
-                    }
-                }
-            }, true),
+                },
+                true
+            ),
             addDisposableListener(this._tabsList, 'dragend', () => {
                 // Only fires for cancel (not after successful drop, since
                 // source tab is removed from DOM and doesn't bubble)
