@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '@theme/Layout';
+import Head from '@docusaurus/Head';
 import { themeConfig } from '../config/theme.config';
 import ExampleFrame from '../components/ui/exampleFrame';
 import BrowserOnly from '@docusaurus/BrowserOnly';
@@ -27,18 +28,6 @@ const DemoPage: React.FC = () => {
             themeConfig.find((c) => c.id.name === themeName)?.id ?? themeAbyss;
         setTheme(newTheme);
         updateTheme(newTheme);
-    }, []);
-
-    React.useEffect(() => {
-        const navbar = document.querySelector('.navbar') as HTMLElement | null;
-        if (navbar) {
-            navbar.style.display = 'none';
-        }
-        return () => {
-            if (navbar) {
-                navbar.style.display = '';
-            }
-        };
     }, []);
 
     return (
@@ -136,6 +125,9 @@ const DemoPage: React.FC = () => {
 export default function Demo() {
     return (
         <Layout noFooter={true}>
+            <Head>
+                <style>{'.navbar { display: none !important; }'}</style>
+            </Head>
             <div
                 style={{
                     height: '100vh',

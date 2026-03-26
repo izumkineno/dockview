@@ -259,6 +259,7 @@ const DockviewDemo = (props: {
     const [panels, setPanels] = React.useState<string[]>([]);
     const [groups, setGroups] = React.useState<string[]>([]);
     const [api, setApi] = React.useState<DockviewApi>();
+    const [layoutReady, setLayoutReady] = React.useState(false);
 
     const [activePanel, setActivePanel] = React.useState<string>();
     const [activeGroup, setActiveGroup] = React.useState<string>();
@@ -349,6 +350,7 @@ const DockviewDemo = (props: {
 
         const loadLayout = () => {
             defaultConfig(api);
+            setLayoutReady(true);
         };
 
         loadLayout();
@@ -411,6 +413,7 @@ const DockviewDemo = (props: {
                         flexGrow: 1,
                         overflow: 'hidden',
                         display: 'flex',
+                        visibility: layoutReady ? 'visible' : 'hidden',
                     }}
                 >
                     <PanelColorsContext.Provider value={panelColors}>
