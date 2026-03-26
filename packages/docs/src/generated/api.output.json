@@ -22788,6 +22788,26 @@
                 "code": ""
             },
             {
+                "name": "onDragEnd",
+                "code": "Event<DragEvent>",
+                "kind": "property",
+                "type": {
+                    "type": "reference",
+                    "value": "Event",
+                    "source": "dockview-core",
+                    "typeArguments": [
+                        {
+                            "type": "reference",
+                            "value": "DragEvent",
+                            "source": "typescript"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isReadonly": true
+                }
+            },
+            {
                 "name": "onDragStart",
                 "code": "Event<DragEvent>",
                 "kind": "property",
@@ -25355,6 +25375,46 @@
                 },
                 "flags": {
                     "isOptional": true
+                }
+            },
+            {
+                "name": "tabAnimation",
+                "code": "\"smooth\" | \"default\"",
+                "kind": "property",
+                "type": {
+                    "type": "union",
+                    "value": [
+                        {
+                            "type": "literal",
+                            "value": "smooth"
+                        },
+                        {
+                            "type": "literal",
+                            "value": "default"
+                        }
+                    ]
+                },
+                "flags": {
+                    "isOptional": true
+                },
+                "comment": {
+                    "summary": [
+                        {
+                            "kind": "text",
+                            "text": "Controls tab drag-and-drop reorder animation style.\n\n- `\"smooth\"`: tabs animate smoothly during drag-and-drop reorder — tabs slide apart to reveal the insertion gap, then animate to their final positions on drop (Chrome-like behavior).\n- `\"default\"`: standard tab reorder behavior without animation.\n\nDefaults to `\"default\"`."
+                        }
+                    ],
+                    "blockTags": [
+                        {
+                            "tag": "@default",
+                            "content": [
+                                {
+                                    "kind": "code",
+                                    "text": "```ts\n\"default\"\n```"
+                                }
+                            ]
+                        }
+                    ]
                 }
             },
             {
