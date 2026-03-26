@@ -58,7 +58,7 @@ const config = {
         {
             href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
             rel: 'stylesheet',
-        }
+        },
     ],
     plugins: [
         'docusaurus-plugin-sass',
@@ -87,7 +87,7 @@ const config = {
                                         __dirname,
                                         '../dockview-core/src'
                                     ),
-                                    'dockview$': path.join(
+                                    dockview$: path.join(
                                         __dirname,
                                         '../dockview/src'
                                     ),
@@ -253,8 +253,13 @@ const config = {
                         sidebarId: 'api',
                         label: 'API',
                     },
-                    { to: '/blog', label: 'Blog', position: 'right' },
-                    { href: '/templates', target:"_blank", label: 'Examples', position: 'right' },
+                    // { to: '/blog', label: 'Blog', position: 'right' },
+                    {
+                        href: '/templates',
+                        target: '_blank',
+                        label: 'Examples',
+                        position: 'right',
+                    },
                     { to: '/demo', label: 'Demo', position: 'right' },
                     {
                         href: 'https://github.com/mathuo/dockview',
@@ -288,10 +293,10 @@ const config = {
                     {
                         title: 'More',
                         items: [
-                            {
-                                label: 'Blog',
-                                to: '/blog',
-                            },
+                            // {
+                            //     label: 'Blog',
+                            //     to: '/blog',
+                            // },
                             {
                                 label: 'GitHub',
                                 href: 'https://github.com/mathuo/dockview',
