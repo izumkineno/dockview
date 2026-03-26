@@ -2,66 +2,88 @@ import { DockviewApi } from 'dockview';
 
 export const nextId = (() => {
     let counter = 0;
-
     return () => counter++;
 })();
 
 export function defaultConfig(api: DockviewApi) {
-    const panel1 = api.addPanel({
-        id: 'panel_1',
-        component: 'default',
+    // Left column: watchlist (full height)
+    const watchlist = api.addPanel({
+        id: 'watchlist',
+        component: 'watchlist',
+        title: 'Watchlist',
         renderer: 'always',
-        title: 'Panel 1',
+    });
+
+    // Price alert as a floating panel
+    const pricealert = api.addPanel({
+        id: 'pricealert',
+        component: 'pricealert',
+        title: 'Price Alert',
+        renderer: 'always',
+        floating: { width: 360, height: 280, x: 60, y: 140 },
+    });
+
+    // Centre column: order book (top) + orders grid (bottom)
+    const orderbook = api.addPanel({
+        id: 'orderbook',
+        component: 'orderbook',
+        title: 'Order Book',
+        renderer: 'always',
+        position: { referencePanel: watchlist, direction: 'right' },
+    });
+
+    const orders = api.addPanel({
+        id: 'orders',
+        component: 'orders',
+        title: 'Orders',
+        renderer: 'always',
+        position: { referencePanel: orderbook, direction: 'below' },
     });
 
     api.addPanel({
-        id: 'panel_2',
-        component: 'default',
-        title: 'Panel 2',
-        position: { referencePanel: panel1 },
+        id: 'vesselfinder',
+        component: 'vesselfinder',
+        title: 'VesselFinder',
+        position: { referencePanel: orders },
+    });
+
+    // Right column: position summary (top) + dev panels (bottom, tabbed)
+    const positionsummary = api.addPanel({
+        id: 'positionsummary',
+        component: 'positionsummary',
+        title: 'Positions',
+        renderer: 'always',
+        position: { referencePanel: orderbook, direction: 'right' },
+    });
+
+    const eventlog = api.addPanel({
+        id: 'eventlog',
+        component: 'eventlog',
+        title: 'Events',
+        renderer: 'always',
+        position: { referencePanel: positionsummary, direction: 'below' },
     });
 
     api.addPanel({
-        id: 'panel_3',
-        component: 'default',
-        title: 'Panel 3',
-        position: { referencePanel: panel1 },
-    });
-
-    const panel4 = api.addPanel({
-        id: 'panel_4',
-        component: 'default',
-        title: 'Panel 4',
-        position: { referencePanel: panel1, direction: 'right' },
-    });
-
-    const panel5 = api.addPanel({
-        id: 'panel_5',
-        component: 'default',
-        title: 'Panel 5',
-        position: { referencePanel: panel4 },
-    });
-
-    const panel6 = api.addPanel({
-        id: 'panel_6',
-        component: 'default',
-        title: 'Panel 6',
-        position: { referencePanel: panel5, direction: 'below' },
-    });
-
-    const panel7 = api.addPanel({
-        id: 'panel_7',
-        component: 'default',
-        title: 'Panel 7',
-        position: { referencePanel: panel6, direction: 'left' },
+        id: 'layoutinspector',
+        component: 'layoutinspector',
+        title: 'Layout JSON',
+        renderer: 'always',
+        position: { referencePanel: eventlog },
     });
 
     api.addPanel({
-        id: 'panel8',
-        component: 'default',
-        title: 'Panel 8',
-        position: { referencePanel: panel7, direction: 'below' },
+        id: 'debuginfo',
+        component: 'debuginfo',
+        title: 'Panel Debug',
+        renderer: 'always',
+        position: { referencePanel: eventlog },
     });
 
-    panel1.api.setActive();
+    // Set active panels
+    watchlist.api.setActive();
+    orderbook.api.setActive();
+    orders.api.setActive();
+    positionsummary.api.setActive();
+    eventlog.api.setActive();
 }

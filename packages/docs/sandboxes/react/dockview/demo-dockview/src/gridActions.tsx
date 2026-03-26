@@ -110,22 +110,6 @@ export const GridActions = (props: {
         }
     };
 
-    const onLoad2 = () => {
-        const state = localStorage.getItem('dv-demo-state');
-        if (state) {
-            try {
-                props.api?.fromJSON(JSON.parse(state), {
-                    keepExistingPanels: true,
-                });
-
-                setGap(props.api?.gap ?? 0);
-            } catch (err) {
-                console.error('failed to load state', err);
-                localStorage.removeItem('dv-demo-state');
-            }
-        }
-    };
-
     const onSave = () => {
         if (props.api) {
             const state = props.api.toJSON();
@@ -169,54 +153,45 @@ export const GridActions = (props: {
 
     return (
         <div className="action-container">
-            <div className="button-group">
-                <button className="text-button" onClick={() => onAddPanel()}>
-                    Add Panel
+            <div className="action-row">
+                <button className="text-button" onClick={onLoad}>
+                    Load
                 </button>
-                <button
-                    className="demo-icon-button"
-                    onClick={() => onAddPanel({ advanced: true })}
-                >
-                    <span className="material-symbols-outlined">tune</span>
+                <button className="text-button" onClick={onSave}>
+                    Save
+                </button>
+                <button className="text-button" onClick={onClear}>
+                    Clear
+                </button>
+                <button className="text-button" onClick={onReset}>
+                    Reset
                 </button>
             </div>
-            <button
-                className="text-button"
-                onClick={() => onAddPanel({ nested: true })}
-            >
-                Add Nested Panel
-            </button>
-            <button className="text-button" onClick={onAddGroup}>
-                Add Group
-            </button>
-            <span className="button-action">
+            <div className="action-row">
+                <div className="button-group">
+                    <button
+                        className="text-button"
+                        onClick={() => onAddPanel()}
+                    >
+                        Add Panel
+                    </button>
+                    <button
+                        className="demo-icon-button"
+                        onClick={() => onAddPanel({ advanced: true })}
+                    >
+                        <span className="material-symbols-outlined">tune</span>
+                    </button>
+                </div>
                 <button
-                    className={
-                        props.hasCustomWatermark
-                            ? 'demo-button selected'
-                            : 'demo-button'
-                    }
-                    onClick={props.toggleCustomWatermark}
+                    className="text-button"
+                    onClick={() => onAddPanel({ nested: true })}
                 >
-                    Use Custom Watermark
+                    Add Nested Panel
                 </button>
-            </span>
-            <button className="text-button" onClick={onClear}>
-                Clear
-            </button>
-            <button className="text-button" onClick={onLoad}>
-                Load
-            </button>
-            <button className="text-button" onClick={onLoad2}>
-                Load2
-            </button>
-            <button className="text-button" onClick={onSave}>
-                Save
-            </button>
-            <button className="text-button" onClick={onReset}>
-                Reset
-            </button>
-            <span style={{ flexGrow: 1 }} />
+                <button className="text-button" onClick={onAddGroup}>
+                    Add Group
+                </button>
+            </div>
         </div>
     );
 };

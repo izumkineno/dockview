@@ -57,3 +57,24 @@ choose a new location.
 
 
 <CodeRunner id="dockview/popout-group"/>
+
+## Popout Window Events
+
+`DockviewApi` exposes three events specific to popout windows:
+
+```ts
+// Fires when the popout window is resized by the user
+api.onDidPopoutGroupSizeChange((event: PopoutGroupChangeSizeEvent) => {
+    console.log('popout resized:', event);
+});
+
+// Fires when the popout window is moved by the user
+api.onDidPopoutGroupPositionChange((event: PopoutGroupChangePositionEvent) => {
+    console.log('popout moved:', event);
+});
+
+// Fires when the browser blocked opening the popout window (e.g. popup blocker)
+api.onDidOpenPopoutWindowFail(() => {
+    alert('Please allow popups for this site to use this feature.');
+});
+```

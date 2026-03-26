@@ -2,8 +2,8 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const { themes } = require('prism-react-renderer');
-const lightCodeTheme = themes.nightOwlLight;
-const darkCodeTheme = themes.palenight;
+const lightCodeTheme = themes.oneLight;
+const darkCodeTheme = themes.oneDark;
 
 // dracula
 // duotoneDark
@@ -56,7 +56,8 @@ const config = {
             href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
         },
         {
-          href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"'
+            href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+            rel: 'stylesheet',
         }
     ],
     plugins: [
@@ -242,19 +243,19 @@ const config = {
                 items: [
                     {
                         type: 'doc',
-                        docId: 'overview/getStarted/installation',
-                        position: 'left',
+                        docId: 'overview/introduction',
+                        position: 'right',
                         label: 'Docs',
                     },
                     {
                         type: 'docSidebar',
-                        position: 'left',
+                        position: 'right',
                         sidebarId: 'api',
                         label: 'API',
                     },
-                    { to: '/blog', label: 'Blog', position: 'left' },
-                    { href: '/templates', target:"_blank", label: 'Examples', position: 'left' },
-                    { to: '/demo', label: 'Demo', position: 'left' },
+                    { to: '/blog', label: 'Blog', position: 'right' },
+                    { href: '/templates', target:"_blank", label: 'Examples', position: 'right' },
+                    { to: '/demo', label: 'Demo', position: 'right' },
                     {
                         href: 'https://github.com/mathuo/dockview',
                         position: 'right',
@@ -294,6 +295,10 @@ const config = {
                             {
                                 label: 'GitHub',
                                 href: 'https://github.com/mathuo/dockview',
+                            },
+                            {
+                                label: 'Contributing',
+                                href: 'https://github.com/mathuo/dockview/blob/master/CONTRIBUTING.md',
                             },
                         ],
                     },
