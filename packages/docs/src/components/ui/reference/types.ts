@@ -35,6 +35,10 @@ export function firstLevelTypes(value: TypeDescriptor.Type | null) {
             return firstLevel(value.value);
         case 'tuple':
             return value.value.map(codifyType);
+        case 'union':
+            return (value as any).value.flatMap(firstLevelTypes);
+        case 'namedTupleMember':
+            return firstLevelTypes((value as any).values);
         default:
             throw new Error('unreachable');
     }
@@ -139,6 +143,17 @@ export function codifyType(value: TypeDescriptor.Type | null, tabs = 0) {
             return codify(value.value, tabs);
         case 'tuple':
             return `[${value.value.map(codifyType).join(', ')}]`;
+        case 'union':
+            return `${(value as any).value
+                .map((_: TypeDescriptor.Type) => {
+                    const isComparator =
+                        _.type === 'or' || _.type === 'intersection';
+                    const code = codifyType(_);
+                    return isComparator ? `(${code})` : code;
+                })
+                .join(' | ')}`;
+        case 'namedTupleMember':
+            return codifyType((value as any).values);
         default:
             throw new Error('unreachable');
     }
