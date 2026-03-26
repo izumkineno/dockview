@@ -77,9 +77,20 @@ export function firstLevel(value: TypeSystem.Type | null) {
         case 'parameter':
             results.push(...firstLevelTypes(value.type));
             break;
+        case 'enum':
+            break;
+        case 'enumMember':
+            break;
+        case 'getSignature':
+            results.push(...firstLevelTypes(value.returnType));
+            break;
+        case 'function':
+            results.push(...firstLevel(value.signature));
+            break;
+        case 'constructorSignature':
+            break;
         default:
-            console.log('test', value);
-            throw new Error('unreachable');
+            break;
     }
 
     return Array.from(new Set(results));
@@ -241,8 +252,30 @@ export function codify(value: TypeSystem.Type | null, tabs = 0) {
         return `type ${value.name} = ${codifyType(value.type)}`;
     }
 
-    console.log('unreachable', value);
-    throw new Error(`unreachable`);
+    if (value.kind === 'enum') {
+        return `enum ${value.name} {\n${value.children
+            .map((c) => `\t${c.name}`)
+            .join(',\n')}\n}`;
+    }
+
+    if (value.kind === 'enumMember') {
+        return `${'\t'.repeat(tabs)}${value.name}`;
+    }
+
+    if (value.kind === 'function') {
+        return `${'\t'.repeat(tabs)}function ${value.name}${codify(value.signature, tabs)}`;
+    }
+
+    if (value.kind === 'getSignature') {
+        return `${'\t'.repeat(tabs)}get ${value.name}(): ${codifyType(value.returnType)}`;
+    }
+
+    if (value.kind === 'constructorSignature') {
+        return '';
+    }
+
+    // Kinds present in JSON data but not in the TypeSystem union (e.g. 'namespace', 'variable')
+    return `${(value as any).name ?? ''}`;
 }
 
 export namespace TypeSystem {
