@@ -237,7 +237,7 @@ const config = {
             navbar: {
                 title: 'Dockview',
                 logo: {
-                    alt: 'My Site Logo',
+                    alt: 'Dockview Logo',
                     src: 'img/dockview_logo.svg',
                 },
                 items: [

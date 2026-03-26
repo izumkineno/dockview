@@ -96,6 +96,11 @@
         text-decoration: none;
     }
 
+    &:focus-visible {
+        outline: 2px solid var(--ifm-color-primary);
+        outline-offset: 2px;
+    }
+
     img {
         flex-shrink: 0;
     }
@@ -208,5 +213,17 @@
     padding: 2px 6px;
     border-radius: 4px;
     color: var(--ifm-color-content-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-framework {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .hero-fw-btn {
+        transition: none;
+    }
 }
 
