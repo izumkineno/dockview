@@ -115,6 +115,7 @@
 .dv-tabs-overflow-container {
     flex-direction: column;
     height: unset;
+    font-size: var(--dv-tabs-and-actions-container-font-size);
     max-height: min(50vh, 400px);
     overflow-y: auto;
     border: 1px solid var(--dv-tab-divider-color);
