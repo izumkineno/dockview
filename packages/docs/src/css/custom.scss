@@ -53,6 +53,8 @@
 
     --dv-docs-markdown-text-color: #374151;
 
+    --ifm-hover-overlay: rgba(0, 0, 0, 0.05);
+
     .navbar {
         border-bottom: 1px solid #e2e8f0;
         box-shadow: none;
@@ -89,6 +91,8 @@
 
     --dv-docs-markdown-text-color: #a1a1aa;
 
+    --ifm-hover-overlay: rgba(255, 255, 255, 0.06);
+
     .navbar {
         border-bottom: 1px solid #27272a;
         box-shadow: none;
@@ -123,6 +127,12 @@
     background-color: var(--ifm-navbar-link-hover-color);
 }
 
+.header-github-link:focus-visible {
+    outline: 2px solid var(--ifm-color-primary);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
 // ─── Buttons ──────────────────────────────────────────────────────────────────
 
 :root {
@@ -143,6 +153,11 @@
     &:active {
         transform: translateY(0);
         box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--ifm-color-primary);
+        outline-offset: 2px;
     }
 }
 
@@ -217,7 +232,6 @@
         th,
         td {
             border: none;
-            padding: none;
             text-align: left;
         }
 
@@ -235,12 +249,21 @@
         // white-space: pre-wrap;
         .token {
             &.maybe-class-name {
-                color: #cf8cff;
+                color: #7c3aed;
             }
             &.keyword {
-                color: rgb(130, 170, 255);
+                color: #1d4ed8;
             }
         }
+    }
+}
+
+:root[data-theme='dark'] .markdown code .token {
+    &.maybe-class-name {
+        color: #c084fc;
+    }
+    &.keyword {
+        color: #93c5fd;
     }
 }
 
@@ -261,23 +284,14 @@
 }
 
 .sidebar-section2 {
-    &:not(:first-child) {
-        // border-top: 1px solid var(--ifm-toc-border-color);
-    }
-
     > .menu__list-item-collapsible {
         padding-top: 10px;
         padding-bottom: 10px;
-        // text-transform: uppercase;
 
         &:hover {
             background-color: inherit;
         }
     }
-}
-
-.menu {
-    // padding-top: 40px;
 }
 
 .menu__list {
@@ -295,22 +309,6 @@
 
     .menu__list .menu__link--active:not(.menu__link--sublist) {
         border-left: 1px solid var(--ifm-color-primary);
-    }
-
-    .menu__list-item-collapsible {
-        // .menu__link {
-        //     display: flex;
-        //     flex-direction: row-reverse;
-        //     justify-content: flex-end;
-
-        //     &::after {
-        //         margin-left: 0px;
-        //     }
-        // }
-
-        .menu__link {
-            // color: white;
-        }
     }
 
     .menu__list-item-collapsible .menu__link:hover,
@@ -364,5 +362,20 @@
     .theme-code-block {
         border: 1px solid #e2e8f0;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button {
+        transition: none;
+
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    .header-github-link::before {
+        transition: none;
     }
 }
