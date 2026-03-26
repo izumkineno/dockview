@@ -22,6 +22,9 @@
         contain: layout paint;
         
         transition: opacity var(--dv-transition-duration) ease-in,
-            transform var(--dv-transition-duration) ease-out;
+            top var(--dv-transition-duration) ease-out,
+            left var(--dv-transition-duration) ease-out,
+            width var(--dv-transition-duration) ease-out,
+            height var(--dv-transition-duration) ease-out;
     }
 }
