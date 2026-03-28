@@ -26,6 +26,7 @@ import {
     DockviewFrameworkOptions,
     DockviewComponentOptions,
     FixedPanelsConfig,
+    TabAnimation,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
@@ -87,6 +88,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
     @Input() fixedPanels?: FixedPanelsConfig;
+    @Input() tabAnimation?: TabAnimation;
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();

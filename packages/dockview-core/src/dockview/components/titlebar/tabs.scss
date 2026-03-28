@@ -3,7 +3,7 @@
     height: 100%;
     overflow: auto;
     scrollbar-width: thin; // firefox
-    
+
     /* GPU optimizations for smooth scrolling */
     will-change: scroll-position;
     transform: translate3d(0, 0, 0);
@@ -78,6 +78,32 @@
     box-sizing: border-box;
     font-size: var(--dv-tab-font-size);
     margin: var(--dv-tab-margin);
+
+    &.dv-tab--shifting {
+        will-change: margin-left;
+        transition: transform var(--dv-transition-duration, 200ms) ease-out,
+                    margin-left var(--dv-transition-duration, 200ms) ease-out;
+    }
+
+    &.dv-tab--dragging {
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: width var(--dv-transition-duration, 200ms) ease-out,
+                    padding var(--dv-transition-duration, 200ms) ease-out,
+                    margin var(--dv-transition-duration, 200ms) ease-out,
+                    opacity var(--dv-transition-duration, 200ms) ease-out;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dv-tab {
+        transition: none !important;
+    }
 }
 
 .dv-tabs-container-vertical {
@@ -89,6 +115,7 @@
 .dv-tabs-overflow-container {
     flex-direction: column;
     height: unset;
+    font-size: var(--dv-tabs-and-actions-container-font-size);
     max-height: min(50vh, 400px);
     overflow-y: auto;
     border: 1px solid var(--dv-tab-divider-color);

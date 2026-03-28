@@ -1,6 +1,7 @@
 ---
 title: Tabs
 sidebar_position: 2
+description: How to customize tab appearance and behaviour in Dockview, including custom tab components.
 ---
 
 import { MultiFrameworkContainer } from '@site/src/components/ui/container';
@@ -438,6 +439,62 @@ const api = createDockview(parentElement, {
     react={DockviewNative}
     typescript={attachNativeDockview}
 />
+
+## Tab Reorder Mode
+
+Controls how tabs animate when reordered via drag-and-drop.
+
+| Mode | Behavior |
+|------|----------|
+| `'default'` | Tabs swap positions instantly on drop — the original behavior. |
+| `'smooth'` | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
+
+<CodeRunner id="dockview/tabview" height={300}/>
+
+<FrameworkSpecific framework='React'>
+  <DocRef declaration="IDockviewReactProps" methods={['tabAnimation']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+  <DocRef declaration="IDockviewVueProps" methods={['tabAnimation']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+  <DocRef declaration="IDockviewAngularProps" methods={['tabAnimation']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+  <DocRef declaration="DockviewComponentOptions" methods={['tabAnimation']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='React'>
+```tsx
+return <DockviewReactComponent tabAnimation="smooth" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Vue'>
+```html
+<dockview-vue tabAnimation="smooth" />
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='Angular'>
+```html
+<dv-dockview tabAnimation="smooth"></dv-dockview>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework='JavaScript'>
+```ts
+const api = createDockview(parentElement, {
+    tabAnimation: 'smooth',
+});
+
+// or toggle at runtime
+api.updateOptions({ tabAnimation: 'smooth' });
+```
+</FrameworkSpecific>
 
 ## Tab Height
 

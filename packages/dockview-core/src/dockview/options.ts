@@ -84,7 +84,21 @@ export interface DockviewOptions {
      * Panels can be placed at top, bottom, left, and/or right positions.
      */
     fixedPanels?: FixedPanelsConfig;
+    /**
+     * Controls tab drag-and-drop reorder animation style.
+     *
+     * - `"smooth"`: tabs animate smoothly during drag-and-drop reorder —
+     *   tabs slide apart to reveal the insertion gap, then animate to their
+     *   final positions on drop (Chrome-like behavior).
+     * - `"default"`: standard tab reorder behavior without animation.
+     *
+     * Defaults to `"default"`.
+     */
+    tabAnimation?: TabAnimation;
 }
+
+export type TabAnimation = 'smooth' | 'default';
+export const DEFAULT_TAB_ANIMATION: TabAnimation = 'default';
 
 export interface DockviewDndOverlayEvent extends IAcceptableEvent {
     nativeEvent: DragEvent;
@@ -134,6 +148,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
         fixedPanels: undefined,
+        tabAnimation: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

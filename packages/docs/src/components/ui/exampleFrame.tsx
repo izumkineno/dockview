@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { CodeSandboxButton } from './codeSandboxButton';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { DockviewTheme } from 'dockview';
 
@@ -8,6 +7,7 @@ const ExampleFrame = (props: {
     theme?: DockviewTheme;
     id: string;
     height?: string;
+    extraProps?: Record<string, unknown>;
 }) => {
     const Component = React.useMemo(
         () =>
@@ -26,34 +26,16 @@ const ExampleFrame = (props: {
                 <React.Suspense>
                     <div
                         style={{
+                            height: props.height ?? '500px',
+                            flexGrow: 1,
                             display: 'flex',
                             flexDirection: 'column',
-                            flexGrow: 1,
                         }}
                     >
-                        <div
-                            style={{
-                                height: props.height ?? '500px',
-                                flexGrow: 1,
-                                display: 'flex',
-                                flexDirection: 'column',
-                            }}
-                        >
-                            <Component theme={props.theme} />
-                        </div>
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                            }}
-                        >
-                            <span style={{ width: '220px' }}>
-                                <CodeSandboxButton
-                                    id={`${props.framework}/${props.id}`}
-                                    hideThemePicker={true}
-                                />
-                            </span>
-                        </div>
+                        <Component
+                            theme={props.theme}
+                            {...props.extraProps}
+                        />
                     </div>
                 </React.Suspense>
             )}

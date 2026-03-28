@@ -12,11 +12,23 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import './app.scss';
 import { defaultConfig } from './defaultLayout';
-import { GridActions } from './gridActions';
-import { PanelActions } from './panelActions';
-import { GroupActions } from './groupActions';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
 import { Table, usePanelApiMetadata } from './debugPanel';
+import { SettingsModal } from './settingsModal';
+import { OrdersPanel } from './ordersPanel';
+import { OrderBookPanel } from './orderBookPanel';
+import { EventLogPanel } from './eventLogPanel';
+import { LayoutInspectorPanel } from './layoutInspectorPanel';
+import { PanelDebugPanel } from './panelDebugPanel';
+import { MarketProvider } from './marketContext';
+import { WatchlistPanel } from './watchlistPanel';
+import { PriceAlertPanel } from './priceAlertPanel';
+import { PositionSummaryPanel } from './positionSummaryPanel';
+import { PanelColorsContext, DARK_COLORS, LIGHT_COLORS, LIGHT_THEME_NAMES } from './panelTheme';
+
+export const ApiContext = React.createContext<DockviewApi | undefined>(
+    undefined
+);
 
 const DebugContext = React.createContext<boolean>(false);
 
@@ -160,6 +172,45 @@ const components = {
             />
         );
     },
+    vesselfinder: (props: IDockviewPanelProps) => {
+        const srcdoc = `<!DOCTYPE html>
+<html><head><style>html,body{margin:0;padding:0;height:100%;overflow:hidden;}</style></head>
+<body>
+<script>var width="100%";var height="100%";var latitude="51.5";var longitude="-0.12";var zoom="8";var names=false;</script>
+<script src="https://www.vesselfinder.com/aismap.js"></script>
+</body></html>`;
+        return (
+            <iframe
+                onMouseDown={() => {
+                    if (!props.api.isActive) {
+                        props.api.setActive();
+                    }
+                }}
+                srcDoc={srcdoc}
+                style={{
+                    border: 'none',
+                    width: '100%',
+                    height: '100%',
+                }}
+            />
+        );
+    },
+    debuginfo: (props: IDockviewPanelProps) => <PanelDebugPanel {...props} />,
+    orders: () => <OrdersPanel />,
+    orderbook: () => <OrderBookPanel />,
+    watchlist: () => <WatchlistPanel />,
+    pricealert: () => <PriceAlertPanel />,
+    positionsummary: () => <PositionSummaryPanel />,
+    eventlog: () => {
+        const api = React.useContext(ApiContext);
+        if (!api) return null;
+        return <EventLogPanel api={api} />;
+    },
+    layoutinspector: () => {
+        const api = React.useContext(ApiContext);
+        if (!api) return null;
+        return <LayoutInspectorPanel api={api} />;
+    },
     shadowDom: (props: IDockviewPanelProps) => {
         const ref = React.useRef<HTMLDivElement>(null);
 
@@ -215,7 +266,11 @@ const WatermarkComponent = () => {
 
 const ThemeContext = React.createContext<DockviewTheme | undefined>(undefined);
 
-const DockviewDemo = (props: { theme?: DockviewTheme }) => {
+const DockviewDemo = (props: {
+    theme?: DockviewTheme;
+    showSettings?: boolean;
+    onCloseSettings?: () => void;
+}) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
     >([]);
@@ -223,6 +278,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
     const [panels, setPanels] = React.useState<string[]>([]);
     const [groups, setGroups] = React.useState<string[]>([]);
     const [api, setApi] = React.useState<DockviewApi>();
+    const [layoutReady, setLayoutReady] = React.useState(false);
 
     const [activePanel, setActivePanel] = React.useState<string>();
     const [activeGroup, setActiveGroup] = React.useState<string>();
@@ -353,6 +409,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                 try {
                     api.fromJSON(JSON.parse(state));
                     populateFixedPanels();
+                    setLayoutReady(true);
                     return;
                 } catch {
                     localStorage.removeItem('dv-demo-state');
@@ -362,6 +419,7 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
 
             defaultConfig(api);
             populateFixedPanels();
+            setLayoutReady(true);
         };
 
         loadLayout();
@@ -374,6 +432,11 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
     const onReady = (event: DockviewReadyEvent) => {
         setApi(event.api);
     };
+
+    const panelColors = React.useMemo(
+        () => LIGHT_THEME_NAMES.has(props.theme?.name ?? '') ? LIGHT_COLORS : DARK_COLORS,
+        [props.theme]
+    );
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
 
@@ -425,7 +488,6 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 flexGrow: 1,
-                padding: '8px',
                 backgroundColor: 'rgba(0,0,50,0.25)',
                 borderRadius: '8px',
                 position: 'relative',
@@ -544,8 +606,12 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                         flexGrow: 1,
                         overflow: 'hidden',
                         display: 'flex',
+                        visibility: layoutReady ? 'visible' : 'hidden',
                     }}
                 >
+                    <PanelColorsContext.Provider value={panelColors}>
+                    <MarketProvider>
+                    <ApiContext.Provider value={api}>
                     <DebugContext.Provider value={debug}>
                         <ThemeContext.Provider value={props.theme}>
                             <DockviewReact
@@ -566,6 +632,9 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                             />
                         </ThemeContext.Provider>
                     </DebugContext.Provider>
+                    </ApiContext.Provider>
+                    </MarketProvider>
+                    </PanelColorsContext.Provider>
                 </div>
 
                 {showLogs && (
@@ -594,7 +663,6 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                                             fontSize: '13px',
                                             display: 'flex',
                                             alignItems: 'center',
-
                                             backgroundColor:
                                                 line.backgroundColor,
                                         }}
@@ -648,6 +716,23 @@ const DockviewDemo = (props: { theme?: DockviewTheme }) => {
                     </div>
                 )}
             </div>
+
+            <SettingsModal
+                open={props.showSettings ?? false}
+                onClose={props.onCloseSettings ?? (() => {})}
+                api={api}
+                panels={panels}
+                groups={groups}
+                activePanel={activePanel}
+                activeGroup={activeGroup}
+                hasCustomWatermark={watermark}
+                toggleCustomWatermark={() => setWatermark(!watermark)}
+                debug={debug}
+                onToggleDebug={() => setDebug(!debug)}
+                showLogs={showLogs}
+                onToggleShowLogs={() => setShowLogs(!showLogs)}
+                onClearLogs={() => setLogLines([])}
+            />
         </div>
     );
 };
