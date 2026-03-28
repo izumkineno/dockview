@@ -15,9 +15,6 @@ import { defaultConfig } from './defaultLayout';
 import { LeftControls, PrefixHeaderControls, RightControls } from './controls';
 import { Table, usePanelApiMetadata } from './debugPanel';
 import { SettingsModal } from './settingsModal';
-import { GridActions } from './gridActions';
-import { PanelActions } from './panelActions';
-import { GroupActions } from './groupActions';
 import { OrdersPanel } from './ordersPanel';
 import { OrderBookPanel } from './orderBookPanel';
 import { EventLogPanel } from './eventLogPanel';
@@ -497,106 +494,6 @@ const DockviewDemo = (props: {
                 ...css,
             }}
         >
-            <div>
-                <GridActions
-                    api={api}
-                    toggleCustomWatermark={() => setWatermark(!watermark)}
-                    hasCustomWatermark={watermark}
-                />
-                {api && (
-                    <PanelActions
-                        api={api}
-                        panels={panels}
-                        activePanel={activePanel}
-                    />
-                )}
-                {api && (
-                    <GroupActions
-                        api={api}
-                        groups={groups}
-                        activeGroup={activeGroup}
-                    />
-                )}
-                {useFixedPanels && api && (
-                    <div className="action-container">
-                        <span
-                            style={{
-                                fontSize: '12px',
-                                opacity: 0.7,
-                                marginRight: '8px',
-                            }}
-                        >
-                            Fixed Panels:
-                        </span>
-                        {(['bottom', 'left', 'right'] as const).map(
-                            (pos) => (
-                                <button
-                                    key={pos}
-                                    className="text-button"
-                                    onClick={() => {
-                                        const visible =
-                                            api.isFixedPanelVisible(pos);
-                                        api.setFixedPanelVisible(pos, !visible);
-                                    }}
-                                >
-                                    Toggle {pos}
-                                </button>
-                            )
-                        )}
-                    </div>
-                )}
-            </div>
-            <div
-                className="action-container"
-                style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    padding: '4px',
-                }}
-            >
-                <button
-                    className={useFixedPanels ? 'text-button' : 'text-button'}
-                    style={useFixedPanels ? { backgroundColor: '#4864dc' } : {}}
-                    onClick={() => setUseFixedPanels(!useFixedPanels)}
-                    title="Toggle fixed side panels (IDE shell layout). Requires re-mount."
-                >
-                    <span style={{ paddingRight: '4px' }}>
-                        {useFixedPanels ? 'Disable' : 'Enable'} Shell
-                    </span>
-                    <span className="material-symbols-outlined">
-                        dashboard_customize
-                    </span>
-                </button>
-                <button
-                    onClick={() => {
-                        setDebug(!debug);
-                    }}
-                >
-                    <span className="material-symbols-outlined">
-                        engineering
-                    </span>
-                </button>
-                {showLogs && (
-                    <button
-                        onClick={() => {
-                            setLogLines([]);
-                        }}
-                    >
-                        <span className="material-symbols-outlined">undo</span>
-                    </button>
-                )}
-                <button
-                    onClick={() => {
-                        setShowLogs(!showLogs);
-                    }}
-                >
-                    <span style={{ paddingRight: '4px' }}>
-                        {`${showLogs ? 'Hide' : 'Show'} Events Log`}
-                    </span>
-                    <span className="material-symbols-outlined">terminal</span>
-                </button>
-            </div>
             <div
                 style={{
                     flexGrow: 1,
