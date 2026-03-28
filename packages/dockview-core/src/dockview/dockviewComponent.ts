@@ -2652,6 +2652,42 @@ export class DockviewComponent
                     return;
                 }
 
+                if (sourceGroup.api.location.type === 'fixed') {
+                    /**
+                     * Fixed groups are permanent structural elements — never move the
+                     * group itself. Instead extract the panel and create a new grid group,
+                     * leaving the fixed slot intact (same behaviour as the size >= 2 path).
+                     */
+                    const removedPanel: IDockviewPanel | undefined =
+                        this.movingLock(() =>
+                            sourceGroup.model.removePanel(sourceItemId, {
+                                skipSetActive: false,
+                                skipSetActiveGroup: true,
+                            })
+                        );
+
+                    if (!removedPanel) {
+                        throw new Error(
+                            `dockview: No panel with id ${sourceItemId}`
+                        );
+                    }
+
+                    const newGroup =
+                        this.createGroupAtLocation(targetLocation);
+                    this.movingLock(() =>
+                        newGroup.model.openPanel(removedPanel, {
+                            skipSetGroupActive: true,
+                        })
+                    );
+                    this.doSetGroupAndPanelActive(newGroup);
+
+                    this._onDidMovePanel.fire({
+                        panel: removedPanel,
+                        from: sourceGroup,
+                    });
+                    return;
+                }
+
                 // source group will become empty so delete the group
                 const targetGroup = this.movingLock(() =>
                     this.doRemoveGroup(sourceGroup, {
