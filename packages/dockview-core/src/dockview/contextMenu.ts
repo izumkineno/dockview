@@ -41,7 +41,7 @@ export class ContextMenuController {
         event.preventDefault();
 
         const items: ContextMenuItem[] =
-            this.accessor.options.getContextMenuItems?.({
+            this.accessor.options.getTabContextMenuItems?.({
                 panel,
                 group,
                 api: this.accessor.api,

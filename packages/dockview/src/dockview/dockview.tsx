@@ -17,7 +17,7 @@ import {
     createDockview,
     BuiltInContextMenuItem,
     ContextMenuItemConfig,
-    GetContextMenuItemsParams,
+    GetTabContextMenuItemsParams,
     IContextMenuItemComponentProps,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
@@ -62,8 +62,8 @@ export interface IDockviewReactProps extends DockviewOptions {
     rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     prefixHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
-    getContextMenuItems?: (
-        params: GetContextMenuItemsParams
+    getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
     ) => (BuiltInContextMenuItem | ReactContextMenuItemConfig)[];
     //
     onReady: (event: DockviewReadyEvent) => void;

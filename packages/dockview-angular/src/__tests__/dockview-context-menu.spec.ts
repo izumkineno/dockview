@@ -38,11 +38,11 @@ describe('DockviewAngularComponent – context menu', () => {
         TestBed.resetTestingModule();
     });
 
-    it('getContextMenuItems input is accepted without error', () => {
-        const getContextMenuItems = jest
+    it('getTabContextMenuItems input is accepted without error', () => {
+        const getTabContextMenuItems = jest
             .fn()
             .mockReturnValue(['close', 'closeAll']);
-        component.getContextMenuItems = getContextMenuItems;
+        component.getTabContextMenuItems = getTabContextMenuItems;
 
         expect(() => component.ngOnInit()).not.toThrow();
     });

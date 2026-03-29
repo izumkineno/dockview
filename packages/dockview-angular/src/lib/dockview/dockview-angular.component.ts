@@ -26,7 +26,7 @@ import {
     DockviewFrameworkOptions,
     DockviewComponentOptions,
     TabAnimation,
-    GetContextMenuItemsParams,
+    GetTabContextMenuItemsParams,
     ContextMenuItem,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
@@ -41,8 +41,8 @@ export interface DockviewAngularOptions extends DockviewOptions {
     leftHeaderActionsComponent?: Type<any>;
     rightHeaderActionsComponent?: Type<any>;
     prefixHeaderActionsComponent?: Type<any>;
-    getContextMenuItems?: (
-        params: GetContextMenuItemsParams
+    getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
     ) => (ContextMenuItem | { component: Type<any> })[];
 }
 
@@ -93,8 +93,8 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
     @Input() tabAnimation?: TabAnimation;
-    @Input() getContextMenuItems?: (
-        params: GetContextMenuItemsParams
+    @Input() getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
     ) => (ContextMenuItem | { component: Type<any> })[];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();

@@ -259,7 +259,7 @@ const DockviewDemo = (props: { theme?: string }) => {
                     prefixHeaderActionsComponent={PrefixHeaderControls}
                     onReady={onReady}
                     className={props.theme || 'dockview-theme-abyss'}
-                    getContextMenuItems={() => [
+                    getTabContextMenuItems={() => [
                         'close',
                         'closeOthers',
                         'closeAll',

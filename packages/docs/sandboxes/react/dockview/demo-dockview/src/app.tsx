@@ -514,7 +514,7 @@ const DockviewDemo = (props: {
                                 }
                                 onReady={onReady}
                                 theme={effectiveTheme}
-                                getContextMenuItems={() => [
+                                getTabContextMenuItems={() => [
                                     'close',
                                     'closeOthers',
                                     'closeAll',

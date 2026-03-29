@@ -48,7 +48,7 @@ export interface ContextMenuItemConfig {
 
 export type ContextMenuItem = BuiltInContextMenuItem | ContextMenuItemConfig;
 
-export interface GetContextMenuItemsParams {
+export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
     group: DockviewGroupPanel;
     api: DockviewApi;
@@ -143,8 +143,8 @@ export interface DockviewOptions {
      * If omitted, the default menu `['close', 'closeOthers', 'closeAll']` is shown.
      * Return an empty array to disable the context menu entirely.
      */
-    getContextMenuItems?: (
-        params: GetContextMenuItemsParams
+    getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
     ) => ContextMenuItem[];
 }
 
@@ -199,7 +199,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
         tabAnimation: undefined,
-        getContextMenuItems: undefined,
+        getTabContextMenuItems: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];

@@ -8,7 +8,7 @@ import { PopupService } from '../../dockview/components/popupService';
 
 function makeAccessor(
     overrides: {
-        getContextMenuItems?: jest.Mock;
+        getTabContextMenuItems?: jest.Mock;
         createContextMenuItemComponent?: jest.Mock;
     } = {}
 ) {
@@ -18,7 +18,7 @@ function makeAccessor(
 
     const accessor = fromPartial<DockviewComponent>({
         options: {
-            getContextMenuItems: overrides.getContextMenuItems,
+            getTabContextMenuItems: overrides.getTabContextMenuItems,
             createContextMenuItemComponent:
                 overrides.createContextMenuItemComponent,
         },
@@ -66,9 +66,9 @@ describe('ContextMenuController', () => {
             });
         });
 
-        test('does not call openPopover when getContextMenuItems returns empty array', () => {
+        test('does not call openPopover when getTabContextMenuItems returns empty array', () => {
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest.fn().mockReturnValue([]),
+                getTabContextMenuItems: jest.fn().mockReturnValue([]),
             });
             const controller = new ContextMenuController(accessor);
 
@@ -118,7 +118,7 @@ describe('ContextMenuController', () => {
         test('calls panel.api.close() and closes popup on click', () => {
             const closePanelMock = jest.fn();
             const { accessor, openPopover, close } = makeAccessor({
-                getContextMenuItems: jest.fn().mockReturnValue(['close']),
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
             });
             const controller = new ContextMenuController(accessor);
 
@@ -147,7 +147,9 @@ describe('ContextMenuController', () => {
             const panel3 = makePanel(close3);
 
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest.fn().mockReturnValue(['closeOthers']),
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['closeOthers']),
             });
             const controller = new ContextMenuController(accessor);
 
@@ -177,7 +179,7 @@ describe('ContextMenuController', () => {
             const panel3 = makePanel(close3);
 
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest.fn().mockReturnValue(['closeAll']),
+                getTabContextMenuItems: jest.fn().mockReturnValue(['closeAll']),
             });
             const controller = new ContextMenuController(accessor);
 
@@ -199,7 +201,9 @@ describe('ContextMenuController', () => {
     describe("built-in 'separator' item", () => {
         test('renders a separator element', () => {
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest.fn().mockReturnValue(['separator']),
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['separator']),
             });
             const controller = new ContextMenuController(accessor);
 
@@ -223,7 +227,7 @@ describe('ContextMenuController', () => {
         test('renders label text and calls action on click', () => {
             const actionMock = jest.fn();
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest
+                getTabContextMenuItems: jest
                     .fn()
                     .mockReturnValue([
                         { label: 'My Action', action: actionMock },
@@ -250,15 +254,13 @@ describe('ContextMenuController', () => {
         test('does not call action when disabled', () => {
             const actionMock = jest.fn();
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest
-                    .fn()
-                    .mockReturnValue([
-                        {
-                            label: 'Disabled',
-                            action: actionMock,
-                            disabled: true,
-                        },
-                    ]),
+                getTabContextMenuItems: jest.fn().mockReturnValue([
+                    {
+                        label: 'Disabled',
+                        action: actionMock,
+                        disabled: true,
+                    },
+                ]),
             });
             const controller = new ContextMenuController(accessor);
 
@@ -292,7 +294,7 @@ describe('ContextMenuController', () => {
             });
 
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest
+                getTabContextMenuItems: jest
                     .fn()
                     .mockReturnValue([{ component: componentRef }]),
                 createContextMenuItemComponent,
@@ -323,7 +325,7 @@ describe('ContextMenuController', () => {
             });
 
             const { accessor, close } = makeAccessor({
-                getContextMenuItems: jest
+                getTabContextMenuItems: jest
                     .fn()
                     .mockReturnValue([{ component: {} }]),
                 createContextMenuItemComponent,
@@ -346,7 +348,7 @@ describe('ContextMenuController', () => {
                 .fn()
                 .mockReturnValue(undefined);
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest
+                getTabContextMenuItems: jest
                     .fn()
                     .mockReturnValue([{ component: {} }]),
                 createContextMenuItemComponent,
@@ -367,7 +369,7 @@ describe('ContextMenuController', () => {
     describe('mixed item list', () => {
         test('renders items in order with correct types', () => {
             const { accessor, openPopover } = makeAccessor({
-                getContextMenuItems: jest
+                getTabContextMenuItems: jest
                     .fn()
                     .mockReturnValue([
                         'close',
