@@ -38,19 +38,23 @@ export class ContextMenuController {
         group: DockviewGroupPanel,
         event: MouseEvent
     ): void {
-        event.preventDefault();
+        if (!this.accessor.options.getTabContextMenuItems) {
+            return;
+        }
 
         const items: ContextMenuItem[] =
-            this.accessor.options.getTabContextMenuItems?.({
+            this.accessor.options.getTabContextMenuItems({
                 panel,
                 group,
                 api: this.accessor.api,
                 event,
-            }) ?? ['close', 'closeOthers', 'closeAll'];
+            });
 
         if (items.length === 0) {
             return;
         }
+
+        event.preventDefault();
 
         const close = () => this.accessor.popupService.close();
         const menuEl = document.createElement('div');

@@ -236,12 +236,12 @@ const headerComponents = {
     },
 };
 
-const FloatMenuItem = ({ group, api, close }: IContextMenuItemComponentProps) => {
+const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) => {
     return (
         <div
             className="dv-context-menu-item"
             onClick={() => {
-                api.addFloatingGroup(group);
+                api.addFloatingGroup(panel);
                 close();
             }}
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
@@ -249,7 +249,7 @@ const FloatMenuItem = ({ group, api, close }: IContextMenuItemComponentProps) =>
             <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
                 ad_group
             </span>
-            Float group
+            Float tab
         </div>
     );
 };

@@ -140,8 +140,8 @@ export interface DockviewOptions {
      * Use built-in string shortcuts (`'close'`, `'closeOthers'`, `'closeAll'`, `'separator'`)
      * or provide a `ContextMenuItemConfig` object for custom items.
      *
-     * If omitted, the default menu `['close', 'closeOthers', 'closeAll']` is shown.
-     * Return an empty array to disable the context menu entirely.
+     * If omitted, no context menu is shown.
+     * Return an empty array to suppress the menu for specific cases.
      */
     getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams

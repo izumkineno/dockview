@@ -39,8 +39,10 @@ function makeGroup(panels: IDockviewPanel[] = []) {
 
 describe('ContextMenuController', () => {
     describe('show()', () => {
-        test('calls event.preventDefault()', () => {
-            const { accessor } = makeAccessor();
+        test('calls event.preventDefault() when menu items are returned', () => {
+            const { accessor } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
             const controller = new ContextMenuController(accessor);
             const event = new MouseEvent('contextmenu', { cancelable: true });
             const spy = jest.spyOn(event, 'preventDefault');
@@ -50,8 +52,34 @@ describe('ContextMenuController', () => {
             expect(spy).toHaveBeenCalled();
         });
 
+        test('does not call event.preventDefault() when no callback provided', () => {
+            const { accessor } = makeAccessor();
+            const controller = new ContextMenuController(accessor);
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            const spy = jest.spyOn(event, 'preventDefault');
+
+            controller.show(makePanel(), makeGroup(), event);
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        test('does not call event.preventDefault() when callback returns empty array', () => {
+            const { accessor } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue([]),
+            });
+            const controller = new ContextMenuController(accessor);
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            const spy = jest.spyOn(event, 'preventDefault');
+
+            controller.show(makePanel(), makeGroup(), event);
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+
         test('calls popupService.openPopover with correct coordinates', () => {
-            const { accessor, openPopover } = makeAccessor();
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
             const controller = new ContextMenuController(accessor);
             const event = new MouseEvent('contextmenu', {
                 clientX: 150,
@@ -81,7 +109,7 @@ describe('ContextMenuController', () => {
             expect(openPopover).not.toHaveBeenCalled();
         });
 
-        test('shows default menu (close, closeOthers, closeAll) when no callback provided', () => {
+        test('does not show menu when no callback provided', () => {
             const { accessor, openPopover } = makeAccessor();
             const controller = new ContextMenuController(accessor);
 
@@ -91,16 +119,13 @@ describe('ContextMenuController', () => {
                 new MouseEvent('contextmenu')
             );
 
-            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
-            const items = menuEl.querySelectorAll('.dv-context-menu-item');
-            expect(items).toHaveLength(3);
-            expect(items[0].textContent).toBe('Close');
-            expect(items[1].textContent).toBe('Close Others');
-            expect(items[2].textContent).toBe('Close All');
+            expect(openPopover).not.toHaveBeenCalled();
         });
 
         test('menu element has class dv-context-menu', () => {
-            const { accessor, openPopover } = makeAccessor();
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
             const controller = new ContextMenuController(accessor);
 
             controller.show(
