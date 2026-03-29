@@ -7,6 +7,7 @@ import {
     DockviewApi,
     DockviewTheme,
     themeAbyss,
+    IContextMenuItemComponentProps,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -231,12 +232,26 @@ const components = {
 
 const headerComponents = {
     default: (props: IDockviewPanelHeaderProps) => {
-        const onContextMenu = (event: React.MouseEvent) => {
-            event.preventDefault();
-            alert('context menu');
-        };
-        return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
+        return <DockviewDefaultTab {...props} />;
     },
+};
+
+const FloatMenuItem = ({ group, api, close }: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addFloatingGroup(group);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+                ad_group
+            </span>
+            Float group
+        </div>
+    );
 };
 
 const colors = [
@@ -499,6 +514,13 @@ const DockviewDemo = (props: {
                                 }
                                 onReady={onReady}
                                 theme={effectiveTheme}
+                                getContextMenuItems={() => [
+                                    'close',
+                                    'closeOthers',
+                                    'closeAll',
+                                    'separator',
+                                    { component: FloatMenuItem },
+                                ]}
                             />
                         </ThemeContext.Provider>
                     </DebugContext.Provider>

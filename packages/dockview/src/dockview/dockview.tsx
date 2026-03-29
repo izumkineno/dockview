@@ -15,12 +15,17 @@ import {
     DockviewFrameworkOptions,
     DockviewReadyEvent,
     createDockview,
+    BuiltInContextMenuItem,
+    ContextMenuItemConfig,
+    GetContextMenuItemsParams,
+    IContextMenuItemComponentProps,
 } from 'dockview-core';
 import { ReactPanelContentPart } from './reactContentPart';
 import { ReactPanelHeaderPart } from './reactHeaderPart';
 import { ReactPortalStore, usePortalsLifecycle } from '../react';
 import { ReactWatermarkPart } from './reactWatermarkPart';
 import { ReactHeaderActionsRendererPart } from './headerActionsRenderer';
+import { ReactContextMenuItemPart } from './reactContextMenuItemPart';
 
 function createGroupControlElement(
     component: React.FunctionComponent<IDockviewHeaderActionsProps> | undefined,
@@ -39,6 +44,13 @@ function createGroupControlElement(
 
 const DEFAULT_REACT_TAB = 'props.defaultTabComponent';
 
+export interface ReactContextMenuItemConfig extends Omit<
+    ContextMenuItemConfig,
+    'component'
+> {
+    component?: React.FunctionComponent<IContextMenuItemComponentProps>;
+}
+
 export interface IDockviewReactProps extends DockviewOptions {
     tabComponents?: Record<
         string,
@@ -50,6 +62,9 @@ export interface IDockviewReactProps extends DockviewOptions {
     rightHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     leftHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
     prefixHeaderActionsComponent?: React.FunctionComponent<IDockviewHeaderActionsProps>;
+    getContextMenuItems?: (
+        params: GetContextMenuItemsParams
+    ) => (BuiltInContextMenuItem | ReactContextMenuItemConfig)[];
     //
     onReady: (event: DockviewReadyEvent) => void;
     onDidDrop?: (event: DockviewDidDropEvent) => void;
@@ -158,6 +173,16 @@ export const DockviewReact = React.forwardRef(
                 defaultTabComponent: props.defaultTabComponent
                     ? DEFAULT_REACT_TAB
                     : undefined,
+                createContextMenuItemComponent: (options) => {
+                    if (!options.component) {
+                        return undefined;
+                    }
+                    return new ReactContextMenuItemPart(
+                        options.id,
+                        options.component as React.FunctionComponent<IContextMenuItemComponentProps>,
+                        { addPortal }
+                    );
+                },
             };
 
             const api = createDockview(domRef.current, {

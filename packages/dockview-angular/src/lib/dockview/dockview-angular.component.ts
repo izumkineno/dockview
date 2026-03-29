@@ -26,8 +26,11 @@ import {
     DockviewFrameworkOptions,
     DockviewComponentOptions,
     TabAnimation,
+    GetContextMenuItemsParams,
+    ContextMenuItem,
 } from 'dockview-core';
 import { AngularFrameworkComponentFactory } from '../utils/component-factory';
+import { AngularRenderer } from '../utils/angular-renderer';
 import { AngularLifecycleManager } from '../utils/lifecycle-utils';
 
 export interface DockviewAngularOptions extends DockviewOptions {
@@ -38,6 +41,9 @@ export interface DockviewAngularOptions extends DockviewOptions {
     leftHeaderActionsComponent?: Type<any>;
     rightHeaderActionsComponent?: Type<any>;
     prefixHeaderActionsComponent?: Type<any>;
+    getContextMenuItems?: (
+        params: GetContextMenuItemsParams
+    ) => (ContextMenuItem | { component: Type<any> })[];
 }
 
 @Component({
@@ -87,6 +93,9 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
     @Input() tabAnimation?: TabAnimation;
+    @Input() getContextMenuItems?: (
+        params: GetContextMenuItemsParams
+    ) => (ContextMenuItem | { component: Type<any> })[];
 
     @Output() ready = new EventEmitter<DockviewReadyEvent>();
     @Output() didDrop = new EventEmitter<DockviewDidDropEvent>();
@@ -222,6 +231,17 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
                       )!;
                   }
                 : undefined,
+            createContextMenuItemComponent: (options) => {
+                if (!options.component) {
+                    return undefined;
+                }
+                const renderer = new AngularRenderer({
+                    component: options.component as Type<any>,
+                    injector: this.injector,
+                    environmentInjector: this.environmentInjector,
+                });
+                return renderer;
+            },
         };
     }
 

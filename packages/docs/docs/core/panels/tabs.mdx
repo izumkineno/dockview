@@ -356,7 +356,7 @@ import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
 const MyCustomTab = (props: IDockviewPanelHeaderProps) => {
     const onContextMenu = (event: React.MouseEvent) => {
         event.preventDefault();
-        alert('context menu');
+        console.log('context menu', props.api.id);
     };
     return <DockviewDefaultTab onContextMenu={onContextMenu} hideClose={true} {...props} />;
 };

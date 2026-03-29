@@ -4,8 +4,10 @@ import {
     DockviewGroupPanelApi,
     DockviewGroupPanelModel,
     IDockviewPanel,
+    IContextMenuItemComponentProps,
 } from 'dockview-core';
 import {
+    VueContextMenuItemRenderer,
     VueHeaderActionsRenderer,
     VuePart,
     findComponent,
@@ -493,5 +495,79 @@ describe('VueHeaderActionsRenderer', () => {
         );
 
         renderer.dispose();
+    });
+});
+
+describe('VueContextMenuItemRenderer', () => {
+    let mockParent: any;
+    let mockComponent: any;
+
+    beforeEach(() => {
+        mockParent = {
+            appContext: { components: {}, provides: {} },
+            provides: {},
+        };
+        mockComponent = { template: '<div>menu item</div>', props: ['params'] };
+        createVNodeMock.mockClear();
+        vueRenderMock.mockClear();
+        (cloneVNode as jest.Mock).mockClear();
+    });
+
+    test('element has class dv-vue-part with full dimensions', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+
+        expect(renderer.element.className).toBe('dv-vue-part');
+        expect(renderer.element.style.height).toBe('100%');
+        expect(renderer.element.style.width).toBe('100%');
+    });
+
+    test('init mounts the component with props', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+        const props = {
+            panel: {} as IDockviewPanel,
+            group: {} as DockviewGroupPanel,
+            api: {} as any,
+            close: jest.fn(),
+        } as IContextMenuItemComponentProps;
+
+        renderer.init(props);
+
+        expect(createVNodeMock).toHaveBeenCalledTimes(1);
+        const passedProps = createVNodeMock.mock.calls[0][1];
+        expect(passedProps.params).toBe(props);
+    });
+
+    test('dispose unmounts the component', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+
+        renderer.init({
+            panel: {} as IDockviewPanel,
+            group: {} as DockviewGroupPanel,
+            api: {} as any,
+            close: jest.fn(),
+        } as IContextMenuItemComponentProps);
+
+        vueRenderMock.mockClear();
+        renderer.dispose();
+
+        // render(null, element) is called to unmount
+        expect(vueRenderMock).toHaveBeenCalledWith(null, renderer.element);
+    });
+
+    test('dispose before init does not throw', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+        expect(() => renderer.dispose()).not.toThrow();
     });
 });
