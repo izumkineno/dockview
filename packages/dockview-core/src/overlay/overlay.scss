@@ -31,7 +31,7 @@
     position: absolute;
     z-index: calc(var(--dv-overlay-z-index) - 2);
 
-    border: 1px solid var(--dv-tab-divider-color);
+    border: var(--dv-floating-border);
     box-shadow: var(--dv-floating-box-shadow);
     
     /* GPU optimizations for floating group movement */
@@ -44,7 +44,7 @@
     }
 
     &.dv-resize-container-dragging {
-        opacity: 0.5;
+        opacity: var(--dv-floating-group-dragging-opacity);
         /* Enhanced GPU acceleration during drag */
         will-change: transform, opacity;
     }
