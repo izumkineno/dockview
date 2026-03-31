@@ -7,6 +7,8 @@ import {
     DockviewApi,
     DockviewTheme,
     FixedPanelsConfig,
+    themeAbyss,
+    IContextMenuItemComponentProps,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -24,7 +26,14 @@ import { MarketProvider } from './marketContext';
 import { WatchlistPanel } from './watchlistPanel';
 import { PriceAlertPanel } from './priceAlertPanel';
 import { PositionSummaryPanel } from './positionSummaryPanel';
-import { PanelColorsContext, DARK_COLORS, LIGHT_COLORS, LIGHT_THEME_NAMES } from './panelTheme';
+import { PanelColorsContext, DARK_COLORS, LIGHT_COLORS } from './panelTheme';
+import {
+    ThemeBuilderState,
+    ThemeCssOverrides,
+    buildEffectiveTheme,
+    getInitialStateFromTheme,
+} from './themeBuilder';
+import { ThemeBuilderModal } from './themeBuilderModal';
 
 export const ApiContext = React.createContext<DockviewApi | undefined>(
     undefined
@@ -242,12 +251,33 @@ const components = {
 
 const headerComponents = {
     default: (props: IDockviewPanelHeaderProps) => {
-        const onContextMenu = (event: React.MouseEvent) => {
-            event.preventDefault();
-            alert('context menu');
-        };
-        return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
+        return <DockviewDefaultTab {...props} />;
     },
+};
+
+const FloatMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addFloatingGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
+                ad_group
+            </span>
+            Float tab
+        </div>
+    );
 };
 
 const colors = [
@@ -270,6 +300,9 @@ const DockviewDemo = (props: {
     theme?: DockviewTheme;
     showSettings?: boolean;
     onCloseSettings?: () => void;
+    showThemeBuilder?: boolean;
+    onCloseThemeBuilder?: () => void;
+    onChangeTheme?: (theme: DockviewTheme) => void;
 }) => {
     const [logLines, setLogLines] = React.useState<
         { text: string; timestamp?: Date; backgroundColor?: string }[]
@@ -433,9 +466,65 @@ const DockviewDemo = (props: {
         setApi(event.api);
     };
 
+    const [builderState, setBuilderState] = React.useState<ThemeBuilderState>(
+        () => getInitialStateFromTheme(props.theme ?? themeAbyss)
+    );
+
+    const prevTheme = React.useRef(props.theme);
+    React.useEffect(() => {
+        if (prevTheme.current !== props.theme) {
+            prevTheme.current = props.theme;
+            setBuilderState(
+                getInitialStateFromTheme(props.theme ?? themeAbyss)
+            );
+        }
+    }, [props.theme]);
+
+    const updateBuilder = (patch: Partial<ThemeBuilderState>) =>
+        setBuilderState((s) => ({ ...s, ...patch }));
+
+    const updateCss = (patch: Partial<ThemeCssOverrides>) =>
+        setBuilderState((s) => {
+            const next = { ...s.cssOverrides };
+            for (const [k, v] of Object.entries(patch)) {
+                if (v === undefined || v === '') {
+                    delete (next as Record<string, unknown>)[k];
+                } else {
+                    (next as Record<string, unknown>)[k] = v;
+                }
+            }
+            return { ...s, cssOverrides: next };
+        });
+
+    const effectiveTheme = React.useMemo(
+        () => buildEffectiveTheme(props.theme ?? themeAbyss, builderState),
+        [props.theme, builderState]
+    );
+
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const prevCssOverrideKeys = React.useRef<string[]>([]);
+
+    React.useEffect(() => {
+        const dvRoot = containerRef.current?.querySelector(
+            '[class*="dockview-theme"]'
+        ) as HTMLElement | null;
+        if (!dvRoot) return;
+
+        for (const k of prevCssOverrideKeys.current) {
+            if (!(k in builderState.cssOverrides)) {
+                dvRoot.style.removeProperty(k);
+            }
+        }
+        for (const [k, v] of Object.entries(builderState.cssOverrides)) {
+            dvRoot.style.setProperty(k, v as string);
+        }
+        prevCssOverrideKeys.current = Object.keys(builderState.cssOverrides);
+    }, [builderState.cssOverrides]);
+
     const panelColors = React.useMemo(
-        () => LIGHT_THEME_NAMES.has(props.theme?.name ?? '') ? LIGHT_COLORS : DARK_COLORS,
-        [props.theme]
+        () =>
+            effectiveTheme.colorScheme === 'light' ? LIGHT_COLORS : DARK_COLORS,
+        [effectiveTheme]
     );
 
     const [watermark, setWatermark] = React.useState<boolean>(false);
@@ -502,6 +591,7 @@ const DockviewDemo = (props: {
                 }}
             >
                 <div
+                    ref={containerRef}
                     style={{
                         flexGrow: 1,
                         overflow: 'hidden',
@@ -510,30 +600,51 @@ const DockviewDemo = (props: {
                     }}
                 >
                     <PanelColorsContext.Provider value={panelColors}>
-                    <MarketProvider>
-                    <ApiContext.Provider value={api}>
-                    <DebugContext.Provider value={debug}>
-                        <ThemeContext.Provider value={props.theme}>
-                            <DockviewReact
-                                key={useFixedPanels ? 'shell' : 'no-shell'}
-                                components={components}
-                                defaultTabComponent={headerComponents.default}
-                                rightHeaderActionsComponent={RightControls}
-                                leftHeaderActionsComponent={LeftControls}
-                                prefixHeaderActionsComponent={
-                                    PrefixHeaderControls
-                                }
-                                watermarkComponent={
-                                    watermark ? WatermarkComponent : undefined
-                                }
-                                onReady={onReady}
-                                theme={props.theme}
-                                fixedPanels={fixedPanelsConfig}
-                            />
-                        </ThemeContext.Provider>
-                    </DebugContext.Provider>
-                    </ApiContext.Provider>
-                    </MarketProvider>
+                        <MarketProvider>
+                            <ApiContext.Provider value={api}>
+                                <DebugContext.Provider value={debug}>
+                                    <ThemeContext.Provider
+                                        value={effectiveTheme}
+                                    >
+                                        <DockviewReact
+                                            key={
+                                                useFixedPanels
+                                                    ? 'shell'
+                                                    : 'no-shell'
+                                            }
+                                            components={components}
+                                            defaultTabComponent={
+                                                headerComponents.default
+                                            }
+                                            rightHeaderActionsComponent={
+                                                RightControls
+                                            }
+                                            leftHeaderActionsComponent={
+                                                LeftControls
+                                            }
+                                            prefixHeaderActionsComponent={
+                                                PrefixHeaderControls
+                                            }
+                                            watermarkComponent={
+                                                watermark
+                                                    ? WatermarkComponent
+                                                    : undefined
+                                            }
+                                            onReady={onReady}
+                                            theme={effectiveTheme}
+                                            fixedPanels={fixedPanelsConfig}
+                                            getTabContextMenuItems={() => [
+                                                'close',
+                                                'closeOthers',
+                                                'closeAll',
+                                                'separator',
+                                                { component: FloatMenuItem },
+                                            ]}
+                                        />
+                                    </ThemeContext.Provider>
+                                </DebugContext.Provider>
+                            </ApiContext.Provider>
+                        </MarketProvider>
                     </PanelColorsContext.Provider>
                 </div>
 
@@ -615,6 +726,20 @@ const DockviewDemo = (props: {
                         </div>
                     </div>
                 )}
+                <ThemeBuilderModal
+                    open={props.showThemeBuilder ?? false}
+                    onClose={props.onCloseThemeBuilder ?? (() => {})}
+                    state={builderState}
+                    onChange={updateBuilder}
+                    onCssChange={updateCss}
+                    onReset={() =>
+                        setBuilderState(
+                            getInitialStateFromTheme(props.theme ?? themeAbyss)
+                        )
+                    }
+                    baseTheme={props.theme ?? themeAbyss}
+                    containerEl={containerRef.current}
+                />
             </div>
 
             <SettingsModal

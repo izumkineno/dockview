@@ -1,11 +1,20 @@
 @mixin dockview-design-space-mixin {
+    --dv-gap: 10px;
+    --dv-spacing-padding: 10px;
     --dv-tab-font-size: 12px;
     --dv-border-radius: 20px;
     --dv-tab-margin: 0.5rem 0.25rem;
     --dv-tabs-and-actions-container-height: 44px;
+    --dv-tab-border-radius: 8px;
+    --dv-sash-border-radius: 4px;
+    --dv-dropdown-border-radius: 8px;
+    --dv-tab-close-icon-size: 8px;
+    --dv-floating-group-border: 2px solid var(--dv-group-view-background-color);
+    --dv-drag-over-border: 2px solid var(--dv-active-sash-color);
 
-    --dv-border-radius: 20px;
     box-sizing: border-box;
+    padding: var(--dv-spacing-padding);
+    background-color: var(--dv-group-view-background-color);
 
     // When the dockview element is embedded inside a shell, the shell wrapper
     // already carries the outer padding. Suppress it on the inner dockview
@@ -22,7 +31,7 @@
     }
 
     .dv-sash {
-        border-radius: 4px;
+        border-radius: var(--dv-sash-border-radius);
     }
 
     .dv-drop-target-anchor {
@@ -35,20 +44,29 @@
     .dv-resize-container {
         border-radius: var(--dv-border-radius) !important;
         border: none;
+
+        .dv-groupview {
+            border: var(--dv-floating-group-border);
+        }
     }
 
     .dv-tabs-overflow-container,
     .dv-tabs-overflow-dropdown-default {
-        border-radius: 8px;
+        border-radius: var(--dv-dropdown-border-radius);
         height: unset !important;
     }
 
+    .dv-render-overlay {
+        border-bottom-left-radius: var(--dv-border-radius);
+        border-bottom-right-radius: var(--dv-border-radius);
+    }
+
     .dv-tab {
-        border-radius: 8px;
+        border-radius: var(--dv-tab-border-radius);
 
         .dv-svg {
-            height: 8px;
-            width: 8px;
+            height: var(--dv-tab-close-icon-size);
+            width: var(--dv-tab-close-icon-size);
         }
     }
 
@@ -82,6 +100,8 @@
             background-color: var(
                 --dv-tabs-and-actions-container-background-color
             );
+            border-bottom-left-radius: var(--dv-border-radius);
+            border-bottom-right-radius: var(--dv-border-radius);
         }
     }
 

@@ -8,6 +8,10 @@ export interface DockviewTheme {
      */
     className: string;
     /**
+     * Whether the theme is light or dark. Useful for adapting panel content colors.
+     */
+    colorScheme?: 'light' | 'dark';
+    /**
      * The gap between the groups
      */
     gap?: number;
@@ -31,16 +35,19 @@ export interface DockviewTheme {
 export const themeDark: DockviewTheme = {
     name: 'dark',
     className: 'dockview-theme-dark',
+    colorScheme: 'dark',
 };
 
 export const themeLight: DockviewTheme = {
     name: 'light',
     className: 'dockview-theme-light',
+    colorScheme: 'light',
 };
 
 export const themeVisualStudio: DockviewTheme = {
     name: 'visualStudio',
     className: 'dockview-theme-vs',
+    colorScheme: 'dark',
     // --dv-tabs-and-actions-container-height is 20px, but the VS theme applies
     // box-sizing: content-box + border-bottom: 2px, so the rendered strip is 22px.
     fixedPanelCollapsedSize: 22,
@@ -49,22 +56,19 @@ export const themeVisualStudio: DockviewTheme = {
 export const themeAbyss: DockviewTheme = {
     name: 'abyss',
     className: 'dockview-theme-abyss',
+    colorScheme: 'dark',
 };
 
 export const themeDracula: DockviewTheme = {
     name: 'dracula',
     className: 'dockview-theme-dracula',
-};
-
-export const themeReplit: DockviewTheme = {
-    name: 'replit',
-    className: 'dockview-theme-replit',
-    gap: 10,
+    colorScheme: 'dark',
 };
 
 export const themeAbyssSpaced: DockviewTheme = {
     name: 'abyssSpaced',
     className: 'dockview-theme-abyss-spaced',
+    colorScheme: 'dark',
     gap: 10,
     fixedPanelCollapsedSize: 44,
     dndOverlayMounting: 'absolute',
@@ -74,6 +78,88 @@ export const themeAbyssSpaced: DockviewTheme = {
 export const themeLightSpaced: DockviewTheme = {
     name: 'lightSpaced',
     className: 'dockview-theme-light-spaced',
+    colorScheme: 'light',
+    gap: 10,
+    dndOverlayMounting: 'absolute',
+    dndPanelOverlay: 'group',
+};
+
+export const themeNord: DockviewTheme = {
+    name: 'nord',
+    className: 'dockview-theme-nord',
+    colorScheme: 'dark',
+};
+
+export const themeNordSpaced: DockviewTheme = {
+    name: 'nordSpaced',
+    className: 'dockview-theme-nord-spaced',
+    colorScheme: 'dark',
+    gap: 10,
+    dndOverlayMounting: 'absolute',
+    dndPanelOverlay: 'group',
+};
+
+export const themeCatppuccinMocha: DockviewTheme = {
+    name: 'catppuccinMocha',
+    className: 'dockview-theme-catppuccin-mocha',
+    colorScheme: 'dark',
+};
+
+export const themeCatppuccinMochaSpaced: DockviewTheme = {
+    name: 'catppuccinMochaSpaced',
+    className: 'dockview-theme-catppuccin-mocha-spaced',
+    colorScheme: 'dark',
+    gap: 10,
+    dndOverlayMounting: 'absolute',
+    dndPanelOverlay: 'group',
+};
+
+export const themeMonokai: DockviewTheme = {
+    name: 'monokai',
+    className: 'dockview-theme-monokai',
+    colorScheme: 'dark',
+};
+
+export const themeSolarizedLight: DockviewTheme = {
+    name: 'solarizedLight',
+    className: 'dockview-theme-solarized-light',
+    colorScheme: 'light',
+};
+
+export const themeSolarizedLightSpaced: DockviewTheme = {
+    name: 'solarizedLightSpaced',
+    className: 'dockview-theme-solarized-light-spaced',
+    colorScheme: 'light',
+    gap: 10,
+    dndOverlayMounting: 'absolute',
+    dndPanelOverlay: 'group',
+};
+
+export const themeGithubDark: DockviewTheme = {
+    name: 'githubDark',
+    className: 'dockview-theme-github-dark',
+    colorScheme: 'dark',
+};
+
+export const themeGithubDarkSpaced: DockviewTheme = {
+    name: 'githubDarkSpaced',
+    className: 'dockview-theme-github-dark-spaced',
+    colorScheme: 'dark',
+    gap: 10,
+    dndOverlayMounting: 'absolute',
+    dndPanelOverlay: 'group',
+};
+
+export const themeGithubLight: DockviewTheme = {
+    name: 'githubLight',
+    className: 'dockview-theme-github-light',
+    colorScheme: 'light',
+};
+
+export const themeGithubLightSpaced: DockviewTheme = {
+    name: 'githubLightSpaced',
+    className: 'dockview-theme-github-light-spaced',
+    colorScheme: 'light',
     gap: 10,
     fixedPanelCollapsedSize: 44,
     dndOverlayMounting: 'absolute',

@@ -172,6 +172,13 @@ export class Tab extends CompositeDisposable {
             addDisposableListener(this._element, 'click', (event) => {
                 this._onTabClick.fire(event);
             }),
+            addDisposableListener(this._element, 'contextmenu', (event) => {
+                this.accessor.contextMenuController.show(
+                    this.panel,
+                    this.group,
+                    event
+                );
+            }),
             this.dropTarget.onDrop((event) => {
                 this._onDropped.fire(event);
             }),
