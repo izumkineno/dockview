@@ -393,12 +393,140 @@ return <DockviewDefaultTab onContextMenu={onContextMenu} hideClose={true} {...pr
 :::
 </FrameworkSpecific>
 
-As a simple example the below attaches a custom event handler for the context menu on all tabs as a default tab renderer
-
-The below example uses a custom tab renderer to reigster a popover when the user right clicked on a tab.
-This still makes use of the `DockviewDefaultTab` since it's only a minor change.
+The example below shows a custom tab renderer that displays the panel title alongside a live-updating parameter value.
 
 <CodeRunner id="dockview/custom-header"/>
+
+## Tab Context Menu
+
+Right-clicking a tab can show a context menu. This is opt-in — no menu is shown unless
+`getTabContextMenuItems` is provided. Return an empty array to suppress the menu for specific panels.
+
+<FrameworkSpecific framework="React">
+  <DocRef declaration="IDockviewReactProps" methods={['getTabContextMenuItems']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+  <DocRef declaration="IDockviewVueProps" methods={['getTabContextMenuItems']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+  <DocRef declaration="IDockviewAngularProps" methods={['getTabContextMenuItems']} />
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+  <DocRef declaration="DockviewComponentOptions" methods={['getTabContextMenuItems']} />
+</FrameworkSpecific>
+
+### Built-in items
+
+Pass string shortcuts to render standard menu entries without any extra code:
+
+| Value | Behaviour |
+| --- | --- |
+| `'close'` | Close the right-clicked panel |
+| `'closeOthers'` | Close every other panel in the same group |
+| `'closeAll'` | Close all panels in the group |
+| `'separator'` | Render a visual divider |
+
+### Custom label items
+
+Provide an object with a `label` and `action` to add a simple clickable entry:
+
+```ts
+getTabContextMenuItems: (params) => [
+    { label: 'Log panel id', action: () => console.log(params.panel.id) },
+    { label: 'Disabled entry', action: () => {}, disabled: true },
+]
+```
+
+### Custom component items
+
+For richer UI, provide a framework component via the `component` field.
+The component receives `panel`, `group`, `api`, `close`, and an optional `componentProps` object.
+
+<FrameworkSpecific framework="React">
+```tsx
+import { IContextMenuItemComponentProps } from 'dockview';
+
+const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) => (
+    <div
+        className="dv-context-menu-item"
+        onClick={() => { api.addFloatingGroup(panel); close(); }}
+    >
+        Float tab
+    </div>
+);
+
+<DockviewReact
+    getTabContextMenuItems={() => [
+        'close',
+        'separator',
+        { component: FloatMenuItem },
+    ]}
+/>
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Vue">
+```ts
+// Vue component receives props under a `params` wrapper: params.panel, params.api, etc.
+const FloatMenuItem = defineComponent({
+    props: { params: { type: Object as PropType<IContextMenuItemComponentProps>, required: true } },
+    template: `
+        <div class="dv-context-menu-item" @click="onClick">Float tab</div>
+    `,
+    methods: {
+        onClick() {
+            this.params.api.addFloatingGroup(this.params.panel);
+            this.params.close();
+        },
+    },
+});
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="Angular">
+```ts
+// Angular component receives panel, group, api, close, componentProps as @Input() bindings.
+@Component({
+    selector: 'float-menu-item',
+    template: `<div class="dv-context-menu-item" (click)="onClick()">Float tab</div>`,
+})
+export class FloatMenuItemComponent {
+    @Input() panel: IDockviewPanel;
+    @Input() api: DockviewApi;
+    @Input() close: () => void;
+
+    onClick() {
+        this.api.addFloatingGroup(this.panel);
+        this.close();
+    }
+}
+```
+</FrameworkSpecific>
+
+<FrameworkSpecific framework="JavaScript">
+```ts
+// Implement IContextMenuItemRenderer to render a custom DOM element.
+class FloatMenuItem {
+    readonly element = document.createElement('div');
+
+    init({ panel, api, close }) {
+        this.element.className = 'dv-context-menu-item';
+        this.element.textContent = 'Float tab';
+        this.element.addEventListener('click', () => {
+            api.addFloatingGroup(panel);
+            close();
+        });
+    }
+
+    dispose() {}
+}
+```
+</FrameworkSpecific>
+
+<CodeRunner id="dockview/context-menu"/>
 
 ## Full Width Tab
 
