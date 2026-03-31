@@ -16,11 +16,7 @@ describe('EdgePanelView', () => {
     describe('construction', () => {
         test('collapsedSize defaults to 35', () => {
             const group = makeGroup();
-            const view = new EdgePanelView(
-                { id: 'test' },
-                group,
-                'horizontal'
-            );
+            const view = new EdgePanelView({ id: 'test' }, group, 'horizontal');
             expect(view.collapsedSize).toBe(35);
         });
 
@@ -47,11 +43,7 @@ describe('EdgePanelView', () => {
 
         test('lastExpandedSize defaults to 200 when initialSize not provided', () => {
             const group = makeGroup();
-            const view = new EdgePanelView(
-                { id: 'test' },
-                group,
-                'horizontal'
-            );
+            const view = new EdgePanelView({ id: 'test' }, group, 'horizontal');
             expect(view.lastExpandedSize).toBe(200);
         });
 
@@ -76,9 +68,7 @@ describe('EdgePanelView', () => {
         test('sets data-testid = dv-edge-panel-<id>', () => {
             const group = makeGroup();
             new EdgePanelView({ id: 'my-panel' }, group, 'horizontal');
-            expect(group.element.dataset.testid).toBe(
-                'dv-edge-panel-my-panel'
-            );
+            expect(group.element.dataset.testid).toBe('dv-edge-panel-my-panel');
         });
     });
 
@@ -119,11 +109,7 @@ describe('EdgePanelView', () => {
 
         test('returns Infinity when expanded and maximumSize not provided', () => {
             const group = makeGroup();
-            const view = new EdgePanelView(
-                { id: 'test' },
-                group,
-                'horizontal'
-            );
+            const view = new EdgePanelView({ id: 'test' }, group, 'horizontal');
             expect(view.maximumSize).toBe(Number.POSITIVE_INFINITY);
         });
 
@@ -141,11 +127,7 @@ describe('EdgePanelView', () => {
     describe('setCollapsed', () => {
         test('setCollapsed(true): isCollapsed becomes true and adds dv-fixed-collapsed class', () => {
             const group = makeGroup();
-            const view = new EdgePanelView(
-                { id: 'test' },
-                group,
-                'horizontal'
-            );
+            const view = new EdgePanelView({ id: 'test' }, group, 'horizontal');
             view.setCollapsed(true);
             expect(view.isCollapsed).toBe(true);
             expect(group.element.classList.contains('dv-fixed-collapsed')).toBe(
@@ -155,11 +137,7 @@ describe('EdgePanelView', () => {
 
         test('setCollapsed(false): isCollapsed becomes false and removes dv-fixed-collapsed class', () => {
             const group = makeGroup();
-            const view = new EdgePanelView(
-                { id: 'test' },
-                group,
-                'horizontal'
-            );
+            const view = new EdgePanelView({ id: 'test' }, group, 'horizontal');
             view.setCollapsed(true);
             view.setCollapsed(false);
             expect(view.isCollapsed).toBe(false);
@@ -170,11 +148,7 @@ describe('EdgePanelView', () => {
 
         test('setCollapsed(true) twice is a no-op on the second call', () => {
             const group = makeGroup();
-            const view = new EdgePanelView(
-                { id: 'test' },
-                group,
-                'horizontal'
-            );
+            const view = new EdgePanelView({ id: 'test' }, group, 'horizontal');
             view.setCollapsed(true);
             const afterFirst = view.isCollapsed;
             // Calling again with same value should not throw and state stays same
@@ -186,11 +160,7 @@ describe('EdgePanelView', () => {
     describe('layout', () => {
         test('horizontal: calls group.layout(size, orthogonalSize)', () => {
             const group = makeGroup();
-            const view = new EdgePanelView(
-                { id: 'test' },
-                group,
-                'horizontal'
-            );
+            const view = new EdgePanelView({ id: 'test' }, group, 'horizontal');
             view.layout(250, 800);
             expect(group.layout).toHaveBeenCalledWith(250, 800);
         });
