@@ -482,6 +482,23 @@ describe('ShellManager', () => {
             shell.dispose();
         });
 
+        test('restores expanded size for collapsed left panel so expand uses saved size', () => {
+            const shell = makeShell(
+                { left: { id: 'left', initialSize: 300 } },
+                { left: makeGroup() }
+            );
+            // Simulate a serialised state where the panel was collapsed at 350px expanded
+            shell.fromJSON({
+                left: { size: 350, visible: true, collapsed: true },
+            });
+            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
+            // lastExpandedSize must be the serialised 350px (not the constructor
+            // default of 300px) so that expanding restores the correct size
+            const leftView = (shell as any)._leftView as FixedPanelView;
+            expect(leftView.lastExpandedSize).toBe(350);
+            shell.dispose();
+        });
+
         test('restores hidden visibility state for right panel', () => {
             const shell = makeShell(
                 { right: { id: 'right' } },

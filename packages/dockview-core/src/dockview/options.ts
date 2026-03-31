@@ -204,7 +204,14 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         getTabContextMenuItems: undefined,
     };
 
-    return Object.keys(properties) as (keyof DockviewOptions)[];
+    // fixedPanels is constructor-only; changing it via updateOptions has no
+    // effect, so exclude it from the watched-props list used by framework
+    // wrappers (React, Vue, Angular) to drive updateOptions calls.
+    const constructorOnlyKeys: (keyof DockviewOptions)[] = ['fixedPanels'];
+
+    return (Object.keys(properties) as (keyof DockviewOptions)[]).filter(
+        (k) => !constructorOnlyKeys.includes(k)
+    );
 })();
 
 export interface CreateComponentOptions {

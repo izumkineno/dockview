@@ -1482,6 +1482,9 @@ export class DockviewComponent
         for (const [position, fixedGroup] of this._fixedGroups) {
             if (fixedGroup === group) {
                 this._shellManager.setFixedPanelCollapsed(position, collapsed);
+                fixedGroup.api._onDidCollapsedChange.fire({
+                    isCollapsed: collapsed,
+                });
                 return;
             }
         }

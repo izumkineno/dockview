@@ -142,6 +142,7 @@ export { ExpansionEvent, PaneviewPanelApi } from './api/paneviewPanelApi';
 export {
     DockviewGroupPanelApi,
     DockviewGroupPanelFloatingChangeEvent,
+    DockviewGroupPanelCollapsedChangeEvent,
     DockviewGroupMoveParams,
 } from './api/dockviewGroupPanelApi';
 export {

@@ -171,6 +171,15 @@ export class FixedPanelView implements IView {
     }
 
     /**
+     * Restore the last-expanded size from serialized state without triggering
+     * a layout. Must be called before setCollapsed(true) during fromJSON so
+     * that expanding after deserialization restores the correct size.
+     */
+    restoreExpandedSize(size: number): void {
+        this._lastExpandedSize = size;
+    }
+
+    /**
      * Apply new effective collapsed and expanded-minimum sizes after a theme
      * or gap change. The caller (ShellManager) is responsible for computing
      * the correct values from the original config and the new gap.
@@ -769,29 +778,56 @@ export class ShellManager implements IDisposable {
 
     fromJSON(data: SerializedFixedPanels): void {
         if (data.left && this._leftIndex !== undefined) {
+            // Always restore the expanded size first. toJSON always records the
+            // expanded size (even when collapsed), so restoredExpandedSize must
+            // be applied before setCollapsed locks min/max to collapsedSize.
+            this._leftView?.restoreExpandedSize(data.left.size);
             this._leftView?.setCollapsed(data.left.collapsed ?? false);
-            this._outerSplitview.resizeView(this._leftIndex, data.left.size);
+            this._outerSplitview.resizeView(
+                this._leftIndex,
+                data.left.collapsed
+                    ? (this._leftView?.collapsedSize ?? data.left.size)
+                    : data.left.size
+            );
             if (!data.left.visible) {
                 this._outerSplitview.setViewVisible(this._leftIndex, false);
             }
         }
         if (data.right && this._rightIndex !== undefined) {
+            this._rightView?.restoreExpandedSize(data.right.size);
             this._rightView?.setCollapsed(data.right.collapsed ?? false);
-            this._outerSplitview.resizeView(this._rightIndex, data.right.size);
+            this._outerSplitview.resizeView(
+                this._rightIndex,
+                data.right.collapsed
+                    ? (this._rightView?.collapsedSize ?? data.right.size)
+                    : data.right.size
+            );
             if (!data.right.visible) {
                 this._outerSplitview.setViewVisible(this._rightIndex, false);
             }
         }
         if (data.top) {
+            this._topView?.restoreExpandedSize(data.top.size);
             this._topView?.setCollapsed(data.top.collapsed ?? false);
-            this._middleColumn.resizeView('top', data.top.size);
+            this._middleColumn.resizeView(
+                'top',
+                data.top.collapsed
+                    ? (this._topView?.collapsedSize ?? data.top.size)
+                    : data.top.size
+            );
             if (!data.top.visible) {
                 this._middleColumn.setViewVisible('top', false);
             }
         }
         if (data.bottom) {
+            this._bottomView?.restoreExpandedSize(data.bottom.size);
             this._bottomView?.setCollapsed(data.bottom.collapsed ?? false);
-            this._middleColumn.resizeView('bottom', data.bottom.size);
+            this._middleColumn.resizeView(
+                'bottom',
+                data.bottom.collapsed
+                    ? (this._bottomView?.collapsedSize ?? data.bottom.size)
+                    : data.bottom.size
+            );
             if (!data.bottom.visible) {
                 this._middleColumn.setViewVisible('bottom', false);
             }

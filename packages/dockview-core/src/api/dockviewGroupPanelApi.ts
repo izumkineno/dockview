@@ -26,9 +26,18 @@ export interface DockviewGroupMoveParams {
     skipSetActive?: boolean;
 }
 
+export interface DockviewGroupPanelCollapsedChangeEvent {
+    readonly isCollapsed: boolean;
+}
+
 export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
+    /**
+     * Fired when a fixed panel's collapsed state changes.
+     * Never fires for non-fixed groups.
+     */
+    readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent>;
     readonly location: DockviewGroupLocation;
     /**
      * If you require the Window object
@@ -75,6 +84,11 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
     readonly _onDidActivePanelChange = new Emitter<DockviewGroupChangeEvent>();
     readonly onDidActivePanelChange = this._onDidActivePanelChange.event;
 
+    readonly _onDidCollapsedChange =
+        new Emitter<DockviewGroupPanelCollapsedChangeEvent>();
+    readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent> =
+        this._onDidCollapsedChange.event;
+
     get location(): DockviewGroupLocation {
         if (!this._group) {
             throw new Error(NOT_INITIALIZED_MESSAGE);
@@ -91,6 +105,7 @@ export class DockviewGroupPanelApiImpl extends GridviewPanelApiImpl {
         this.addDisposables(
             this._onDidLocationChange,
             this._onDidActivePanelChange,
+            this._onDidCollapsedChange,
             this._onDidVisibilityChange.event((event) => {
                 // When becoming visible, apply any pending size change
                 if (event.isVisible && this._pendingSize) {
