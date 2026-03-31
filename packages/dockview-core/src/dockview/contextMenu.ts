@@ -3,6 +3,9 @@ import { DockviewGroupPanel } from './dockviewGroupPanel';
 import { IDockviewPanel } from './dockviewPanel';
 import { ContextMenuItem } from './options';
 
+let _nextId = 0;
+const nextContextMenuItemId = () => `dv-ctx-menu-item-${_nextId++}`;
+
 function buildItem(
     label: string,
     close: () => void,
@@ -88,7 +91,7 @@ export class ContextMenuController {
             } else if (item.component) {
                 const renderer =
                     this.accessor.options.createContextMenuItemComponent?.({
-                        id: Math.random().toString(36).slice(2),
+                        id: nextContextMenuItemId(),
                         component: item.component,
                     });
                 if (renderer) {
