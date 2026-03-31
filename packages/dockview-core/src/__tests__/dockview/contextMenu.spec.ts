@@ -198,15 +198,13 @@ describe('ContextMenuController', () => {
 
         test('disabled items have aria-disabled="true"', () => {
             const { accessor, openPopover } = makeAccessor({
-                getTabContextMenuItems: jest
-                    .fn()
-                    .mockReturnValue([
-                        {
-                            label: 'Disabled',
-                            action: jest.fn(),
-                            disabled: true,
-                        },
-                    ]),
+                getTabContextMenuItems: jest.fn().mockReturnValue([
+                    {
+                        label: 'Disabled',
+                        action: jest.fn(),
+                        disabled: true,
+                    },
+                ]),
             });
             const controller = new ContextMenuController(accessor);
 
