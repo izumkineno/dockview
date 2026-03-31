@@ -38,10 +38,11 @@ export class AngularRenderer<T = any>
     }
 
     init(parameters: Parameters): void {
-        // Only forward params, api, and containerApi to the component
-        // (matching the React renderer). Other init parameters like
-        // 'title' are internal to the framework.
+        // Forward the known user-facing fields from panel/tab renderers
+        // and context menu item renderers. Other internal fields (e.g. 'title')
+        // are excluded here; update() further guards with `key in instance`.
         const filtered: Record<string, unknown> = {};
+        // Panel / tab renderer fields
         if ('params' in parameters) {
             filtered['params'] = parameters['params'];
         }
@@ -50,6 +51,19 @@ export class AngularRenderer<T = any>
         }
         if ('containerApi' in parameters) {
             filtered['containerApi'] = parameters['containerApi'];
+        }
+        // Context menu item renderer fields (IContextMenuItemComponentProps)
+        if ('panel' in parameters) {
+            filtered['panel'] = parameters['panel'];
+        }
+        if ('group' in parameters) {
+            filtered['group'] = parameters['group'];
+        }
+        if ('close' in parameters) {
+            filtered['close'] = parameters['close'];
+        }
+        if ('componentProps' in parameters) {
+            filtered['componentProps'] = parameters['componentProps'];
         }
 
         if (this.componentRef) {
@@ -67,9 +81,7 @@ export class AngularRenderer<T = any>
         const instance = this.componentRef.instance as Record<string, unknown>;
 
         for (const key of Object.keys(params)) {
-            if (key in instance) {
-                instance[key] = params[key];
-            }
+            instance[key] = params[key];
         }
 
         // trigger change detection

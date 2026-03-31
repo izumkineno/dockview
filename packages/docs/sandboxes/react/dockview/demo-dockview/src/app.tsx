@@ -7,6 +7,7 @@ import {
     DockviewApi,
     DockviewTheme,
     themeAbyss,
+    IContextMenuItemComponentProps,
 } from 'dockview';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -231,12 +232,33 @@ const components = {
 
 const headerComponents = {
     default: (props: IDockviewPanelHeaderProps) => {
-        const onContextMenu = (event: React.MouseEvent) => {
-            event.preventDefault();
-            alert('context menu');
-        };
-        return <DockviewDefaultTab onContextMenu={onContextMenu} {...props} />;
+        return <DockviewDefaultTab {...props} />;
     },
+};
+
+const FloatMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
+    return (
+        <div
+            className="dv-context-menu-item"
+            onClick={() => {
+                api.addFloatingGroup(panel);
+                close();
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
+                ad_group
+            </span>
+            Float tab
+        </div>
+    );
 };
 
 const colors = [
@@ -383,7 +405,9 @@ const DockviewDemo = (props: {
     React.useEffect(() => {
         if (prevTheme.current !== props.theme) {
             prevTheme.current = props.theme;
-            setBuilderState(getInitialStateFromTheme(props.theme ?? themeAbyss));
+            setBuilderState(
+                getInitialStateFromTheme(props.theme ?? themeAbyss)
+            );
         }
     }, [props.theme]);
 
@@ -429,7 +453,8 @@ const DockviewDemo = (props: {
     }, [builderState.cssOverrides]);
 
     const panelColors = React.useMemo(
-        () => effectiveTheme.colorScheme === 'light' ? LIGHT_COLORS : DARK_COLORS,
+        () =>
+            effectiveTheme.colorScheme === 'light' ? LIGHT_COLORS : DARK_COLORS,
         [effectiveTheme]
     );
 
@@ -482,28 +507,45 @@ const DockviewDemo = (props: {
                     }}
                 >
                     <PanelColorsContext.Provider value={panelColors}>
-                    <MarketProvider>
-                    <ApiContext.Provider value={api}>
-                    <DebugContext.Provider value={debug}>
-                        <ThemeContext.Provider value={effectiveTheme}>
-                            <DockviewReact
-                                components={components}
-                                defaultTabComponent={headerComponents.default}
-                                rightHeaderActionsComponent={RightControls}
-                                leftHeaderActionsComponent={LeftControls}
-                                prefixHeaderActionsComponent={
-                                    PrefixHeaderControls
-                                }
-                                watermarkComponent={
-                                    watermark ? WatermarkComponent : undefined
-                                }
-                                onReady={onReady}
-                                theme={effectiveTheme}
-                            />
-                        </ThemeContext.Provider>
-                    </DebugContext.Provider>
-                    </ApiContext.Provider>
-                    </MarketProvider>
+                        <MarketProvider>
+                            <ApiContext.Provider value={api}>
+                                <DebugContext.Provider value={debug}>
+                                    <ThemeContext.Provider
+                                        value={effectiveTheme}
+                                    >
+                                        <DockviewReact
+                                            components={components}
+                                            defaultTabComponent={
+                                                headerComponents.default
+                                            }
+                                            rightHeaderActionsComponent={
+                                                RightControls
+                                            }
+                                            leftHeaderActionsComponent={
+                                                LeftControls
+                                            }
+                                            prefixHeaderActionsComponent={
+                                                PrefixHeaderControls
+                                            }
+                                            watermarkComponent={
+                                                watermark
+                                                    ? WatermarkComponent
+                                                    : undefined
+                                            }
+                                            onReady={onReady}
+                                            theme={effectiveTheme}
+                                            getTabContextMenuItems={() => [
+                                                'close',
+                                                'closeOthers',
+                                                'closeAll',
+                                                'separator',
+                                                { component: FloatMenuItem },
+                                            ]}
+                                        />
+                                    </ThemeContext.Provider>
+                                </DebugContext.Provider>
+                            </ApiContext.Provider>
+                        </MarketProvider>
                     </PanelColorsContext.Provider>
                 </div>
 

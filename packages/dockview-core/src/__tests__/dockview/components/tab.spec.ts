@@ -267,6 +267,26 @@ describe('tab', () => {
         ).toBe(0);
     });
 
+    describe('contextmenu event', () => {
+        test('right-clicking a tab calls contextMenuController.show with the panel and group', () => {
+            const showMock = jest.fn();
+            const accessor = fromPartial<DockviewComponent>({
+                options: {},
+                contextMenuController: { show: showMock },
+            });
+
+            const panel = fromPartial<IDockviewPanel>({ id: 'panelId' });
+            const group = fromPartial<DockviewGroupPanel>({ id: 'groupId' });
+
+            const cut = new Tab(panel, accessor, group);
+
+            const event = new MouseEvent('contextmenu', { cancelable: true });
+            fireEvent(cut.element, event);
+
+            expect(showMock).toHaveBeenCalledWith(panel, group, event);
+        });
+    });
+
     describe('disableDnd option', () => {
         test('that tab is draggable by default (disableDnd not set)', () => {
             const accessor = fromPartial<DockviewComponent>({

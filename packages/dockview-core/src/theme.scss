@@ -9,7 +9,8 @@
     --dv-drag-over-border-color: transparent;
     --dv-tabs-container-scrollbar-color: #888;
     --dv-icon-hover-background-color: rgba(90, 93, 94, 0.31);
-    --dv-floating-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
     --dv-floating-border: 1px solid rgba(255, 255, 255, 0.1);
     --dv-overlay-z-index: 999;
     //
@@ -82,7 +83,8 @@
     --dv-paneview-header-border-color: rgb(51, 51, 51);
 
     --dv-scrollbar-background-color: rgba(0, 0, 0, 0.25);
-    --dv-floating-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -294,11 +296,21 @@
     --dv-color-nord-snow-1: #d8dee9;
 
     --dv-group-view-background-color: var(--dv-color-nord-polar-0);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-nord-polar-1);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-nord-polar-0);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-nord-polar-2);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-nord-polar-1);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-nord-polar-2);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-0
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-nord-snow-0);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-nord-snow-1);
     --dv-inactivegroup-visiblepanel-tab-color: #8a9bbf;
@@ -367,13 +379,22 @@
     --dv-color-nord-snow-0: #eceff4;
     --dv-color-nord-snow-1: #d8dee9;
 
-
     --dv-group-view-background-color: var(--dv-color-nord-polar-0);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-nord-polar-1);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-nord-polar-2);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-nord-polar-1);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-nord-polar-2);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-nord-polar-1);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-1
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-nord-polar-2
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-nord-polar-1
+    );
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-nord-snow-0);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-nord-snow-1);
     --dv-inactivegroup-visiblepanel-tab-color: #8a9bbf;
@@ -404,11 +425,21 @@
     --dv-color-mocha-lavender: #b4befe;
 
     --dv-group-view-background-color: var(--dv-color-mocha-base);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-mocha-mantle);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-mocha-base);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-mocha-surface0);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-mocha-mantle);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-mocha-crust);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-base
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-surface0
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-crust
+    );
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-mocha-text);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-mocha-subtext1);
     --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-mocha-subtext0);
@@ -479,13 +510,22 @@
     --dv-color-mocha-mauve: #cba6f7;
     --dv-color-mocha-lavender: #b4befe;
 
-
     --dv-group-view-background-color: var(--dv-color-mocha-crust);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-mocha-mantle);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-mocha-surface0);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-mocha-mantle);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-mocha-surface0);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-mocha-mantle);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-surface0
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-mantle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-mocha-surface0
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-mocha-mantle
+    );
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-mocha-text);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-mocha-subtext1);
     --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-mocha-subtext0);
@@ -511,10 +551,16 @@
     --dv-color-monokai-green: #a6e22e;
 
     --dv-group-view-background-color: var(--dv-color-monokai-bg);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-monokai-bg-light);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-monokai-bg);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-monokai-bg-light
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-monokai-bg
+    );
     --dv-activegroup-hiddenpanel-tab-background-color: #2d2c25;
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-monokai-bg);
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-monokai-bg
+    );
     --dv-inactivegroup-hiddenpanel-tab-background-color: #2d2c25;
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-monokai-fg);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-monokai-comment);
@@ -586,9 +632,13 @@
 
     --dv-group-view-background-color: var(--dv-color-sol-base3);
     --dv-tabs-and-actions-container-background-color: var(--dv-color-sol-base2);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-sol-base3);
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
     --dv-activegroup-hiddenpanel-tab-background-color: #e8e2d0;
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-sol-base3);
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
     --dv-inactivegroup-hiddenpanel-tab-background-color: #e8e2d0;
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-sol-base01);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-sol-base00);
@@ -599,7 +649,8 @@
     --dv-active-sash-color: var(--dv-color-sol-blue);
     --dv-scrollbar-background-color: rgba(101, 123, 131, 0.25);
     --dv-drag-over-background-color: rgba(38, 139, 210, 0.15);
-    --dv-floating-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -618,14 +669,17 @@
     --dv-color-sol-base01: #586e75;
     --dv-color-sol-blue: #268bd2;
 
-
     --dv-drag-over-background-color: rgba(38, 139, 210, 0.1);
     --dv-group-view-background-color: var(--dv-color-sol-base2);
     --dv-tabs-and-actions-container-background-color: var(--dv-color-sol-base3);
     --dv-activegroup-visiblepanel-tab-background-color: #e8e2d0;
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-sol-base3);
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
     --dv-inactivegroup-visiblepanel-tab-background-color: #e8e2d0;
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-sol-base3);
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-sol-base3
+    );
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-sol-base01);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-sol-base00);
     --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-sol-base1);
@@ -633,7 +687,8 @@
     --dv-separator-border: transparent;
     --dv-paneview-active-outline-color: var(--dv-color-sol-blue);
     --dv-active-sash-color: var(--dv-color-sol-blue);
-    --dv-floating-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
     --dv-scrollbar-background-color: rgba(101, 123, 131, 0.25);
 
@@ -657,11 +712,21 @@
     --dv-color-gh-accent: #58a6ff;
 
     --dv-group-view-background-color: var(--dv-color-gh-canvas-default);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-gh-canvas-subtle);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-gh-canvas-default);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-canvas-subtle);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-gh-canvas-default);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-canvas-subtle);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-canvas-default
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-canvas-default
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-default);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-fg-muted);
     --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-subtle);
@@ -691,14 +756,23 @@
     --dv-color-gh-fg-subtle: #6e7681;
     --dv-color-gh-accent: #58a6ff;
 
-
     --dv-drag-over-background-color: rgba(88, 166, 255, 0.1);
     --dv-group-view-background-color: var(--dv-color-gh-canvas-inset);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-gh-canvas-subtle);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-gh-border);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-canvas-subtle);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-gh-border);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-canvas-subtle);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-border
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-border
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-canvas-subtle
+    );
     --dv-activegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-default);
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-fg-muted);
     --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-gh-fg-subtle);
@@ -727,21 +801,36 @@
     --dv-color-gh-light-accent: #0969da;
 
     --dv-group-view-background-color: var(--dv-color-gh-light-canvas-default);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-gh-light-canvas-subtle);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-gh-light-canvas-default);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-light-canvas-subtle);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-gh-light-canvas-default);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-light-canvas-subtle);
-    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-gh-light-fg-default);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-light-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-subtle
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-subtle
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-default
+    );
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-light-fg-muted);
-    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-gh-light-fg-subtle);
+    --dv-inactivegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-subtle
+    );
     --dv-inactivegroup-hiddenpanel-tab-color: rgba(110, 118, 129, 0.4);
     --dv-separator-border: var(--dv-color-gh-light-border);
     --dv-paneview-active-outline-color: var(--dv-color-gh-light-accent);
     --dv-active-sash-color: var(--dv-color-gh-light-accent);
     --dv-scrollbar-background-color: rgba(208, 215, 222, 0.5);
     --dv-drag-over-background-color: rgba(9, 105, 218, 0.1);
-    --dv-floating-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -761,28 +850,41 @@
     --dv-color-gh-light-fg-subtle: #6e7781;
     --dv-color-gh-light-accent: #0969da;
 
-
     --dv-drag-over-background-color: rgba(9, 105, 218, 0.08);
     --dv-group-view-background-color: var(--dv-color-gh-light-canvas-subtle);
-    --dv-tabs-and-actions-container-background-color: var(--dv-color-gh-light-canvas-default);
-    --dv-activegroup-visiblepanel-tab-background-color: var(--dv-color-gh-light-border);
-    --dv-activegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-light-canvas-default);
-    --dv-inactivegroup-visiblepanel-tab-background-color: var(--dv-color-gh-light-border);
-    --dv-inactivegroup-hiddenpanel-tab-background-color: var(--dv-color-gh-light-canvas-default);
-    --dv-activegroup-visiblepanel-tab-color: var(--dv-color-gh-light-fg-default);
+    --dv-tabs-and-actions-container-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-activegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-border
+    );
+    --dv-activegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-inactivegroup-visiblepanel-tab-background-color: var(
+        --dv-color-gh-light-border
+    );
+    --dv-inactivegroup-hiddenpanel-tab-background-color: var(
+        --dv-color-gh-light-canvas-default
+    );
+    --dv-activegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-default
+    );
     --dv-activegroup-hiddenpanel-tab-color: var(--dv-color-gh-light-fg-muted);
-    --dv-inactivegroup-visiblepanel-tab-color: var(--dv-color-gh-light-fg-subtle);
+    --dv-inactivegroup-visiblepanel-tab-color: var(
+        --dv-color-gh-light-fg-subtle
+    );
     --dv-inactivegroup-hiddenpanel-tab-color: rgba(110, 118, 129, 0.4);
     --dv-separator-border: transparent;
     --dv-paneview-active-outline-color: var(--dv-color-gh-light-accent);
     --dv-active-sash-color: var(--dv-color-gh-light-accent);
-    --dv-floating-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
     --dv-scrollbar-background-color: rgba(208, 215, 222, 0.5);
 
     --dv-floating-group-border: 2px solid rgba(208, 215, 222, 0.5);
 }
-
 
 .dockview-theme-abyss-spaced {
     @include dockview-theme-core-mixin();
@@ -873,7 +975,8 @@
     /////
     --dv-active-sash-color: rgb(91, 30, 207);
     //
-    --dv-floating-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --dv-floating-box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
     --dv-floating-border: 1px solid rgba(0, 0, 0, 0.1);
 
     --dv-scrollbar-background-color: rgba(0, 0, 0, 0.25);
@@ -888,4 +991,50 @@
 
 .dockview-spaced {
     @include dockview-design-space-mixin();
+}
+
+// ─── Context menu ─────────────────────────────────────────────────────────────
+
+.dv-context-menu {
+    min-width: 160px;
+    overflow: hidden;
+    background: var(
+        --dv-context-menu-background-color,
+        var(--dv-activegroup-hiddenpanel-tab-background-color)
+    );
+    color: var(
+        --dv-context-menu-color,
+        var(--dv-activegroup-hiddenpanel-tab-color)
+    );
+    border: 1px solid var(--dv-tab-divider-color);
+    border-radius: var(--dv-border-radius);
+    box-shadow: var(--dv-floating-box-shadow);
+    padding: 4px 0;
+}
+
+.dv-context-menu-item {
+    height: 25px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: var(--dv-tabs-and-actions-container-font-size);
+    white-space: nowrap;
+    user-select: none;
+
+    &:hover {
+        background: var(--dv-icon-hover-background-color);
+    }
+
+    &.dv-context-menu-item--disabled {
+        opacity: 0.4;
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+.dv-context-menu-separator {
+    height: 1px;
+    background: var(--dv-tab-divider-color);
+    margin: 4px 0;
 }

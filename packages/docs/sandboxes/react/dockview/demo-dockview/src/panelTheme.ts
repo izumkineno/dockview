@@ -63,6 +63,5 @@ export const LIGHT_COLORS: PanelColors = {
     blueBg: 'rgba(37,99,235,0.06)',
 };
 
-
 export const PanelColorsContext = React.createContext<PanelColors>(DARK_COLORS);
 export const usePanelColors = () => React.useContext(PanelColorsContext);

@@ -10,6 +10,8 @@ import type {
     ITabRenderer,
     IWatermarkPanelProps,
     IWatermarkRenderer,
+    IContextMenuItemRenderer,
+    IContextMenuItemComponentProps,
     PanelUpdateEvent,
     Parameters,
     TabPartInitParameters,
@@ -269,6 +271,29 @@ export class VueHeaderActionsRenderer
 
     private updateProps(): void {
         this._renderDisposable?.update({ params: this.buildEnrichedProps() });
+    }
+}
+
+export class VueContextMenuItemRenderer
+    extends AbstractVueRenderer
+    implements IContextMenuItemRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    init(props: IContextMenuItemComponentProps): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = mountVueComponent(
+            this.component,
+            this.parent,
+            { params: props },
+            this.element
+        );
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
     }
 }
 

@@ -22,10 +22,50 @@ export interface IHeaderActionsRenderer extends IDisposable {
     init(params: IGroupHeaderProps): void;
 }
 
-export interface TabContextMenuEvent {
-    event: MouseEvent;
-    api: DockviewApi;
+export type BuiltInContextMenuItem =
+    | 'close'
+    | 'closeOthers'
+    | 'closeAll'
+    | 'separator';
+
+export interface ContextMenuItemConfig {
+    label?: string;
+    /**
+     * A framework component to render as the menu item.
+     * The component type is opaque to core; the framework adapter renders it.
+     */
+    component?: unknown;
+    componentProps?: object;
+    action?: () => void;
+    disabled?: boolean;
+}
+
+export type ContextMenuItem = BuiltInContextMenuItem | ContextMenuItemConfig;
+
+export interface GetTabContextMenuItemsParams {
     panel: IDockviewPanel;
+    group: DockviewGroupPanel;
+    api: DockviewApi;
+    event: MouseEvent;
+}
+
+export interface IContextMenuItemComponentProps {
+    panel: IDockviewPanel;
+    group: DockviewGroupPanel;
+    api: DockviewApi;
+    /** Call to close the context menu */
+    close: () => void;
+    componentProps?: object;
+}
+
+export interface IContextMenuItemRenderer extends IDisposable {
+    readonly element: HTMLElement;
+    init(props: IContextMenuItemComponentProps): void;
+}
+
+export interface CreateContextMenuItemComponentOptions {
+    id: string;
+    component: unknown;
 }
 
 export interface ViewFactoryData {
@@ -89,6 +129,18 @@ export interface DockviewOptions {
      * Defaults to `"default"`.
      */
     tabAnimation?: TabAnimation;
+    /**
+     * Return the items to display in the tab context menu on right-click.
+     *
+     * Use built-in string shortcuts (`'close'`, `'closeOthers'`, `'closeAll'`, `'separator'`)
+     * or provide a `ContextMenuItemConfig` object for custom items.
+     *
+     * If omitted, no context menu is shown.
+     * Return an empty array to suppress the menu for specific cases.
+     */
+    getTabContextMenuItems?: (
+        params: GetTabContextMenuItemsParams
+    ) => ContextMenuItem[];
 }
 
 export type TabAnimation = 'smooth' | 'default';
@@ -142,6 +194,7 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
         tabAnimation: undefined,
+        getTabContextMenuItems: undefined,
     };
 
     return Object.keys(properties) as (keyof DockviewOptions)[];
@@ -174,6 +227,9 @@ export interface DockviewFrameworkOptions {
     ) => ITabRenderer | undefined;
     createComponent: (options: CreateComponentOptions) => IContentRenderer;
     createWatermarkComponent?: () => IWatermarkRenderer;
+    createContextMenuItemComponent?: (
+        options: CreateContextMenuItemComponentOptions
+    ) => IContextMenuItemRenderer | undefined;
 }
 
 export type DockviewComponentOptions = DockviewOptions &

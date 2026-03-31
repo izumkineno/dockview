@@ -221,8 +221,8 @@ const ColorRow = (props: {
                     isHexColor(props.value)
                         ? props.value
                         : isHexColor(placeholder)
-                        ? placeholder
-                        : '#000000'
+                          ? placeholder
+                          : '#000000'
                 }
                 onChange={(e) => props.onChange(e.target.value)}
                 style={{
@@ -294,7 +294,9 @@ export const ThemeBuilderModal = (props: {
     baseTheme: DockviewTheme;
     containerEl: HTMLElement | null;
 }) => {
-    const [themeDefaults, setThemeDefaults] = React.useState<Record<string, number>>({});
+    const [themeDefaults, setThemeDefaults] = React.useState<
+        Record<string, number>
+    >({});
 
     React.useEffect(() => {
         if (!props.open || !props.containerEl) return;
@@ -308,13 +310,22 @@ export const ThemeBuilderModal = (props: {
             const fval = (v: string, fb: number) =>
                 parseFloat(getComputedStyle(dvRoot).getPropertyValue(v)) || fb;
             setThemeDefaults({
-                '--dv-tabs-and-actions-container-height': val('--dv-tabs-and-actions-container-height', 35),
-                '--dv-tabs-and-actions-container-font-size': val('--dv-tabs-and-actions-container-font-size', 13),
+                '--dv-tabs-and-actions-container-height': val(
+                    '--dv-tabs-and-actions-container-height',
+                    35
+                ),
+                '--dv-tabs-and-actions-container-font-size': val(
+                    '--dv-tabs-and-actions-container-font-size',
+                    13
+                ),
                 '--dv-border-radius': val('--dv-border-radius', 0),
                 '--dv-spacing-padding': val('--dv-spacing-padding', 0),
                 '--dv-tab-border-radius': val('--dv-tab-border-radius', 0),
                 '--dv-sash-border-radius': val('--dv-sash-border-radius', 0),
-                '--dv-floating-group-dragging-opacity': fval('--dv-floating-group-dragging-opacity', 0.5),
+                '--dv-floating-group-dragging-opacity': fval(
+                    '--dv-floating-group-dragging-opacity',
+                    0.5
+                ),
             });
         };
         // RAF ensures dockview's own effects (which swap the CSS class) have run first
@@ -333,13 +344,15 @@ export const ThemeBuilderModal = (props: {
 
     const computedVar = (varName: string, fallback: number): number => {
         const override = css[varName as keyof ThemeCssOverrides];
-        if (override !== undefined && override !== '') return parseInt(override) || fallback;
+        if (override !== undefined && override !== '')
+            return parseInt(override) || fallback;
         return themeDefaults[varName] ?? fallback;
     };
 
-    const draggingOpacity = css['--dv-floating-group-dragging-opacity'] !== undefined
-        ? parseFloat(css['--dv-floating-group-dragging-opacity'])
-        : (themeDefaults['--dv-floating-group-dragging-opacity'] ?? 0.5);
+    const draggingOpacity =
+        css['--dv-floating-group-dragging-opacity'] !== undefined
+            ? parseFloat(css['--dv-floating-group-dragging-opacity'])
+            : (themeDefaults['--dv-floating-group-dragging-opacity'] ?? 0.5);
 
     const tabH = computedVar('--dv-tabs-and-actions-container-height', 35);
     const tabFs = computedVar('--dv-tabs-and-actions-container-font-size', 13);
@@ -462,9 +475,7 @@ export const ThemeBuilderModal = (props: {
                     min={0}
                     max={30}
                     unit="px"
-                    onChange={(v) =>
-                        set({ '--dv-spacing-padding': `${v}px` })
-                    }
+                    onChange={(v) => set({ '--dv-spacing-padding': `${v}px` })}
                 />
                 <SliderRow
                     label="Tab Bar Height"
@@ -500,9 +511,7 @@ export const ThemeBuilderModal = (props: {
                     min={0}
                     max={20}
                     unit="px"
-                    onChange={(v) =>
-                        set({ '--dv-border-radius': `${v}px` })
-                    }
+                    onChange={(v) => set({ '--dv-border-radius': `${v}px` })}
                 />
                 <SliderRow
                     label="Tab Border Radius"
@@ -630,14 +639,8 @@ export const ThemeBuilderModal = (props: {
             {/* Chrome */}
             <Section title="Chrome">
                 {colorRow('Tab divider', '--dv-tab-divider-color')}
-                {colorRow(
-                    'Icon hover bg',
-                    '--dv-icon-hover-background-color'
-                )}
-                {colorRow(
-                    'Drag-over bg',
-                    '--dv-drag-over-background-color'
-                )}
+                {colorRow('Icon hover bg', '--dv-icon-hover-background-color')}
+                {colorRow('Drag-over bg', '--dv-drag-over-background-color')}
                 <TextRow
                     label="Drag-over border"
                     varName="--dv-drag-over-border"
@@ -650,10 +653,7 @@ export const ThemeBuilderModal = (props: {
                 />
                 {colorRow('Active sash', '--dv-active-sash-color')}
                 {colorRow('Sash', '--dv-sash-color')}
-                {colorRow(
-                    'Scrollbar',
-                    '--dv-scrollbar-background-color'
-                )}
+                {colorRow('Scrollbar', '--dv-scrollbar-background-color')}
             </Section>
 
             {/* Floating */}
@@ -667,7 +667,13 @@ export const ThemeBuilderModal = (props: {
                         minHeight: 30,
                     }}
                 >
-                    <span style={{ flex: 1, fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+                    <span
+                        style={{
+                            flex: 1,
+                            fontSize: 11,
+                            color: 'rgba(255,255,255,0.7)',
+                        }}
+                    >
                         Dragging Opacity
                     </span>
                     <input
@@ -677,7 +683,10 @@ export const ThemeBuilderModal = (props: {
                         step={0.05}
                         value={draggingOpacity}
                         onChange={(e) =>
-                            set({ '--dv-floating-group-dragging-opacity': e.target.value })
+                            set({
+                                '--dv-floating-group-dragging-opacity':
+                                    e.target.value,
+                            })
                         }
                         style={{ width: 90 }}
                     />

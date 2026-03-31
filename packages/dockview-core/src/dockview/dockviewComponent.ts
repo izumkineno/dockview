@@ -80,6 +80,7 @@ import {
 import { PopoutWindow } from '../popoutWindow';
 import { StrictEventsSequencing } from './strictEventsSequencing';
 import { PopupService } from './components/popupService';
+import { ContextMenuController } from './contextMenu';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
 import { themeAbyss } from './theme';
 
@@ -285,6 +286,7 @@ export class DockviewComponent
 
     readonly overlayRenderContainer: OverlayRenderContainer;
     readonly popupService: PopupService;
+    readonly contextMenuController: ContextMenuController;
     readonly rootDropTargetContainer: DropTargetAnchorContainer;
 
     private readonly _onWillDragPanel = new Emitter<TabDragEvent>();
@@ -440,6 +442,7 @@ export class DockviewComponent
         this._options = options;
 
         this.popupService = new PopupService(this.element);
+        this.contextMenuController = new ContextMenuController(this);
         this._themeClassnames = new Classnames(this.element);
         this._api = new DockviewApi(this);
 
