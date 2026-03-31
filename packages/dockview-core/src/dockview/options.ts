@@ -22,12 +22,6 @@ export interface IHeaderActionsRenderer extends IDisposable {
     init(params: IGroupHeaderProps): void;
 }
 
-export interface TabContextMenuEvent {
-    event: MouseEvent;
-    api: DockviewApi;
-    panel: IDockviewPanel;
-}
-
 export type BuiltInContextMenuItem =
     | 'close'
     | 'closeOthers'
@@ -61,6 +55,7 @@ export interface IContextMenuItemComponentProps {
     api: DockviewApi;
     /** Call to close the context menu */
     close: () => void;
+    componentProps?: object;
 }
 
 export interface IContextMenuItemRenderer extends IDisposable {

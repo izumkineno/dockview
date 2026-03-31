@@ -22,14 +22,16 @@ const components = {
     const containerApi: DockviewApi  = props.containerApi;
 
     return <div>{/** logic */}</div>
-  },
-  tab_2: (props: IDockviewPanelHeaderProps) => {
-    return <div>{/** logic */}</div>
-  }
+
+},
+tab_2: (props: IDockviewPanelHeaderProps) => {
+return <div>{/* * logic */}</div>
+}
 };
 
 return <DockviewReact tabComponents={tabComponents}/>
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -55,7 +57,8 @@ const App = {
       >
       </dockview-vue>`,
 };
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -70,28 +73,27 @@ export class TabComponent1 {
 }
 
 @Component({
-    selector: 'tab-component-2',
-    template: `<div>Custom Tab 2</div>`
+selector: 'tab-component-2',
+template: `<div>Custom Tab 2</div>`
 })
 export class TabComponent2 {
-    @Input() api: DockviewPanelApi;
-    @Input() containerApi: DockviewApi;
+@Input() api: DockviewPanelApi;
+@Input() containerApi: DockviewApi;
 }
 
 @Component({
-    selector: 'app-root',
-    template: `
-        <dv-dockview 
+selector: 'app-root',
+template: `         <dv-dockview 
             [tabComponents]="tabComponents"
             (ready)="onReady($event)">
         </dv-dockview>
     `
 })
 export class AppComponent {
-    tabComponents = {
-        'tab_1': TabComponent1,
-        'tab_2': TabComponent2,
-    };
+tabComponents = {
+'tab_1': TabComponent1,
+'tab_2': TabComponent2,
+};
 
     onReady(event: DockviewReadyEvent) {
         event.api.addPanel({
@@ -100,8 +102,10 @@ export class AppComponent {
             tabComponent: 'tab_1'
         });
     }
+
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -120,7 +124,7 @@ class CustomTabRenderer implements IHeaderRenderer {
     init(parameters: HeaderPartInitParameters): void {
         const api: DockviewPanelApi = parameters.api;
         const containerApi: DockviewApi = parameters.containerApi;
-        
+
         this._element.textContent = api.title || 'Custom Tab';
     }
 
@@ -145,9 +149,9 @@ api.addPanel({
     component: 'component_1',
     tabComponent: 'tab_1'
 });
-```
-</FrameworkSpecific>
+````
 
+</FrameworkSpecific>
 
 ## Default Tab Renderer
 
@@ -157,11 +161,12 @@ const CustomTabRenderer = (props: IDockviewPanelHeaderProps) => {
   const api: DockviewPanelApi  = props.api;
   const containerApi: DockviewApi  = props.containerApi;
 
-  return <div>{/** logic */}</div>
+return <div>{/* * logic */}</div>
 }
 
 return <DockviewReact defaultTabRenderer={CustomTabRenderer}/>
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -187,7 +192,8 @@ const App = {
       >
       </dockview-vue>`,
 };
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -202,16 +208,15 @@ export class CustomTabRenderer {
 }
 
 @Component({
-    selector: 'app-root',
-    template: `
-        <dv-dockview 
+selector: 'app-root',
+template: `         <dv-dockview 
             [defaultTabRenderer]="defaultTabRenderer"
             (ready)="onReady($event)">
         </dv-dockview>
     `
 })
 export class AppComponent {
-    defaultTabRenderer = CustomTabRenderer;
+defaultTabRenderer = CustomTabRenderer;
 
     onReady(event: DockviewReadyEvent) {
         event.api.addPanel({
@@ -219,8 +224,10 @@ export class AppComponent {
             component: 'component_1',
         });
     }
+
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -240,7 +247,7 @@ class DefaultTabRenderer implements IHeaderRenderer {
     init(parameters: HeaderPartInitParameters): void {
         const api: DockviewPanelApi = parameters.api;
         const containerApi: DockviewApi = parameters.containerApi;
-        
+
         this._element.textContent = api.title || 'Default Tab';
     }
 
@@ -255,7 +262,8 @@ const api = createDockview(parentElement, {
         return new DefaultTabRenderer();
     },
 });
-```
+````
+
 </FrameworkSpecific>
 
 ## Accessing Custom Panel Parameters
@@ -268,10 +276,11 @@ to provide type-hints for the panel parameters which can be accessed via the `pa
 type MyParameters = { my_value: number };
 
 const MyTab = (props: IDockviewPanelHeaderProps<MyParameters>) => {
-  const value: number = props.params.my_value;
-  return <div>{/** logic */}</div>
+const value: number = props.params.my_value;
+return <div>{/* * logic */}</div>
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -291,7 +300,8 @@ export default defineComponent({
     },
     template: `<div>{{ params.my_value }}</div>`,
 });
-```
+````
+
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -302,13 +312,14 @@ import type { IDockviewPanelHeaderProps } from 'dockview-angular';
 type MyParameters = { my_value: number };
 
 @Component({
-    selector: 'my-tab',
-    template: `<div>{{ params.my_value }}</div>`,
+selector: 'my-tab',
+template: `<div>{{ params.my_value }}</div>`,
 })
 export class MyTab {
-    @Input() params: MyParameters;
+@Input() params: MyParameters;
 }
-```
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -337,30 +348,31 @@ class MyTab implements IHeaderRenderer {
 
     dispose(): void {}
 }
-```
-</FrameworkSpecific>
+````
 
+</FrameworkSpecific>
 
 ## Extend the Default Tab Implementation
 
 If you only want to make minor changes to the tab rendering you may be able to use the
 default implementation as a base. This could include:
+
 - Hiding the close button
 - Attaching additional event listeners
-
 
 <FrameworkSpecific framework='React'>
 ```tsx
 import { IDockviewPanelHeaderProps, DockviewDefaultTab } from 'dockview';
 
 const MyCustomTab = (props: IDockviewPanelHeaderProps) => {
-    const onContextMenu = (event: React.MouseEvent) => {
-        event.preventDefault();
-        console.log('context menu', props.api.id);
-    };
-    return <DockviewDefaultTab onContextMenu={onContextMenu} hideClose={true} {...props} />;
+const onContextMenu = (event: React.MouseEvent) => {
+event.preventDefault();
+console.log('context menu', props.api.id);
 };
-```
+return <DockviewDefaultTab onContextMenu={onContextMenu} hideClose={true} {...props} />;
+};
+
+````
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Vue'>
@@ -411,13 +423,14 @@ When a group has only one single tab you may want that tab to take the full widt
 <FrameworkSpecific framework='React'>
 ```tsx
 return <DockviewReactComponent singleTabMode="fullwidth" />
-```
+````
+
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-```html
-<dockview-vue singleTabMode="fullwidth" />
-```
+<FrameworkSpecific framework="Vue">
+    ```html
+    <dockview-vue singleTabMode="fullwidth" />
+    ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='Angular'>
@@ -444,45 +457,44 @@ const api = createDockview(parentElement, {
 
 Controls how tabs animate when reordered via drag-and-drop.
 
-| Mode | Behavior |
-|------|----------|
-| `'default'` | Tabs swap positions instantly on drop — the original behavior. |
-| `'smooth'` | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
+| Mode        | Behavior                                                                        |
+| ----------- | ------------------------------------------------------------------------------- |
+| `'default'` | Tabs swap positions instantly on drop — the original behavior.                  |
+| `'smooth'`  | Tabs slide smoothly to open a gap for the dragged tab, similar to browser tabs. |
 
-<CodeRunner id="dockview/tabview" height={300}/>
+<CodeRunner id="dockview/tabview" height={300} />
 
-<FrameworkSpecific framework='React'>
-  <DocRef declaration="IDockviewReactProps" methods={['tabAnimation']} />
+<FrameworkSpecific framework="React">
+    <DocRef declaration="IDockviewReactProps" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-  <DocRef declaration="IDockviewVueProps" methods={['tabAnimation']} />
+<FrameworkSpecific framework="Vue">
+    <DocRef declaration="IDockviewVueProps" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-  <DocRef declaration="IDockviewAngularProps" methods={['tabAnimation']} />
+<FrameworkSpecific framework="Angular">
+    <DocRef declaration="IDockviewAngularProps" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='JavaScript'>
-  <DocRef declaration="DockviewComponentOptions" methods={['tabAnimation']} />
+<FrameworkSpecific framework="JavaScript">
+    <DocRef declaration="DockviewComponentOptions" methods={['tabAnimation']} />
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='React'>
-```tsx
-return <DockviewReactComponent tabAnimation="smooth" />
-```
+<FrameworkSpecific framework="React">
+    ```tsx return <DockviewReactComponent tabAnimation="smooth" />
+    ```
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Vue'>
-```html
-<dockview-vue tabAnimation="smooth" />
-```
+<FrameworkSpecific framework="Vue">
+    ```html
+    <dockview-vue tabAnimation="smooth" />
+    ```
 </FrameworkSpecific>
 
-<FrameworkSpecific framework='Angular'>
-```html
-<dv-dockview tabAnimation="smooth"></dv-dockview>
-```
+<FrameworkSpecific framework="Angular">
+    ```html
+    <dv-dockview tabAnimation="smooth"></dv-dockview>
+    ```
 </FrameworkSpecific>
 
 <FrameworkSpecific framework='JavaScript'>
@@ -493,6 +505,7 @@ const api = createDockview(parentElement, {
 
 // or toggle at runtime
 api.updateOptions({ tabAnimation: 'smooth' });
+
 ```
 </FrameworkSpecific>
 
@@ -500,3 +513,4 @@ api.updateOptions({ tabAnimation: 'smooth' });
 
 Tab height can be controlled through CSS.
 
+```

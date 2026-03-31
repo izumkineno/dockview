@@ -33,7 +33,7 @@
 
     border: var(--dv-floating-border);
     box-shadow: var(--dv-floating-box-shadow);
-    
+
     /* GPU optimizations for floating group movement */
     will-change: transform, opacity;
     transform: translate3d(0, 0, 0);

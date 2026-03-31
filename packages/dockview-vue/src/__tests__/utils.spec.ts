@@ -543,6 +543,26 @@ describe('VueContextMenuItemRenderer', () => {
         expect(passedProps.params).toBe(props);
     });
 
+    test('componentProps is accessible as params.componentProps', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+        const componentProps = { foo: 'bar' };
+        const props: IContextMenuItemComponentProps = {
+            panel: {} as IDockviewPanel,
+            group: {} as DockviewGroupPanel,
+            api: {} as any,
+            close: jest.fn(),
+            componentProps,
+        };
+
+        renderer.init(props);
+
+        const passedProps = createVNodeMock.mock.calls[0][1];
+        expect(passedProps.params.componentProps).toBe(componentProps);
+    });
+
     test('dispose unmounts the component', () => {
         const renderer = new VueContextMenuItemRenderer(
             mockComponent,

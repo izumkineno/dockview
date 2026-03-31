@@ -47,6 +47,33 @@ describe('ReactContextMenuItemPart', () => {
         expect(addPortal).toHaveBeenCalled();
     });
 
+    test('init passes componentProps through to the ReactPart parameters', () => {
+        const addPortal = jest.fn().mockReturnValue({ dispose: jest.fn() });
+        const cut = new ReactContextMenuItemPart(
+            'id-1',
+            jest.fn(),
+            fromPartial<ReactPortalStore>({ addPortal })
+        );
+
+        const componentProps = { foo: 'bar' };
+        const props: IContextMenuItemComponentProps = {
+            panel: {} as any,
+            group: {} as any,
+            api: {} as any,
+            close: jest.fn(),
+            componentProps,
+        };
+
+        cut.init(props);
+
+        // ReactPart stores the full props as `parameters` and passes them to
+        // the bridge component as `componentProps`, making them available to
+        // the user's React component as direct props.
+        const parameters = (cut.part as any)
+            .parameters as IContextMenuItemComponentProps;
+        expect(parameters.componentProps).toBe(componentProps);
+    });
+
     test('dispose cleans up the part', () => {
         const addPortal = jest.fn().mockReturnValue({ dispose: jest.fn() });
         const cut = new ReactContextMenuItemPart(

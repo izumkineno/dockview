@@ -80,7 +80,9 @@ export interface ThemeBuilderState {
     cssOverrides: ThemeCssOverrides;
 }
 
-export function getInitialStateFromTheme(theme: DockviewTheme): ThemeBuilderState {
+export function getInitialStateFromTheme(
+    theme: DockviewTheme
+): ThemeBuilderState {
     return {
         gap: theme.gap ?? 0,
         dndOverlayMounting: theme.dndOverlayMounting ?? 'relative',
@@ -116,8 +118,13 @@ export function generateCodeSnippet(
     if (state.gap !== (baseTheme.gap ?? 0)) {
         themeFields.push(`  gap: ${state.gap},`);
     }
-    if (state.dndOverlayMounting !== (baseTheme.dndOverlayMounting ?? 'relative')) {
-        themeFields.push(`  dndOverlayMounting: '${state.dndOverlayMounting}',`);
+    if (
+        state.dndOverlayMounting !==
+        (baseTheme.dndOverlayMounting ?? 'relative')
+    ) {
+        themeFields.push(
+            `  dndOverlayMounting: '${state.dndOverlayMounting}',`
+        );
     }
     if (state.dndPanelOverlay !== (baseTheme.dndPanelOverlay ?? 'content')) {
         themeFields.push(`  dndPanelOverlay: '${state.dndPanelOverlay}',`);

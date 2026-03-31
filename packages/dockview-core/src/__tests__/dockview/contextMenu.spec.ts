@@ -137,6 +137,108 @@ describe('ContextMenuController', () => {
             const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
             expect(menuEl.className).toBe('dv-context-menu');
         });
+
+        test('menu element has role="menu"', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue(['close']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            expect(menuEl.getAttribute('role')).toBe('menu');
+        });
+    });
+
+    describe('ARIA attributes', () => {
+        test('built-in label items have role="menuitem"', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['close', 'closeOthers', 'closeAll']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup([makePanel()]),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const items = menuEl.querySelectorAll('.dv-context-menu-item');
+            items.forEach((item) => {
+                expect(item.getAttribute('role')).toBe('menuitem');
+            });
+        });
+
+        test('separator has role="separator"', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue(['separator']),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const sep = menuEl.querySelector('.dv-context-menu-separator')!;
+            expect(sep.getAttribute('role')).toBe('separator');
+        });
+
+        test('disabled items have aria-disabled="true"', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue([
+                        {
+                            label: 'Disabled',
+                            action: jest.fn(),
+                            disabled: true,
+                        },
+                    ]),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.getAttribute('aria-disabled')).toBe('true');
+        });
+
+        test('enabled items do not have aria-disabled', () => {
+            const { accessor, openPopover } = makeAccessor({
+                getTabContextMenuItems: jest
+                    .fn()
+                    .mockReturnValue([{ label: 'Enabled', action: jest.fn() }]),
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu')
+            );
+
+            const menuEl = openPopover.mock.calls[0][0] as HTMLElement;
+            const item = menuEl.querySelector('.dv-context-menu-item')!;
+            expect(item.getAttribute('aria-disabled')).toBeNull();
+        });
     });
 
     describe("built-in 'close' item", () => {
@@ -366,6 +468,37 @@ describe('ContextMenuController', () => {
             const { close: closeFn } = initMock.mock.calls[0][0];
             closeFn();
             expect(close).toHaveBeenCalled();
+        });
+
+        test('forwards componentProps to renderer.init()', () => {
+            const componentRef = { type: 'my-component' };
+            const initMock = jest.fn();
+            const createContextMenuItemComponent = jest.fn().mockReturnValue({
+                element: document.createElement('div'),
+                init: initMock,
+                dispose: jest.fn(),
+            });
+
+            const { accessor } = makeAccessor({
+                getTabContextMenuItems: jest.fn().mockReturnValue([
+                    {
+                        component: componentRef,
+                        componentProps: { foo: 'bar' },
+                    },
+                ]),
+                createContextMenuItemComponent,
+            });
+            const controller = new ContextMenuController(accessor);
+
+            controller.show(
+                makePanel(),
+                makeGroup(),
+                new MouseEvent('contextmenu')
+            );
+
+            expect(initMock).toHaveBeenCalledWith(
+                expect.objectContaining({ componentProps: { foo: 'bar' } })
+            );
         });
 
         test('skips item if createContextMenuItemComponent returns undefined', () => {

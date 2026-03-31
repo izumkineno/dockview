@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, Type } from '@angular/core';
+import { Component, Input, Type } from '@angular/core';
 import {
     CreateContextMenuItemComponentOptions,
+    DockviewGroupPanel,
+    IDockviewPanel,
     IContextMenuItemComponentProps,
 } from 'dockview-core';
 import { DockviewAngularComponent } from '../lib/dockview/dockview-angular.component';
@@ -13,6 +15,18 @@ import { setupTestBed, getTestComponents } from './__test_utils__/test-helpers';
     template: '<div class="test-menu-item">My Item</div>',
 })
 class TestContextMenuItemComponent {}
+
+@Component({
+    selector: 'test-context-menu-item-with-inputs',
+    template: '<div></div>',
+})
+class TestContextMenuItemWithInputsComponent {
+    @Input() panel!: IDockviewPanel;
+    @Input() group!: DockviewGroupPanel;
+    @Input() api!: any;
+    @Input() close!: () => void;
+    @Input() componentProps?: object;
+}
 
 describe('DockviewAngularComponent – context menu', () => {
     let component: DockviewAngularComponent;
@@ -97,6 +111,42 @@ describe('DockviewAngularComponent – context menu', () => {
         };
 
         expect(() => renderer.init(props)).not.toThrow();
+        renderer.dispose();
+    });
+
+    it('forwards panel, group, close, and componentProps to the Angular component @Inputs', () => {
+        component.ngOnInit();
+
+        const frameworkOptions = (component as any).createFrameworkOptions();
+        const factory = frameworkOptions.createContextMenuItemComponent;
+
+        const renderer: AngularRenderer<TestContextMenuItemWithInputsComponent> =
+            factory({
+                id: 'test-id',
+                component: TestContextMenuItemWithInputsComponent as Type<any>,
+            } as CreateContextMenuItemComponentOptions);
+
+        const panel = {} as IDockviewPanel;
+        const group = {} as DockviewGroupPanel;
+        const closeFn = jest.fn();
+        const extraProps = { foo: 'bar' };
+
+        const props: IContextMenuItemComponentProps = {
+            panel,
+            group,
+            api: {} as any,
+            close: closeFn,
+            componentProps: extraProps,
+        };
+
+        renderer.init(props);
+
+        const instance = renderer.component!.instance;
+        expect(instance.panel).toBe(panel);
+        expect(instance.group).toBe(group);
+        expect(instance.close).toBe(closeFn);
+        expect(instance.componentProps).toBe(extraProps);
+
         renderer.dispose();
     });
 });

@@ -21,7 +21,11 @@ import {
 import { usePanelApiMetadata } from './debugPanel.tsx';
 import { LogLine, LogLines } from './logLines.tsx';
 
-const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) => {
+const FloatMenuItem = ({
+    panel,
+    api,
+    close,
+}: IContextMenuItemComponentProps) => {
     return (
         <div
             className="dv-context-menu-item"
@@ -31,7 +35,10 @@ const FloatMenuItem = ({ panel, api, close }: IContextMenuItemComponentProps) =>
             }}
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
         >
-            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
+            <span
+                className="material-symbols-outlined"
+                style={{ fontSize: '14px' }}
+            >
                 ad_group
             </span>
             Float tab

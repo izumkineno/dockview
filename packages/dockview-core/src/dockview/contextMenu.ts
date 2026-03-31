@@ -11,8 +11,10 @@ function buildItem(
 ): HTMLElement {
     const el = document.createElement('div');
     el.className = 'dv-context-menu-item';
+    el.setAttribute('role', 'menuitem');
     if (disabled) {
         el.classList.add('dv-context-menu-item--disabled');
+        el.setAttribute('aria-disabled', 'true');
     }
     el.textContent = label;
     if (!disabled) {
@@ -27,6 +29,7 @@ function buildItem(
 function buildSeparator(): HTMLElement {
     const el = document.createElement('div');
     el.className = 'dv-context-menu-separator';
+    el.setAttribute('role', 'separator');
     return el;
 }
 
@@ -59,6 +62,7 @@ export class ContextMenuController {
         const close = () => this.accessor.popupService.close();
         const menuEl = document.createElement('div');
         menuEl.className = 'dv-context-menu';
+        menuEl.setAttribute('role', 'menu');
 
         for (const item of items) {
             if (item === 'separator') {
@@ -93,6 +97,7 @@ export class ContextMenuController {
                         group,
                         api: this.accessor.api,
                         close,
+                        componentProps: item.componentProps,
                     });
                     menuEl.appendChild(renderer.element);
                 }
