@@ -59,7 +59,7 @@ import {
 } from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
-import { FixedPanelPosition } from '../dockview/dockviewShell';
+import { EdgePanelPosition } from '../dockview/dockviewShell';
 import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
@@ -931,26 +931,26 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
 
     /**
      * Get the group panel API for a fixed side panel at the given position.
-     * Returns `undefined` if no fixed panel is configured at that position.
+     * Returns `undefined` if no edge panel is configured at that position.
      */
-    getFixedPanel(
-        position: FixedPanelPosition
+    getEdgePanel(
+        position: EdgePanelPosition
     ): DockviewGroupPanelApi | undefined {
-        return this.component.getFixedPanel(position);
+        return this.component.getEdgePanel(position);
     }
 
     /**
      * Set the visibility of a fixed side panel.
      */
-    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void {
-        this.component.setFixedPanelVisible(position, visible);
+    setEdgePanelVisible(position: EdgePanelPosition, visible: boolean): void {
+        this.component.setEdgePanelVisible(position, visible);
     }
 
     /**
      * Check whether a fixed side panel is currently visible.
      */
-    isFixedPanelVisible(position: FixedPanelPosition): boolean {
-        return this.component.isFixedPanelVisible(position);
+    isEdgePanelVisible(position: EdgePanelPosition): boolean {
+        return this.component.isEdgePanelVisible(position);
     }
 
     updateOptions(options: Partial<DockviewComponentOptions>) {

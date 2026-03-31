@@ -32,7 +32,7 @@ export class PopupService extends CompositeDisposable {
 
     /**
      * Move the popup anchor into a new root element. Call this when a shell
-     * wraps the dockview component so that fixed-panel overflow dropdowns
+     * wraps the dockview component so that edge-panel overflow dropdowns
      * position correctly relative to the full layout area.
      */
     updateRoot(newRoot: HTMLElement): void {

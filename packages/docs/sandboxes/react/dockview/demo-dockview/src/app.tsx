@@ -6,7 +6,7 @@ import {
     IDockviewPanelProps,
     DockviewApi,
     DockviewTheme,
-    FixedPanelsConfig,
+    EdgePanelsConfig,
     themeAbyss,
     IContextMenuItemComponentProps,
 } from 'dockview';
@@ -407,7 +407,7 @@ const DockviewDemo = (props: {
             }),
         ];
 
-        const fixedPanelDefs: {
+        const edgePanelDefs: {
             pos: 'bottom' | 'left' | 'right';
             id: string;
             title: string;
@@ -420,9 +420,9 @@ const DockviewDemo = (props: {
             { pos: 'bottom', id: 'bottom-3', title: 'Problems' },
         ];
 
-        const populateFixedPanels = () => {
-            for (const { pos, id, title } of fixedPanelDefs) {
-                const groupApi = api.getFixedPanel(pos);
+        const populateEdgePanels = () => {
+            for (const { pos, id, title } of edgePanelDefs) {
+                const groupApi = api.getEdgePanel(pos);
                 if (groupApi && !api.panels.find((p) => p.id === id)) {
                     api.addPanel({
                         id,
@@ -441,7 +441,7 @@ const DockviewDemo = (props: {
             if (state) {
                 try {
                     api.fromJSON(JSON.parse(state));
-                    populateFixedPanels();
+                    populateEdgePanels();
                     setLayoutReady(true);
                     return;
                 } catch {
@@ -451,7 +451,7 @@ const DockviewDemo = (props: {
             }
 
             defaultConfig(api);
-            populateFixedPanels();
+            populateEdgePanels();
             setLayoutReady(true);
         };
 
@@ -544,9 +544,9 @@ const DockviewDemo = (props: {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
-    const [useFixedPanels, setUseFixedPanels] = React.useState<boolean>(true);
+    const [useEdgePanels, setUseEdgePanels] = React.useState<boolean>(true);
 
-    const fixedPanelsConfig: FixedPanelsConfig | undefined = useFixedPanels
+    const edgePanelsConfig: EdgePanelsConfig | undefined = useEdgePanels
         ? {
               bottom: {
                   id: 'bottom',
@@ -608,7 +608,7 @@ const DockviewDemo = (props: {
                                     >
                                         <DockviewReact
                                             key={
-                                                useFixedPanels
+                                                useEdgePanels
                                                     ? 'shell'
                                                     : 'no-shell'
                                             }
@@ -632,7 +632,7 @@ const DockviewDemo = (props: {
                                             }
                                             onReady={onReady}
                                             theme={effectiveTheme}
-                                            fixedPanels={fixedPanelsConfig}
+                                            edgePanels={edgePanelsConfig}
                                             getTabContextMenuItems={() => [
                                                 'close',
                                                 'closeOthers',

@@ -34,7 +34,7 @@ export interface DockviewGroupPanelApi extends GridviewPanelApi {
     readonly onDidLocationChange: Event<DockviewGroupPanelFloatingChangeEvent>;
     readonly onDidActivePanelChange: Event<DockviewGroupChangeEvent>;
     /**
-     * Fired when a fixed panel's collapsed state changes.
+     * Fired when a edge panel's collapsed state changes.
      * Never fires for non-fixed groups.
      */
     readonly onDidCollapsedChange: Event<DockviewGroupPanelCollapsedChangeEvent>;

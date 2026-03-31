@@ -16,11 +16,11 @@ export interface DockviewTheme {
      */
     gap?: number;
     /**
-     * The collapsed size (in px) for fixed panels when using this theme.
+     * The collapsed size (in px) for edge panels when using this theme.
      * When set, this overrides the default 35px collapsed size so that
-     * collapsed fixed panels match the theme's tab strip height.
+     * collapsed edge panels match the theme's tab strip height.
      */
-    fixedPanelCollapsedSize?: number;
+    edgePanelCollapsedSize?: number;
     /**
      * The mouting position of the overlay shown when dragging a panel. `absolute`
      * will mount the overlay to root of the dockview component whereas `relative` will mount the overlay to the group container.
@@ -50,7 +50,7 @@ export const themeVisualStudio: DockviewTheme = {
     colorScheme: 'dark',
     // --dv-tabs-and-actions-container-height is 20px, but the VS theme applies
     // box-sizing: content-box + border-bottom: 2px, so the rendered strip is 22px.
-    fixedPanelCollapsedSize: 22,
+    edgePanelCollapsedSize: 22,
 };
 
 export const themeAbyss: DockviewTheme = {
@@ -70,7 +70,7 @@ export const themeAbyssSpaced: DockviewTheme = {
     className: 'dockview-theme-abyss-spaced',
     colorScheme: 'dark',
     gap: 10,
-    fixedPanelCollapsedSize: 44,
+    edgePanelCollapsedSize: 44,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
 };
@@ -161,7 +161,7 @@ export const themeGithubLightSpaced: DockviewTheme = {
     className: 'dockview-theme-github-light-spaced',
     colorScheme: 'light',
     gap: 10,
-    fixedPanelCollapsedSize: 44,
+    edgePanelCollapsedSize: 44,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
 };

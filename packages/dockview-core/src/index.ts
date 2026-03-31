@@ -81,12 +81,12 @@ export {
 
 export * from './dockview/dockviewComponent';
 export {
-    FixedPanelView,
-    FixedPanelViewOptions,
-    FixedPanelPosition,
-    FixedPanelsConfig,
-    SerializedFixedPanels,
-    IFixedPanelGroup,
+    EdgePanelView,
+    EdgePanelViewOptions,
+    EdgePanelPosition,
+    EdgePanelsConfig,
+    SerializedEdgePanels,
+    IEdgePanelGroup,
 } from './dockview/dockviewShell';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';

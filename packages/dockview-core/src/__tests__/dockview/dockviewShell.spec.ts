@@ -1,22 +1,22 @@
 import {
-    FixedPanelView,
-    IFixedPanelGroup,
+    EdgePanelView,
+    IEdgePanelGroup,
     ShellManager,
-    FixedPanelsConfig,
+    EdgePanelsConfig,
 } from '../../dockview/dockviewShell';
 
-function makeGroup(): IFixedPanelGroup & { layout: jest.Mock } {
+function makeGroup(): IEdgePanelGroup & { layout: jest.Mock } {
     return {
         element: document.createElement('div'),
         layout: jest.fn(),
     };
 }
 
-describe('FixedPanelView', () => {
+describe('EdgePanelView', () => {
     describe('construction', () => {
         test('collapsedSize defaults to 35', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test' },
                 group,
                 'horizontal'
@@ -26,7 +26,7 @@ describe('FixedPanelView', () => {
 
         test('expandedMinimumSize = collapsedSize + 50 when minimumSize not provided', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', collapsedSize: 30 },
                 group,
                 'horizontal'
@@ -37,7 +37,7 @@ describe('FixedPanelView', () => {
 
         test('expandedMinimumSize = provided minimumSize when given', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', minimumSize: 100 },
                 group,
                 'horizontal'
@@ -47,7 +47,7 @@ describe('FixedPanelView', () => {
 
         test('lastExpandedSize defaults to 200 when initialSize not provided', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test' },
                 group,
                 'horizontal'
@@ -57,7 +57,7 @@ describe('FixedPanelView', () => {
 
         test('lastExpandedSize = provided initialSize', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', initialSize: 350 },
                 group,
                 'horizontal'
@@ -65,19 +65,19 @@ describe('FixedPanelView', () => {
             expect(view.lastExpandedSize).toBe(350);
         });
 
-        test('adds dv-fixed-panel CSS class to group element', () => {
+        test('adds dv-edge-panel CSS class to group element', () => {
             const group = makeGroup();
-            new FixedPanelView({ id: 'test' }, group, 'horizontal');
-            expect(group.element.classList.contains('dv-fixed-panel')).toBe(
+            new EdgePanelView({ id: 'test' }, group, 'horizontal');
+            expect(group.element.classList.contains('dv-edge-panel')).toBe(
                 true
             );
         });
 
-        test('sets data-testid = dv-fixed-panel-<id>', () => {
+        test('sets data-testid = dv-edge-panel-<id>', () => {
             const group = makeGroup();
-            new FixedPanelView({ id: 'my-panel' }, group, 'horizontal');
+            new EdgePanelView({ id: 'my-panel' }, group, 'horizontal');
             expect(group.element.dataset.testid).toBe(
-                'dv-fixed-panel-my-panel'
+                'dv-edge-panel-my-panel'
             );
         });
     });
@@ -85,7 +85,7 @@ describe('FixedPanelView', () => {
     describe('minimumSize getter', () => {
         test('returns collapsedSize when collapsed', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', collapsedSize: 40 },
                 group,
                 'horizontal'
@@ -96,7 +96,7 @@ describe('FixedPanelView', () => {
 
         test('returns expandedMinimumSize when expanded', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', collapsedSize: 40, minimumSize: 120 },
                 group,
                 'horizontal'
@@ -108,7 +108,7 @@ describe('FixedPanelView', () => {
     describe('maximumSize getter', () => {
         test('returns collapsedSize when collapsed', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', collapsedSize: 40 },
                 group,
                 'horizontal'
@@ -119,7 +119,7 @@ describe('FixedPanelView', () => {
 
         test('returns Infinity when expanded and maximumSize not provided', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test' },
                 group,
                 'horizontal'
@@ -129,7 +129,7 @@ describe('FixedPanelView', () => {
 
         test('returns provided expandedMaximumSize when expanded', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', maximumSize: 600 },
                 group,
                 'horizontal'
@@ -141,7 +141,7 @@ describe('FixedPanelView', () => {
     describe('setCollapsed', () => {
         test('setCollapsed(true): isCollapsed becomes true and adds dv-fixed-collapsed class', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test' },
                 group,
                 'horizontal'
@@ -155,7 +155,7 @@ describe('FixedPanelView', () => {
 
         test('setCollapsed(false): isCollapsed becomes false and removes dv-fixed-collapsed class', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test' },
                 group,
                 'horizontal'
@@ -170,7 +170,7 @@ describe('FixedPanelView', () => {
 
         test('setCollapsed(true) twice is a no-op on the second call', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test' },
                 group,
                 'horizontal'
@@ -186,7 +186,7 @@ describe('FixedPanelView', () => {
     describe('layout', () => {
         test('horizontal: calls group.layout(size, orthogonalSize)', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test' },
                 group,
                 'horizontal'
@@ -197,7 +197,7 @@ describe('FixedPanelView', () => {
 
         test('vertical: calls group.layout(orthogonalSize, size)', () => {
             const group = makeGroup();
-            const view = new FixedPanelView({ id: 'test' }, group, 'vertical');
+            const view = new EdgePanelView({ id: 'test' }, group, 'vertical');
             view.layout(200, 900);
             // vertical: size=height, orthogonalSize=width → layout(width, height)
             expect(group.layout).toHaveBeenCalledWith(900, 200);
@@ -205,7 +205,7 @@ describe('FixedPanelView', () => {
 
         test('when not collapsed: updates lastExpandedSize', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', initialSize: 200 },
                 group,
                 'horizontal'
@@ -216,7 +216,7 @@ describe('FixedPanelView', () => {
 
         test('when collapsed: does NOT update lastExpandedSize', () => {
             const group = makeGroup();
-            const view = new FixedPanelView(
+            const view = new EdgePanelView(
                 { id: 'test', initialSize: 200 },
                 group,
                 'horizontal'
@@ -245,12 +245,12 @@ describe('ShellManager', () => {
     });
 
     function makeShell(
-        config: FixedPanelsConfig,
+        config: EdgePanelsConfig,
         groups: {
-            top?: IFixedPanelGroup;
-            bottom?: IFixedPanelGroup;
-            left?: IFixedPanelGroup;
-            right?: IFixedPanelGroup;
+            top?: IEdgePanelGroup;
+            bottom?: IEdgePanelGroup;
+            left?: IEdgePanelGroup;
+            right?: IEdgePanelGroup;
         } = {}
     ): ShellManager {
         return new ShellManager(
@@ -262,16 +262,16 @@ describe('ShellManager', () => {
         );
     }
 
-    describe('hasFixedPanel', () => {
+    describe('hasEdgePanel', () => {
         test('returns true for configured positions and false for others', () => {
             const shell = makeShell(
                 { left: { id: 'left' } },
                 { left: makeGroup() }
             );
-            expect(shell.hasFixedPanel('left')).toBe(true);
-            expect(shell.hasFixedPanel('right')).toBe(false);
-            expect(shell.hasFixedPanel('top')).toBe(false);
-            expect(shell.hasFixedPanel('bottom')).toBe(false);
+            expect(shell.hasEdgePanel('left')).toBe(true);
+            expect(shell.hasEdgePanel('right')).toBe(false);
+            expect(shell.hasEdgePanel('top')).toBe(false);
+            expect(shell.hasEdgePanel('bottom')).toBe(false);
             shell.dispose();
         });
 
@@ -290,25 +290,25 @@ describe('ShellManager', () => {
                     bottom: makeGroup(),
                 }
             );
-            expect(shell.hasFixedPanel('left')).toBe(true);
-            expect(shell.hasFixedPanel('right')).toBe(true);
-            expect(shell.hasFixedPanel('top')).toBe(true);
-            expect(shell.hasFixedPanel('bottom')).toBe(true);
+            expect(shell.hasEdgePanel('left')).toBe(true);
+            expect(shell.hasEdgePanel('right')).toBe(true);
+            expect(shell.hasEdgePanel('top')).toBe(true);
+            expect(shell.hasEdgePanel('bottom')).toBe(true);
             shell.dispose();
         });
     });
 
-    describe('setFixedPanelVisible / isFixedPanelVisible', () => {
+    describe('setEdgePanelVisible / isEdgePanelVisible', () => {
         test('left panel: visible by default, can be hidden and shown', () => {
             const shell = makeShell(
                 { left: { id: 'left' } },
                 { left: makeGroup() }
             );
-            expect(shell.isFixedPanelVisible('left')).toBe(true);
-            shell.setFixedPanelVisible('left', false);
-            expect(shell.isFixedPanelVisible('left')).toBe(false);
-            shell.setFixedPanelVisible('left', true);
-            expect(shell.isFixedPanelVisible('left')).toBe(true);
+            expect(shell.isEdgePanelVisible('left')).toBe(true);
+            shell.setEdgePanelVisible('left', false);
+            expect(shell.isEdgePanelVisible('left')).toBe(false);
+            shell.setEdgePanelVisible('left', true);
+            expect(shell.isEdgePanelVisible('left')).toBe(true);
             shell.dispose();
         });
 
@@ -317,9 +317,9 @@ describe('ShellManager', () => {
                 { right: { id: 'right' } },
                 { right: makeGroup() }
             );
-            expect(shell.isFixedPanelVisible('right')).toBe(true);
-            shell.setFixedPanelVisible('right', false);
-            expect(shell.isFixedPanelVisible('right')).toBe(false);
+            expect(shell.isEdgePanelVisible('right')).toBe(true);
+            shell.setEdgePanelVisible('right', false);
+            expect(shell.isEdgePanelVisible('right')).toBe(false);
             shell.dispose();
         });
 
@@ -328,9 +328,9 @@ describe('ShellManager', () => {
                 { top: { id: 'top' } },
                 { top: makeGroup() }
             );
-            expect(shell.isFixedPanelVisible('top')).toBe(true);
-            shell.setFixedPanelVisible('top', false);
-            expect(shell.isFixedPanelVisible('top')).toBe(false);
+            expect(shell.isEdgePanelVisible('top')).toBe(true);
+            shell.setEdgePanelVisible('top', false);
+            expect(shell.isEdgePanelVisible('top')).toBe(false);
             shell.dispose();
         });
 
@@ -339,33 +339,33 @@ describe('ShellManager', () => {
                 { bottom: { id: 'bottom' } },
                 { bottom: makeGroup() }
             );
-            expect(shell.isFixedPanelVisible('bottom')).toBe(true);
-            shell.setFixedPanelVisible('bottom', false);
-            expect(shell.isFixedPanelVisible('bottom')).toBe(false);
+            expect(shell.isEdgePanelVisible('bottom')).toBe(true);
+            shell.setEdgePanelVisible('bottom', false);
+            expect(shell.isEdgePanelVisible('bottom')).toBe(false);
             shell.dispose();
         });
 
         test('unconfigured position always returns false', () => {
             const shell = makeShell({}, {});
-            expect(shell.isFixedPanelVisible('left')).toBe(false);
-            expect(shell.isFixedPanelVisible('right')).toBe(false);
-            expect(shell.isFixedPanelVisible('top')).toBe(false);
-            expect(shell.isFixedPanelVisible('bottom')).toBe(false);
+            expect(shell.isEdgePanelVisible('left')).toBe(false);
+            expect(shell.isEdgePanelVisible('right')).toBe(false);
+            expect(shell.isEdgePanelVisible('top')).toBe(false);
+            expect(shell.isEdgePanelVisible('bottom')).toBe(false);
             shell.dispose();
         });
     });
 
-    describe('setFixedPanelCollapsed / isFixedPanelCollapsed', () => {
+    describe('setEdgePanelCollapsed / isEdgePanelCollapsed', () => {
         test('collapse and expand left panel', () => {
             const shell = makeShell(
                 { left: { id: 'left' } },
                 { left: makeGroup() }
             );
-            expect(shell.isFixedPanelCollapsed('left')).toBe(false);
-            shell.setFixedPanelCollapsed('left', true);
-            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
-            shell.setFixedPanelCollapsed('left', false);
-            expect(shell.isFixedPanelCollapsed('left')).toBe(false);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(false);
+            shell.setEdgePanelCollapsed('left', true);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(true);
+            shell.setEdgePanelCollapsed('left', false);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(false);
             shell.dispose();
         });
 
@@ -374,8 +374,8 @@ describe('ShellManager', () => {
                 { right: { id: 'right' } },
                 { right: makeGroup() }
             );
-            shell.setFixedPanelCollapsed('right', true);
-            expect(shell.isFixedPanelCollapsed('right')).toBe(true);
+            shell.setEdgePanelCollapsed('right', true);
+            expect(shell.isEdgePanelCollapsed('right')).toBe(true);
             shell.dispose();
         });
 
@@ -384,8 +384,8 @@ describe('ShellManager', () => {
                 { top: { id: 'top' } },
                 { top: makeGroup() }
             );
-            shell.setFixedPanelCollapsed('top', true);
-            expect(shell.isFixedPanelCollapsed('top')).toBe(true);
+            shell.setEdgePanelCollapsed('top', true);
+            expect(shell.isEdgePanelCollapsed('top')).toBe(true);
             shell.dispose();
         });
 
@@ -394,17 +394,17 @@ describe('ShellManager', () => {
                 { bottom: { id: 'bottom' } },
                 { bottom: makeGroup() }
             );
-            shell.setFixedPanelCollapsed('bottom', true);
-            expect(shell.isFixedPanelCollapsed('bottom')).toBe(true);
+            shell.setEdgePanelCollapsed('bottom', true);
+            expect(shell.isEdgePanelCollapsed('bottom')).toBe(true);
             shell.dispose();
         });
 
         test('collapse unconfigured position is a no-op', () => {
             const shell = makeShell({}, {});
             expect(() =>
-                shell.setFixedPanelCollapsed('left', true)
+                shell.setEdgePanelCollapsed('left', true)
             ).not.toThrow();
-            expect(shell.isFixedPanelCollapsed('left')).toBe(false);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(false);
             shell.dispose();
         });
     });
@@ -427,7 +427,7 @@ describe('ShellManager', () => {
                 { left: { id: 'left', initialSize: 250 } },
                 { left: makeGroup() }
             );
-            shell.setFixedPanelCollapsed('left', true);
+            shell.setEdgePanelCollapsed('left', true);
             const json = shell.toJSON();
             // collapsed flag should be set; avoid asserting pixel size (jsdom has no real layout)
             expect(json.left!.collapsed).toBe(true);
@@ -440,7 +440,7 @@ describe('ShellManager', () => {
                 { left: { id: 'left' } },
                 { left: makeGroup() }
             );
-            shell.setFixedPanelVisible('left', false);
+            shell.setEdgePanelVisible('left', false);
             const json = shell.toJSON();
             expect(json.left!.visible).toBe(false);
             shell.dispose();
@@ -466,7 +466,7 @@ describe('ShellManager', () => {
                 { left: makeGroup() }
             );
             shell.fromJSON({ left: { size: 200, visible: false } });
-            expect(shell.isFixedPanelVisible('left')).toBe(false);
+            expect(shell.isEdgePanelVisible('left')).toBe(false);
             shell.dispose();
         });
 
@@ -478,7 +478,7 @@ describe('ShellManager', () => {
             shell.fromJSON({
                 left: { size: 200, visible: true, collapsed: true },
             });
-            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(true);
             shell.dispose();
         });
 
@@ -491,10 +491,10 @@ describe('ShellManager', () => {
             shell.fromJSON({
                 left: { size: 350, visible: true, collapsed: true },
             });
-            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(true);
             // lastExpandedSize must be the serialised 350px (not the constructor
             // default of 300px) so that expanding restores the correct size
-            const leftView = (shell as any)._leftView as FixedPanelView;
+            const leftView = (shell as any)._leftView as EdgePanelView;
             expect(leftView.lastExpandedSize).toBe(350);
             shell.dispose();
         });
@@ -505,7 +505,7 @@ describe('ShellManager', () => {
                 { right: makeGroup() }
             );
             shell.fromJSON({ right: { size: 200, visible: false } });
-            expect(shell.isFixedPanelVisible('right')).toBe(false);
+            expect(shell.isEdgePanelVisible('right')).toBe(false);
             shell.dispose();
         });
 
@@ -515,7 +515,7 @@ describe('ShellManager', () => {
                 { top: makeGroup() }
             );
             shell.fromJSON({ top: { size: 200, visible: false } });
-            expect(shell.isFixedPanelVisible('top')).toBe(false);
+            expect(shell.isEdgePanelVisible('top')).toBe(false);
             shell.dispose();
         });
 
@@ -525,7 +525,7 @@ describe('ShellManager', () => {
                 { bottom: makeGroup() }
             );
             shell.fromJSON({ bottom: { size: 200, visible: false } });
-            expect(shell.isFixedPanelVisible('bottom')).toBe(false);
+            expect(shell.isEdgePanelVisible('bottom')).toBe(false);
             shell.dispose();
         });
     });
@@ -541,7 +541,7 @@ describe('ShellManager', () => {
                 0,
                 48
             );
-            const leftView = (shell as any)._leftView as FixedPanelView;
+            const leftView = (shell as any)._leftView as EdgePanelView;
             expect(leftView.collapsedSize).toBe(48);
             shell.dispose();
         });
@@ -556,7 +556,7 @@ describe('ShellManager', () => {
                 0,
                 48
             );
-            const leftView = (shell as any)._leftView as FixedPanelView;
+            const leftView = (shell as any)._leftView as EdgePanelView;
             expect(leftView.collapsedSize).toBe(60);
             shell.dispose();
         });
@@ -846,12 +846,12 @@ describe('ShellManager', () => {
                 0,
                 35
             );
-            shell.setFixedPanelCollapsed('left', true);
-            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
+            shell.setEdgePanelCollapsed('left', true);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(true);
 
             shell.updateTheme(10, 44);
 
-            expect(shell.isFixedPanelCollapsed('left')).toBe(true);
+            expect(shell.isEdgePanelCollapsed('left')).toBe(true);
             shell.dispose();
         });
 

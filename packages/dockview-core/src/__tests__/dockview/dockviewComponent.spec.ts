@@ -21,7 +21,7 @@ import { DockviewApi } from '../../api/component.api';
 import { DockviewDndOverlayEvent } from '../../dockview/options';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
-import { FixedPanelsConfig } from '../../dockview/dockviewShell';
+import { EdgePanelsConfig } from '../../dockview/dockviewShell';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -8568,17 +8568,17 @@ describe('dockviewComponent', () => {
         });
     });
 
-    describe('fixed panels', () => {
+    describe('edge panels', () => {
         function createFixedDockview(
             c: HTMLElement,
             positions: ('left' | 'right' | 'top' | 'bottom')[],
-            overrideConfig?: Partial<FixedPanelsConfig>
+            overrideConfig?: Partial<EdgePanelsConfig>
         ) {
-            const fixedPanels: FixedPanelsConfig = {};
+            const edgePanels: EdgePanelsConfig = {};
             for (const pos of positions) {
-                fixedPanels[pos] = { id: `${pos}-group` };
+                edgePanels[pos] = { id: `${pos}-group` };
             }
-            Object.assign(fixedPanels, overrideConfig);
+            Object.assign(edgePanels, overrideConfig);
             return new DockviewComponent(c, {
                 createComponent(options) {
                     switch (options.name) {
@@ -8591,35 +8591,35 @@ describe('dockviewComponent', () => {
                             throw new Error(`unsupported`);
                     }
                 },
-                fixedPanels,
+                edgePanels,
             });
         }
 
-        test('getFixedPanel returns DockviewGroupPanelApi for configured positions', () => {
+        test('getEdgePanel returns DockviewGroupPanelApi for configured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'right']);
-            expect(dv.getFixedPanel('left')).toBeDefined();
-            expect(dv.getFixedPanel('right')).toBeDefined();
+            expect(dv.getEdgePanel('left')).toBeDefined();
+            expect(dv.getEdgePanel('right')).toBeDefined();
             dv.dispose();
         });
 
-        test('getFixedPanel returns undefined for unconfigured positions', () => {
+        test('getEdgePanel returns undefined for unconfigured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
-            expect(dv.getFixedPanel('right')).toBeUndefined();
-            expect(dv.getFixedPanel('top')).toBeUndefined();
-            expect(dv.getFixedPanel('bottom')).toBeUndefined();
+            expect(dv.getEdgePanel('right')).toBeUndefined();
+            expect(dv.getEdgePanel('top')).toBeUndefined();
+            expect(dv.getEdgePanel('bottom')).toBeUndefined();
             dv.dispose();
         });
 
-        test('getFixedPanel returns undefined when no fixedPanels option provided', () => {
+        test('getEdgePanel returns undefined when no edgePanels option provided', () => {
             const c = document.createElement('div');
             const dv = new DockviewComponent(c, {
                 createComponent(options) {
                     return new PanelContentPartTest(options.id, options.name);
                 },
             });
-            expect(dv.getFixedPanel('left')).toBeUndefined();
+            expect(dv.getEdgePanel('left')).toBeUndefined();
             dv.dispose();
         });
 
@@ -8627,14 +8627,14 @@ describe('dockviewComponent', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'top']);
 
-            const leftApi = dv.getFixedPanel('left')!;
+            const leftApi = dv.getEdgePanel('left')!;
             expect(leftApi.location.type).toBe('fixed');
             expect(
                 (leftApi.location as { type: 'fixed'; position: string })
                     .position
             ).toBe('left');
 
-            const topApi = dv.getFixedPanel('top')!;
+            const topApi = dv.getEdgePanel('top')!;
             expect(topApi.location.type).toBe('fixed');
             expect(
                 (topApi.location as { type: 'fixed'; position: string })
@@ -8644,45 +8644,45 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
-        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for left', () => {
+        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for left', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
-            expect(dv.isFixedPanelVisible('left')).toBe(true);
-            dv.setFixedPanelVisible('left', false);
-            expect(dv.isFixedPanelVisible('left')).toBe(false);
-            dv.setFixedPanelVisible('left', true);
-            expect(dv.isFixedPanelVisible('left')).toBe(true);
+            expect(dv.isEdgePanelVisible('left')).toBe(true);
+            dv.setEdgePanelVisible('left', false);
+            expect(dv.isEdgePanelVisible('left')).toBe(false);
+            dv.setEdgePanelVisible('left', true);
+            expect(dv.isEdgePanelVisible('left')).toBe(true);
             dv.dispose();
         });
 
-        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for right', () => {
+        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for right', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['right']);
-            dv.setFixedPanelVisible('right', false);
-            expect(dv.isFixedPanelVisible('right')).toBe(false);
+            dv.setEdgePanelVisible('right', false);
+            expect(dv.isEdgePanelVisible('right')).toBe(false);
             dv.dispose();
         });
 
-        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for top', () => {
+        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for top', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['top']);
-            dv.setFixedPanelVisible('top', false);
-            expect(dv.isFixedPanelVisible('top')).toBe(false);
+            dv.setEdgePanelVisible('top', false);
+            expect(dv.isEdgePanelVisible('top')).toBe(false);
             dv.dispose();
         });
 
-        test('setFixedPanelVisible / isFixedPanelVisible delegates correctly for bottom', () => {
+        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for bottom', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['bottom']);
-            dv.setFixedPanelVisible('bottom', false);
-            expect(dv.isFixedPanelVisible('bottom')).toBe(false);
+            dv.setEdgePanelVisible('bottom', false);
+            expect(dv.isEdgePanelVisible('bottom')).toBe(false);
             dv.dispose();
         });
 
-        test('isFixedPanelVisible returns false for unconfigured positions', () => {
+        test('isEdgePanelVisible returns false for unconfigured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
-            expect(dv.isFixedPanelVisible('right')).toBe(false);
+            expect(dv.isEdgePanelVisible('right')).toBe(false);
             dv.dispose();
         });
 
@@ -8690,7 +8690,7 @@ describe('dockviewComponent', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
 
-            const leftApi = dv.getFixedPanel('left')!;
+            const leftApi = dv.getEdgePanel('left')!;
             expect(leftApi.isCollapsed()).toBe(false);
 
             leftApi.collapse();
@@ -8706,7 +8706,7 @@ describe('dockviewComponent', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['right']);
 
-            const rightApi = dv.getFixedPanel('right')!;
+            const rightApi = dv.getEdgePanel('right')!;
             expect(rightApi.isCollapsed()).toBe(false);
 
             rightApi.collapse();
@@ -8718,43 +8718,43 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
-        test('toJSON includes fixedPanels field for configured positions', () => {
+        test('toJSON includes edgePanels field for configured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'top']);
             dv.layout(1000, 800);
 
             const json = dv.toJSON();
-            expect(json.fixedPanels).toBeDefined();
-            expect(json.fixedPanels!.left).toBeDefined();
-            expect(json.fixedPanels!.top).toBeDefined();
-            expect(json.fixedPanels!.right).toBeUndefined();
-            expect(json.fixedPanels!.bottom).toBeUndefined();
+            expect(json.edgePanels).toBeDefined();
+            expect(json.edgePanels!.left).toBeDefined();
+            expect(json.edgePanels!.top).toBeDefined();
+            expect(json.edgePanels!.right).toBeUndefined();
+            expect(json.edgePanels!.bottom).toBeUndefined();
             dv.dispose();
         });
 
-        test('toJSON fixedPanels entries have visible and size fields', () => {
+        test('toJSON edgePanels entries have visible and size fields', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
             dv.layout(1000, 800);
 
             const json = dv.toJSON();
-            expect(typeof json.fixedPanels!.left!.visible).toBe('boolean');
-            expect(typeof json.fixedPanels!.left!.size).toBe('number');
+            expect(typeof json.edgePanels!.left!.visible).toBe('boolean');
+            expect(typeof json.edgePanels!.left!.size).toBe('number');
             dv.dispose();
         });
 
-        test('toJSON fixedPanels includes collapsed: true after collapsing', () => {
+        test('toJSON edgePanels includes collapsed: true after collapsing', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
             dv.layout(1000, 800);
 
-            dv.getFixedPanel('left')!.collapse();
+            dv.getEdgePanel('left')!.collapse();
             const json = dv.toJSON();
-            expect(json.fixedPanels!.left!.collapsed).toBe(true);
+            expect(json.edgePanels!.left!.collapsed).toBe(true);
             dv.dispose();
         });
 
-        test('fromJSON restores fixed panel visibility state', () => {
+        test('fromJSON restores edge panel visibility state', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
             dv.layout(1000, 800);
@@ -8781,7 +8781,7 @@ describe('dockviewComponent', () => {
                     orientation: Orientation.HORIZONTAL,
                 },
                 panels: {},
-                fixedPanels: {
+                edgePanels: {
                     left: {
                         size: 200,
                         visible: false,
@@ -8789,11 +8789,11 @@ describe('dockviewComponent', () => {
                 },
             });
 
-            expect(dv.isFixedPanelVisible('left')).toBe(false);
+            expect(dv.isEdgePanelVisible('left')).toBe(false);
             dv.dispose();
         });
 
-        test('fromJSON restores fixed panel panels via group state', () => {
+        test('fromJSON restores edge panel panels via group state', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
             dv.layout(1000, 800);
@@ -8820,30 +8820,30 @@ describe('dockviewComponent', () => {
                     orientation: Orientation.HORIZONTAL,
                 },
                 panels: {
-                    'fixed-panel-1': {
-                        id: 'fixed-panel-1',
+                    'edge-panel-1': {
+                        id: 'edge-panel-1',
                         contentComponent: 'default',
-                        title: 'Fixed Panel 1',
+                        title: 'Edge Panel 1',
                     },
                 },
-                fixedPanels: {
+                edgePanels: {
                     left: {
                         size: 200,
                         visible: true,
                         group: {
                             id: 'left-group',
-                            views: ['fixed-panel-1'],
-                            activeView: 'fixed-panel-1',
+                            views: ['edge-panel-1'],
+                            activeView: 'edge-panel-1',
                         },
                     },
                 },
             });
 
             // The fixed group should now contain the deserialized panel
-            const leftGroup = dv.getFixedPanel('left')!;
+            const leftGroup = dv.getEdgePanel('left')!;
             // group is accessible; verify the panel is in the dockview panels list
             expect(
-                dv.panels.find((p) => p.id === 'fixed-panel-1')
+                dv.panels.find((p) => p.id === 'edge-panel-1')
             ).toBeDefined();
             dv.dispose();
         });

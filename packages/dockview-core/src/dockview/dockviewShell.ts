@@ -8,9 +8,9 @@ import {
 } from '../splitview/splitview';
 import { watchElementResize } from '../dom';
 
-export type FixedPanelPosition = 'top' | 'bottom' | 'left' | 'right';
+export type EdgePanelPosition = 'top' | 'bottom' | 'left' | 'right';
 
-export interface FixedPanelViewOptions {
+export interface EdgePanelViewOptions {
     id: string;
     initialSize?: number;
     minimumSize?: number;
@@ -19,14 +19,14 @@ export interface FixedPanelViewOptions {
     initiallyCollapsed?: boolean;
 }
 
-export interface FixedPanelsConfig {
-    top?: FixedPanelViewOptions;
-    bottom?: FixedPanelViewOptions;
-    left?: FixedPanelViewOptions;
-    right?: FixedPanelViewOptions;
+export interface EdgePanelsConfig {
+    top?: EdgePanelViewOptions;
+    bottom?: EdgePanelViewOptions;
+    left?: EdgePanelViewOptions;
+    right?: EdgePanelViewOptions;
 }
 
-export interface SerializedFixedPanels {
+export interface SerializedEdgePanels {
     top?: {
         size: number;
         visible: boolean;
@@ -54,16 +54,16 @@ export interface SerializedFixedPanels {
 }
 
 /**
- * Minimal interface for a fixed panel group host.
+ * Minimal interface for a edge panel group host.
  * Avoids circular imports by not referencing DockviewGroupPanel directly.
  */
-export interface IFixedPanelGroup {
+export interface IEdgePanelGroup {
     readonly element: HTMLElement;
     layout(width: number, height: number): void;
 }
 
-export class FixedPanelView implements IView {
-    private readonly _group: IFixedPanelGroup;
+export class EdgePanelView implements IView {
+    private readonly _group: IEdgePanelGroup;
     private readonly _orientation: 'horizontal' | 'vertical';
     private readonly _onDidChange = new Emitter<{
         size?: number;
@@ -113,15 +113,15 @@ export class FixedPanelView implements IView {
     }
 
     constructor(
-        options: FixedPanelViewOptions,
-        group: IFixedPanelGroup,
+        options: EdgePanelViewOptions,
+        group: IEdgePanelGroup,
         orientation: 'horizontal' | 'vertical'
     ) {
         this._group = group;
         this._orientation = orientation;
 
-        group.element.classList.add('dv-fixed-panel');
-        group.element.dataset.testid = `dv-fixed-panel-${options.id}`;
+        group.element.classList.add('dv-edge-panel');
+        group.element.dataset.testid = `dv-edge-panel-${options.id}`;
 
         this._collapsedSize = options.collapsedSize ?? 35;
         this._expandedMaximumSize =
@@ -238,7 +238,7 @@ class CenterView implements IView {
 
 /**
  * The vertical centre column: top (optional) | center | bottom (optional).
- * This view sits between the left and right fixed panels in the outer
+ * This view sits between the left and right edge panels in the outer
  * horizontal splitview, so its primary axis is width (horizontal).
  */
 class MiddleColumnView implements IView, IDisposable {
@@ -264,9 +264,9 @@ class MiddleColumnView implements IView, IDisposable {
     }
 
     constructor(
-        topView: FixedPanelView | undefined,
+        topView: EdgePanelView | undefined,
         centerView: CenterView,
-        bottomView: FixedPanelView | undefined,
+        bottomView: EdgePanelView | undefined,
         topSize: number,
         bottomSize: number,
         gap = 0
@@ -348,13 +348,13 @@ class MiddleColumnView implements IView, IDisposable {
 }
 
 function adjustedOpts(
-    base: FixedPanelViewOptions,
+    base: EdgePanelViewOptions,
     defaultCollapsed: number,
     gapAdd: number
-): FixedPanelViewOptions {
+): EdgePanelViewOptions {
     const effectiveCollapsed =
         (base.collapsedSize ?? defaultCollapsed) + gapAdd;
-    const result: FixedPanelViewOptions = {
+    const result: EdgePanelViewOptions = {
         ...base,
         collapsedSize: effectiveCollapsed,
     };
@@ -369,10 +369,10 @@ export class ShellManager implements IDisposable {
     private readonly _middleColumn: MiddleColumnView;
     private readonly _shellElement: HTMLElement;
 
-    private readonly _topView: FixedPanelView | undefined;
-    private readonly _bottomView: FixedPanelView | undefined;
-    private readonly _leftView: FixedPanelView | undefined;
-    private readonly _rightView: FixedPanelView | undefined;
+    private readonly _topView: EdgePanelView | undefined;
+    private readonly _bottomView: EdgePanelView | undefined;
+    private readonly _leftView: EdgePanelView | undefined;
+    private readonly _rightView: EdgePanelView | undefined;
 
     // Indices in the outer HORIZONTAL splitview
     private readonly _leftIndex: number | undefined;
@@ -382,19 +382,19 @@ export class ShellManager implements IDisposable {
     private readonly _disposables = new CompositeDisposable();
 
     // Retained for updateTheme() recalculations.
-    private readonly _config: FixedPanelsConfig;
+    private readonly _config: EdgePanelsConfig;
     private _currentWidth = 0;
     private _currentHeight = 0;
 
     constructor(
         container: HTMLElement,
         dockviewElement: HTMLElement,
-        config: FixedPanelsConfig,
+        config: EdgePanelsConfig,
         groups: {
-            top?: IFixedPanelGroup;
-            bottom?: IFixedPanelGroup;
-            left?: IFixedPanelGroup;
-            right?: IFixedPanelGroup;
+            top?: IEdgePanelGroup;
+            bottom?: IEdgePanelGroup;
+            left?: IEdgePanelGroup;
+            right?: IEdgePanelGroup;
         },
         layoutGrid: (width: number, height: number) => void,
         gap = 0,
@@ -419,7 +419,7 @@ export class ShellManager implements IDisposable {
         const innerGapAdd = innerN > 1 ? (gap * (innerN - 1)) / innerN : 0;
 
         if (config.top && groups.top) {
-            this._topView = new FixedPanelView(
+            this._topView = new EdgePanelView(
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.top },
                     defaultCollapsedSize,
@@ -430,7 +430,7 @@ export class ShellManager implements IDisposable {
             );
         }
         if (config.bottom && groups.bottom) {
-            this._bottomView = new FixedPanelView(
+            this._bottomView = new EdgePanelView(
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.bottom },
                     defaultCollapsedSize,
@@ -441,7 +441,7 @@ export class ShellManager implements IDisposable {
             );
         }
         if (config.left && groups.left) {
-            this._leftView = new FixedPanelView(
+            this._leftView = new EdgePanelView(
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.left },
                     defaultCollapsedSize,
@@ -452,7 +452,7 @@ export class ShellManager implements IDisposable {
             );
         }
         if (config.right && groups.right) {
-            this._rightView = new FixedPanelView(
+            this._rightView = new EdgePanelView(
                 adjustedOpts(
                     { collapsedSize: defaultCollapsedSize, ...config.right },
                     defaultCollapsedSize,
@@ -536,7 +536,7 @@ export class ShellManager implements IDisposable {
                 this._bottomView,
                 this._leftView,
                 this._rightView,
-            ].filter((v): v is FixedPanelView => v !== undefined)
+            ].filter((v): v is EdgePanelView => v !== undefined)
         );
     }
 
@@ -551,7 +551,7 @@ export class ShellManager implements IDisposable {
 
     /**
      * Called when the active theme changes. Updates splitview margins and
-     * fixed-panel collapsed sizes so the layout matches the new theme's gap
+     * edge-panel collapsed sizes so the layout matches the new theme's gap
      * and tab-strip dimensions.
      */
     updateTheme(gap: number, defaultCollapsedSize: number): void {
@@ -570,8 +570,8 @@ export class ShellManager implements IDisposable {
         // ShellManager owns the config, so it computes the final adjusted values
         // and passes them directly to each view.
         const updateView = (
-            view: FixedPanelView,
-            baseCfg: FixedPanelViewOptions,
+            view: EdgePanelView,
+            baseCfg: EdgePanelViewOptions,
             gapAdd: number
         ) => {
             const baseCS = baseCfg.collapsedSize ?? defaultCollapsedSize;
@@ -624,7 +624,7 @@ export class ShellManager implements IDisposable {
         }
     }
 
-    hasFixedPanel(position: FixedPanelPosition): boolean {
+    hasEdgePanel(position: EdgePanelPosition): boolean {
         switch (position) {
             case 'top':
                 return this._topView !== undefined;
@@ -637,7 +637,7 @@ export class ShellManager implements IDisposable {
         }
     }
 
-    setFixedPanelVisible(position: FixedPanelPosition, visible: boolean): void {
+    setEdgePanelVisible(position: EdgePanelPosition, visible: boolean): void {
         switch (position) {
             case 'left':
                 if (this._leftIndex !== undefined) {
@@ -662,7 +662,7 @@ export class ShellManager implements IDisposable {
         }
     }
 
-    isFixedPanelVisible(position: FixedPanelPosition): boolean {
+    isEdgePanelVisible(position: EdgePanelPosition): boolean {
         switch (position) {
             case 'left':
                 if (this._leftIndex !== undefined) {
@@ -680,8 +680,8 @@ export class ShellManager implements IDisposable {
         }
     }
 
-    setFixedPanelCollapsed(
-        position: FixedPanelPosition,
+    setEdgePanelCollapsed(
+        position: EdgePanelPosition,
         collapsed: boolean
     ): void {
         const view = this._getView(position);
@@ -716,11 +716,11 @@ export class ShellManager implements IDisposable {
         }
     }
 
-    isFixedPanelCollapsed(position: FixedPanelPosition): boolean {
+    isEdgePanelCollapsed(position: EdgePanelPosition): boolean {
         return this._getView(position)?.isCollapsed ?? false;
     }
 
-    private _getView(position: FixedPanelPosition): FixedPanelView | undefined {
+    private _getView(position: EdgePanelPosition): EdgePanelView | undefined {
         switch (position) {
             case 'top':
                 return this._topView;
@@ -733,11 +733,11 @@ export class ShellManager implements IDisposable {
         }
     }
 
-    toJSON(): SerializedFixedPanels {
-        const fixedPanels: SerializedFixedPanels = {};
+    toJSON(): SerializedEdgePanels {
+        const edgePanels: SerializedEdgePanels = {};
 
         if (this._leftView && this._leftIndex !== undefined) {
-            fixedPanels.left = {
+            edgePanels.left = {
                 size: this._leftView.isCollapsed
                     ? this._leftView.lastExpandedSize
                     : this._outerSplitview.getViewSize(this._leftIndex),
@@ -746,7 +746,7 @@ export class ShellManager implements IDisposable {
             };
         }
         if (this._rightView && this._rightIndex !== undefined) {
-            fixedPanels.right = {
+            edgePanels.right = {
                 size: this._rightView.isCollapsed
                     ? this._rightView.lastExpandedSize
                     : this._outerSplitview.getViewSize(this._rightIndex),
@@ -755,7 +755,7 @@ export class ShellManager implements IDisposable {
             };
         }
         if (this._topView) {
-            fixedPanels.top = {
+            edgePanels.top = {
                 size: this._topView.isCollapsed
                     ? this._topView.lastExpandedSize
                     : this._middleColumn.getViewSize('top'),
@@ -764,7 +764,7 @@ export class ShellManager implements IDisposable {
             };
         }
         if (this._bottomView) {
-            fixedPanels.bottom = {
+            edgePanels.bottom = {
                 size: this._bottomView.isCollapsed
                     ? this._bottomView.lastExpandedSize
                     : this._middleColumn.getViewSize('bottom'),
@@ -773,10 +773,10 @@ export class ShellManager implements IDisposable {
             };
         }
 
-        return fixedPanels;
+        return edgePanels;
     }
 
-    fromJSON(data: SerializedFixedPanels): void {
+    fromJSON(data: SerializedEdgePanels): void {
         if (data.left && this._leftIndex !== undefined) {
             // Always restore the expanded size first. toJSON always records the
             // expanded size (even when collapsed), so restoredExpandedSize must

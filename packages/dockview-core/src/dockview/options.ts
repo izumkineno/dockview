@@ -16,7 +16,7 @@ import { FloatingGroupOptions } from './dockviewComponent';
 import { Contraints } from '../gridview/gridviewPanel';
 import { AcceptableEvent, IAcceptableEvent } from '../events';
 import { DockviewTheme } from './theme';
-import { FixedPanelsConfig } from './dockviewShell';
+import { EdgePanelsConfig } from './dockviewShell';
 
 export interface IHeaderActionsRenderer extends IDisposable {
     readonly element: HTMLElement;
@@ -123,7 +123,7 @@ export interface DockviewOptions {
      * Configure fixed side panels around the dockview grid (IDE shell layout).
      * Panels can be placed at top, bottom, left, and/or right positions.
      */
-    fixedPanels?: FixedPanelsConfig;
+    edgePanels?: EdgePanelsConfig;
     /**
      * Controls tab drag-and-drop reorder animation style.
      *
@@ -199,15 +199,15 @@ export const PROPERTY_KEYS_DOCKVIEW: (keyof DockviewOptions)[] = (() => {
         theme: undefined,
         disableTabsOverflowList: undefined,
         scrollbars: undefined,
-        fixedPanels: undefined,
+        edgePanels: undefined,
         tabAnimation: undefined,
         getTabContextMenuItems: undefined,
     };
 
-    // fixedPanels is constructor-only; changing it via updateOptions has no
+    // edgePanels is constructor-only; changing it via updateOptions has no
     // effect, so exclude it from the watched-props list used by framework
     // wrappers (React, Vue, Angular) to drive updateOptions calls.
-    const constructorOnlyKeys: (keyof DockviewOptions)[] = ['fixedPanels'];
+    const constructorOnlyKeys: (keyof DockviewOptions)[] = ['edgePanels'];
 
     return (Object.keys(properties) as (keyof DockviewOptions)[]).filter(
         (k) => !constructorOnlyKeys.includes(k)

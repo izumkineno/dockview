@@ -74,7 +74,7 @@
     // margin-left/right are the cross-axis margins that control the tab
     // pill's visual "height" (physical width). Match the 0.5rem cross-axis
     // margin used by horizontal tabs so the pill proportions are consistent
-    // across all four fixed-panel positions.
+    // across all four edge-panel positions.
     .dv-tabs-container-vertical {
         .dv-tab {
             margin: 0.25rem 0.5rem;
@@ -87,7 +87,7 @@
         .dv-tabs-and-actions-container {
             padding: 0px calc(var(--dv-border-radius) / 2);
 
-            // Vertical tab bars (left/right fixed panels): swap the padding
+            // Vertical tab bars (left/right edge panels): swap the padding
             // axes. Horizontal padding would squeeze the tab into a fraction
             // of the 44px strip width, so use vertical padding instead to
             // provide breathing room at the top and bottom of the strip.

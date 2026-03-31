@@ -92,7 +92,7 @@ describe('tabs', () => {
         });
     });
 
-    describe('fixed panel tab click behaviour', () => {
+    describe('edge panel tab click behaviour', () => {
         function makePanel(id: string): IDockviewPanel {
             return fromPartial<IDockviewPanel>({
                 id,

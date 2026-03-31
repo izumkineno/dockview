@@ -25,7 +25,7 @@ import {
     PROPERTY_KEYS_DOCKVIEW,
     DockviewFrameworkOptions,
     DockviewComponentOptions,
-    FixedPanelsConfig,
+    EdgePanelsConfig,
     TabAnimation,
     GetTabContextMenuItemsParams,
     ContextMenuItem,
@@ -93,7 +93,7 @@ export class DockviewAngularComponent implements OnInit, OnDestroy, OnChanges {
     @Input() locked?: boolean;
     @Input() disableAutoResizing?: boolean;
     @Input() singleTabMode?: 'fullwidth' | 'default';
-    @Input() fixedPanels?: FixedPanelsConfig;
+    @Input() edgePanels?: EdgePanelsConfig;
     @Input() tabAnimation?: TabAnimation;
     @Input() getTabContextMenuItems?: (
         params: GetTabContextMenuItemsParams
