@@ -51,7 +51,7 @@ import { OverlayRenderContainer } from '../overlay/overlayRenderContainer';
 import { TitleEvent } from '../api/dockviewPanelApi';
 import { Contraints } from '../gridview/gridviewPanel';
 import { DropTargetAnchorContainer } from '../dnd/dropTargetAnchorContainer';
-import { EdgePanelPosition } from './dockviewShell';
+import { EdgeGroupPosition } from './dockviewShell';
 
 interface GroupMoveEvent {
     groupId: string;
@@ -207,7 +207,7 @@ export type DockviewGroupLocation =
     | { type: 'grid' }
     | { type: 'floating' }
     | { type: 'popout'; getWindow: () => Window; popoutUrl?: string }
-    | { type: 'fixed'; position: EdgePanelPosition };
+    | { type: 'fixed'; position: EdgeGroupPosition };
 
 export class DockviewGroupPanelModel
     extends CompositeDisposable

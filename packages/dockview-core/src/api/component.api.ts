@@ -59,7 +59,7 @@ import {
 } from '../paneview/options';
 import { SplitviewComponentOptions } from '../splitview/options';
 import { GridviewComponentOptions } from '../gridview/options';
-import { EdgePanelPosition } from '../dockview/dockviewShell';
+import { EdgeGroupPosition, EdgeGroupOptions } from '../dockview/dockviewShell';
 import { DockviewGroupPanelApi } from './dockviewGroupPanelApi';
 
 export interface CommonApi<T = any> {
@@ -930,27 +930,38 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
     }
 
     /**
-     * Get the group panel API for a fixed side panel at the given position.
-     * Returns `undefined` if no edge panel is configured at that position.
+     * Add an edge group at the given position. Returns the group panel API
+     * for the newly created group. Throws if a group already exists there.
      */
-    getEdgePanel(
-        position: EdgePanelPosition
+    addEdgeGroup(
+        position: EdgeGroupPosition,
+        options: EdgeGroupOptions
+    ): DockviewGroupPanelApi {
+        return this.component.addEdgeGroup(position, options);
+    }
+
+    /**
+     * Get the group panel API for a fixed side group at the given position.
+     * Returns `undefined` if no edge group is configured at that position.
+     */
+    getEdgeGroup(
+        position: EdgeGroupPosition
     ): DockviewGroupPanelApi | undefined {
-        return this.component.getEdgePanel(position);
+        return this.component.getEdgeGroup(position);
     }
 
     /**
-     * Set the visibility of a fixed side panel.
+     * Set the visibility of a fixed side group.
      */
-    setEdgePanelVisible(position: EdgePanelPosition, visible: boolean): void {
-        this.component.setEdgePanelVisible(position, visible);
+    setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
+        this.component.setEdgeGroupVisible(position, visible);
     }
 
     /**
-     * Check whether a fixed side panel is currently visible.
+     * Check whether a fixed side group is currently visible.
      */
-    isEdgePanelVisible(position: EdgePanelPosition): boolean {
-        return this.component.isEdgePanelVisible(position);
+    isEdgeGroupVisible(position: EdgeGroupPosition): boolean {
+        return this.component.isEdgeGroupVisible(position);
     }
 
     updateOptions(options: Partial<DockviewComponentOptions>) {

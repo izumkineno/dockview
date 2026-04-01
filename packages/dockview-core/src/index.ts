@@ -81,12 +81,11 @@ export {
 
 export * from './dockview/dockviewComponent';
 export {
-    EdgePanelView,
-    EdgePanelViewOptions,
-    EdgePanelPosition,
-    EdgePanelsConfig,
-    SerializedEdgePanels,
-    IEdgePanelGroup,
+    EdgeGroupView,
+    EdgeGroupOptions,
+    EdgeGroupPosition,
+    SerializedEdgeGroups,
+    IEdgeGroupHost,
 } from './dockview/dockviewShell';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';

@@ -6,7 +6,6 @@ import {
     IDockviewPanelProps,
     DockviewApi,
     DockviewTheme,
-    EdgePanelsConfig,
     themeAbyss,
     IContextMenuItemComponentProps,
 } from 'dockview';
@@ -407,7 +406,7 @@ const DockviewDemo = (props: {
             }),
         ];
 
-        const edgePanelDefs: {
+        const edgeGroupDefs: {
             pos: 'bottom' | 'left' | 'right';
             id: string;
             title: string;
@@ -420,9 +419,9 @@ const DockviewDemo = (props: {
             { pos: 'bottom', id: 'bottom-3', title: 'Problems' },
         ];
 
-        const populateEdgePanels = () => {
-            for (const { pos, id, title } of edgePanelDefs) {
-                const groupApi = api.getEdgePanel(pos);
+        const populateEdgeGroups = () => {
+            for (const { pos, id, title } of edgeGroupDefs) {
+                const groupApi = api.getEdgeGroup(pos);
                 if (groupApi && !api.panels.find((p) => p.id === id)) {
                     api.addPanel({
                         id,
@@ -441,7 +440,7 @@ const DockviewDemo = (props: {
             if (state) {
                 try {
                     api.fromJSON(JSON.parse(state));
-                    populateEdgePanels();
+                    populateEdgeGroups();
                     setLayoutReady(true);
                     return;
                 } catch {
@@ -451,7 +450,7 @@ const DockviewDemo = (props: {
             }
 
             defaultConfig(api);
-            populateEdgePanels();
+            populateEdgeGroups();
             setLayoutReady(true);
         };
 
@@ -463,6 +462,26 @@ const DockviewDemo = (props: {
     }, [api]);
 
     const onReady = (event: DockviewReadyEvent) => {
+        if (useEdgeGroups) {
+            event.api.addEdgeGroup('bottom', {
+                id: 'bottom',
+                initialSize: 200,
+                minimumSize: 100,
+                collapsed: true,
+            });
+            event.api.addEdgeGroup('left', {
+                id: 'left',
+                initialSize: 220,
+                minimumSize: 150,
+                collapsed: true,
+            });
+            event.api.addEdgeGroup('right', {
+                id: 'right',
+                initialSize: 220,
+                minimumSize: 150,
+                collapsed: true,
+            });
+        }
         setApi(event.api);
     };
 
@@ -544,30 +563,7 @@ const DockviewDemo = (props: {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
-    const [useEdgePanels, setUseEdgePanels] = React.useState<boolean>(true);
-
-    const edgePanelsConfig: EdgePanelsConfig | undefined = useEdgePanels
-        ? {
-              bottom: {
-                  id: 'bottom',
-                  initialSize: 200,
-                  minimumSize: 100,
-                  initiallyCollapsed: true,
-              },
-              left: {
-                  id: 'left',
-                  initialSize: 220,
-                  minimumSize: 150,
-                  initiallyCollapsed: true,
-              },
-              right: {
-                  id: 'right',
-                  initialSize: 220,
-                  minimumSize: 150,
-                  initiallyCollapsed: true,
-              },
-          }
-        : undefined;
+    const [useEdgeGroups, setUseEdgeGroups] = React.useState<boolean>(true);
 
     return (
         <div
@@ -608,7 +604,7 @@ const DockviewDemo = (props: {
                                     >
                                         <DockviewReact
                                             key={
-                                                useEdgePanels
+                                                useEdgeGroups
                                                     ? 'shell'
                                                     : 'no-shell'
                                             }
@@ -632,7 +628,6 @@ const DockviewDemo = (props: {
                                             }
                                             onReady={onReady}
                                             theme={effectiveTheme}
-                                            edgePanels={edgePanelsConfig}
                                             getTabContextMenuItems={() => [
                                                 'close',
                                                 'closeOthers',

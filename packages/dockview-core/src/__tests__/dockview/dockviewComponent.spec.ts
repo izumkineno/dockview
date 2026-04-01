@@ -21,7 +21,7 @@ import { DockviewApi } from '../../api/component.api';
 import { DockviewDndOverlayEvent } from '../../dockview/options';
 import { SizeEvent } from '../../api/gridviewPanelApi';
 import { setupMockWindow } from '../__mocks__/mockWindow';
-import { EdgePanelsConfig } from '../../dockview/dockviewShell';
+import { EdgeGroupOptions } from '../../dockview/dockviewShell';
 
 class PanelContentPartTest implements IContentRenderer {
     element: HTMLElement = document.createElement('div');
@@ -3914,15 +3914,17 @@ describe('dockviewComponent', () => {
             },
         });
 
+        dockview.layout(1000, 800);
+
         expect(JSON.parse(JSON.stringify(dockview.toJSON()))).toEqual({
             grid: {
-                height: 0,
-                width: 0,
+                height: 800,
+                width: 1000,
                 orientation: Orientation.HORIZONTAL,
                 root: {
                     data: [],
                     type: 'branch',
-                    size: 0,
+                    size: 800,
                 },
             },
             panels: {},
@@ -4708,7 +4710,7 @@ describe('dockviewComponent', () => {
         expect(el!.childNodes.length).toBe(0);
     });
 
-    test('that disableAutoResizing is false by default', () => {
+    test('that disableResizing is always true because the shell manages resizing', () => {
         const container = document.createElement('div');
 
         const dockview = new DockviewComponent(container, {
@@ -4726,7 +4728,9 @@ describe('dockviewComponent', () => {
             },
         });
 
-        expect(dockview.disableResizing).toBeFalsy();
+        // The shell is always active and drives layout via watchElementResize,
+        // so disableResizing is always true on DockviewComponent.
+        expect(dockview.disableResizing).toBeTruthy();
     });
 
     test('that disableAutoResizing can be enabled', () => {
@@ -8572,14 +8576,11 @@ describe('dockviewComponent', () => {
         function createFixedDockview(
             c: HTMLElement,
             positions: ('left' | 'right' | 'top' | 'bottom')[],
-            overrideConfig?: Partial<EdgePanelsConfig>
+            overrideOptions?: Partial<
+                Record<'left' | 'right' | 'top' | 'bottom', EdgeGroupOptions>
+            >
         ) {
-            const edgePanels: EdgePanelsConfig = {};
-            for (const pos of positions) {
-                edgePanels[pos] = { id: `${pos}-group` };
-            }
-            Object.assign(edgePanels, overrideConfig);
-            return new DockviewComponent(c, {
+            const dv = new DockviewComponent(c, {
                 createComponent(options) {
                     switch (options.name) {
                         case 'default':
@@ -8591,35 +8592,68 @@ describe('dockviewComponent', () => {
                             throw new Error(`unsupported`);
                     }
                 },
-                edgePanels,
             });
+            for (const pos of positions) {
+                dv.addEdgeGroup(pos, {
+                    id: `${pos}-group`,
+                    ...overrideOptions?.[pos],
+                });
+            }
+            return dv;
         }
 
-        test('getEdgePanel returns DockviewGroupPanelApi for configured positions', () => {
+        test('getEdgeGroup returns DockviewGroupPanelApi for configured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'right']);
-            expect(dv.getEdgePanel('left')).toBeDefined();
-            expect(dv.getEdgePanel('right')).toBeDefined();
+            expect(dv.getEdgeGroup('left')).toBeDefined();
+            expect(dv.getEdgeGroup('right')).toBeDefined();
             dv.dispose();
         });
 
-        test('getEdgePanel returns undefined for unconfigured positions', () => {
+        test('getEdgeGroup returns undefined for unconfigured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
-            expect(dv.getEdgePanel('right')).toBeUndefined();
-            expect(dv.getEdgePanel('top')).toBeUndefined();
-            expect(dv.getEdgePanel('bottom')).toBeUndefined();
+            expect(dv.getEdgeGroup('right')).toBeUndefined();
+            expect(dv.getEdgeGroup('top')).toBeUndefined();
+            expect(dv.getEdgeGroup('bottom')).toBeUndefined();
             dv.dispose();
         });
 
-        test('getEdgePanel returns undefined when no edgePanels option provided', () => {
+        test('getEdgeGroup returns undefined when addEdgeGroup has not been called', () => {
             const c = document.createElement('div');
             const dv = new DockviewComponent(c, {
                 createComponent(options) {
                     return new PanelContentPartTest(options.id, options.name);
                 },
             });
-            expect(dv.getEdgePanel('left')).toBeUndefined();
+            expect(dv.getEdgeGroup('left')).toBeUndefined();
+            dv.dispose();
+        });
+
+        test('addEdgeGroup returns DockviewGroupPanelApi', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+            const api = dv.addEdgeGroup('left', { id: 'left-group' });
+            expect(api).toBeDefined();
+            expect(api.location.type).toBe('fixed');
+            dv.dispose();
+        });
+
+        test('addEdgeGroup throws when position already registered', () => {
+            const c = document.createElement('div');
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+            dv.addEdgeGroup('left', { id: 'left-group' });
+            expect(() =>
+                dv.addEdgeGroup('left', { id: 'left-group-2' })
+            ).toThrow();
             dv.dispose();
         });
 
@@ -8627,14 +8661,14 @@ describe('dockviewComponent', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'top']);
 
-            const leftApi = dv.getEdgePanel('left')!;
+            const leftApi = dv.getEdgeGroup('left')!;
             expect(leftApi.location.type).toBe('fixed');
             expect(
                 (leftApi.location as { type: 'fixed'; position: string })
                     .position
             ).toBe('left');
 
-            const topApi = dv.getEdgePanel('top')!;
+            const topApi = dv.getEdgeGroup('top')!;
             expect(topApi.location.type).toBe('fixed');
             expect(
                 (topApi.location as { type: 'fixed'; position: string })
@@ -8644,45 +8678,45 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
-        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for left', () => {
+        test('setEdgeGroupVisible / isEdgeGroupVisible delegates correctly for left', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
-            expect(dv.isEdgePanelVisible('left')).toBe(true);
-            dv.setEdgePanelVisible('left', false);
-            expect(dv.isEdgePanelVisible('left')).toBe(false);
-            dv.setEdgePanelVisible('left', true);
-            expect(dv.isEdgePanelVisible('left')).toBe(true);
+            expect(dv.isEdgeGroupVisible('left')).toBe(true);
+            dv.setEdgeGroupVisible('left', false);
+            expect(dv.isEdgeGroupVisible('left')).toBe(false);
+            dv.setEdgeGroupVisible('left', true);
+            expect(dv.isEdgeGroupVisible('left')).toBe(true);
             dv.dispose();
         });
 
-        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for right', () => {
+        test('setEdgeGroupVisible / isEdgeGroupVisible delegates correctly for right', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['right']);
-            dv.setEdgePanelVisible('right', false);
-            expect(dv.isEdgePanelVisible('right')).toBe(false);
+            dv.setEdgeGroupVisible('right', false);
+            expect(dv.isEdgeGroupVisible('right')).toBe(false);
             dv.dispose();
         });
 
-        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for top', () => {
+        test('setEdgeGroupVisible / isEdgeGroupVisible delegates correctly for top', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['top']);
-            dv.setEdgePanelVisible('top', false);
-            expect(dv.isEdgePanelVisible('top')).toBe(false);
+            dv.setEdgeGroupVisible('top', false);
+            expect(dv.isEdgeGroupVisible('top')).toBe(false);
             dv.dispose();
         });
 
-        test('setEdgePanelVisible / isEdgePanelVisible delegates correctly for bottom', () => {
+        test('setEdgeGroupVisible / isEdgeGroupVisible delegates correctly for bottom', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['bottom']);
-            dv.setEdgePanelVisible('bottom', false);
-            expect(dv.isEdgePanelVisible('bottom')).toBe(false);
+            dv.setEdgeGroupVisible('bottom', false);
+            expect(dv.isEdgeGroupVisible('bottom')).toBe(false);
             dv.dispose();
         });
 
-        test('isEdgePanelVisible returns false for unconfigured positions', () => {
+        test('isEdgeGroupVisible returns false for unconfigured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
-            expect(dv.isEdgePanelVisible('right')).toBe(false);
+            expect(dv.isEdgeGroupVisible('right')).toBe(false);
             dv.dispose();
         });
 
@@ -8690,7 +8724,7 @@ describe('dockviewComponent', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
 
-            const leftApi = dv.getEdgePanel('left')!;
+            const leftApi = dv.getEdgeGroup('left')!;
             expect(leftApi.isCollapsed()).toBe(false);
 
             leftApi.collapse();
@@ -8706,7 +8740,7 @@ describe('dockviewComponent', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['right']);
 
-            const rightApi = dv.getEdgePanel('right')!;
+            const rightApi = dv.getEdgeGroup('right')!;
             expect(rightApi.isCollapsed()).toBe(false);
 
             rightApi.collapse();
@@ -8718,39 +8752,39 @@ describe('dockviewComponent', () => {
             dv.dispose();
         });
 
-        test('toJSON includes edgePanels field for configured positions', () => {
+        test('toJSON includes edgeGroups field for configured positions', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left', 'top']);
             dv.layout(1000, 800);
 
             const json = dv.toJSON();
-            expect(json.edgePanels).toBeDefined();
-            expect(json.edgePanels!.left).toBeDefined();
-            expect(json.edgePanels!.top).toBeDefined();
-            expect(json.edgePanels!.right).toBeUndefined();
-            expect(json.edgePanels!.bottom).toBeUndefined();
+            expect(json.edgeGroups).toBeDefined();
+            expect(json.edgeGroups!.left).toBeDefined();
+            expect(json.edgeGroups!.top).toBeDefined();
+            expect(json.edgeGroups!.right).toBeUndefined();
+            expect(json.edgeGroups!.bottom).toBeUndefined();
             dv.dispose();
         });
 
-        test('toJSON edgePanels entries have visible and size fields', () => {
+        test('toJSON edgeGroups entries have visible and size fields', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
             dv.layout(1000, 800);
 
             const json = dv.toJSON();
-            expect(typeof json.edgePanels!.left!.visible).toBe('boolean');
-            expect(typeof json.edgePanels!.left!.size).toBe('number');
+            expect(typeof json.edgeGroups!.left!.visible).toBe('boolean');
+            expect(typeof json.edgeGroups!.left!.size).toBe('number');
             dv.dispose();
         });
 
-        test('toJSON edgePanels includes collapsed: true after collapsing', () => {
+        test('toJSON edgeGroups includes collapsed: true after collapsing', () => {
             const c = document.createElement('div');
             const dv = createFixedDockview(c, ['left']);
             dv.layout(1000, 800);
 
-            dv.getEdgePanel('left')!.collapse();
+            dv.getEdgeGroup('left')!.collapse();
             const json = dv.toJSON();
-            expect(json.edgePanels!.left!.collapsed).toBe(true);
+            expect(json.edgeGroups!.left!.collapsed).toBe(true);
             dv.dispose();
         });
 
@@ -8781,7 +8815,7 @@ describe('dockviewComponent', () => {
                     orientation: Orientation.HORIZONTAL,
                 },
                 panels: {},
-                edgePanels: {
+                edgeGroups: {
                     left: {
                         size: 200,
                         visible: false,
@@ -8789,7 +8823,7 @@ describe('dockviewComponent', () => {
                 },
             });
 
-            expect(dv.isEdgePanelVisible('left')).toBe(false);
+            expect(dv.isEdgeGroupVisible('left')).toBe(false);
             dv.dispose();
         });
 
@@ -8820,46 +8854,83 @@ describe('dockviewComponent', () => {
                     orientation: Orientation.HORIZONTAL,
                 },
                 panels: {
-                    'edge-panel-1': {
-                        id: 'edge-panel-1',
+                    'edge-group-panel-1': {
+                        id: 'edge-group-panel-1',
                         contentComponent: 'default',
                         title: 'Edge Panel 1',
                     },
                 },
-                edgePanels: {
+                edgeGroups: {
                     left: {
                         size: 200,
                         visible: true,
                         group: {
                             id: 'left-group',
-                            views: ['edge-panel-1'],
-                            activeView: 'edge-panel-1',
+                            views: ['edge-group-panel-1'],
+                            activeView: 'edge-group-panel-1',
                         },
                     },
                 },
             });
 
             // The fixed group should now contain the deserialized panel
-            const leftGroup = dv.getEdgePanel('left')!;
+            const leftGroup = dv.getEdgeGroup('left')!;
             // group is accessible; verify the panel is in the dockview panels list
             expect(
-                dv.panels.find((p) => p.id === 'edge-panel-1')
+                dv.panels.find((p) => p.id === 'edge-group-panel-1')
             ).toBeDefined();
             dv.dispose();
         });
 
-        test('dispose removes the shell element from the DOM', () => {
+        test('shell element is always present in the DOM after construction', () => {
             const c = document.createElement('div');
-            const dv = createFixedDockview(c, ['left']);
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
+            // Shell is always created even with no edge panels
+            expect(c.childNodes.length).toBeGreaterThan(0);
+            dv.dispose();
+            expect(c.childNodes.length).toBe(0);
+        });
+
+        test('fromJSON auto-creates edge groups from serialized state', () => {
+            const c = document.createElement('div');
+            // No addEdgeGroup called before fromJSON
+            const dv = new DockviewComponent(c, {
+                createComponent(options) {
+                    return new PanelContentPartTest(options.id, options.name);
+                },
+            });
             dv.layout(1000, 800);
 
-            // After construction the container should have a child (shell element)
-            expect(c.childNodes.length).toBeGreaterThan(0);
+            dv.fromJSON({
+                activeGroup: 'center-group',
+                grid: {
+                    root: {
+                        type: 'branch',
+                        data: [
+                            {
+                                type: 'leaf',
+                                data: { views: [], id: 'center-group' },
+                                size: 500,
+                            },
+                        ],
+                        size: 1000,
+                    },
+                    height: 800,
+                    width: 1000,
+                    orientation: Orientation.HORIZONTAL,
+                },
+                panels: {},
+                edgeGroups: {
+                    left: { size: 220, visible: true },
+                },
+            });
 
+            expect(dv.getEdgeGroup('left')).toBeDefined();
             dv.dispose();
-
-            // After dispose the shell should be removed
-            expect(c.childNodes.length).toBe(0);
         });
     });
 });
