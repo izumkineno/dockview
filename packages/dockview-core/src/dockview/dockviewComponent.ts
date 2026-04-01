@@ -1435,12 +1435,12 @@ export class DockviewComponent
         this.addDisposables(
             group.model.onDidRemovePanel(() => {
                 if (group.model.isEmpty) {
-                    this._shellManager.setEdgeGroupCollapsed(position, true);
+                    this._shellManager!.setEdgeGroupCollapsed(position, true);
                 }
             })
         );
 
-        this._shellManager.addEdgeView(
+        this._shellManager!.addEdgeView(
             position,
             options,
             group as IEdgeGroupHost
@@ -1456,11 +1456,11 @@ export class DockviewComponent
     }
 
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void {
-        this._shellManager.setEdgeGroupVisible(position, visible);
+        this._shellManager!.setEdgeGroupVisible(position, visible);
     }
 
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean {
-        return this._shellManager.isEdgeGroupVisible(position);
+        return this._shellManager!.isEdgeGroupVisible(position);
     }
 
     setFixedGroupCollapsed(
@@ -1469,7 +1469,7 @@ export class DockviewComponent
     ): void {
         for (const [position, fixedGroup] of this._fixedGroups) {
             if (fixedGroup === group) {
-                this._shellManager.setEdgeGroupCollapsed(position, collapsed);
+                this._shellManager!.setEdgeGroupCollapsed(position, collapsed);
                 fixedGroup.api._onDidCollapsedChange.fire({
                     isCollapsed: collapsed,
                 });
@@ -1481,7 +1481,7 @@ export class DockviewComponent
     isFixedGroupCollapsed(group: DockviewGroupPanel): boolean {
         for (const [position, fixedGroup] of this._fixedGroups) {
             if (fixedGroup === group) {
-                return this._shellManager.isEdgeGroupCollapsed(position);
+                return this._shellManager!.isEdgeGroupCollapsed(position);
             }
         }
         return false;
@@ -1606,7 +1606,7 @@ export class DockviewComponent
         }
 
         if (this._fixedGroups.size > 0) {
-            const shellSerialized = this._shellManager.toJSON();
+            const shellSerialized = this._shellManager!.toJSON();
 
             // Augment each entry with the serialized group state
             for (const [position, group] of this._fixedGroups) {
@@ -1844,7 +1844,7 @@ export class DockviewComponent
                     }
                 }
 
-                this._shellManager.fromJSON(data.edgeGroups);
+                this._shellManager!.fromJSON(data.edgeGroups);
             }
 
             const serializedFloatingGroups = data.floatingGroups ?? [];
