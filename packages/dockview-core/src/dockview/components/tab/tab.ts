@@ -140,6 +140,7 @@ export class Tab extends CompositeDisposable {
                         )
                     );
                     newNode.style.position = 'absolute';
+                    newNode.classList.add('dv-tab-ghost-drag');
 
                     addGhostImage(event.dataTransfer, newNode, {
                         y: -10,
