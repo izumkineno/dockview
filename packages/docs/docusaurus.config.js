@@ -242,6 +242,11 @@ const config = {
                 },
                 items: [
                     {
+                        to: '/newsletter',
+                        label: 'Newsletter',
+                        position: 'right',
+                    },
+                    {
                         type: 'doc',
                         docId: 'overview/introduction',
                         position: 'right',
