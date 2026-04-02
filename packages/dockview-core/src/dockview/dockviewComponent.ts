@@ -289,6 +289,7 @@ export interface IDockviewComponent extends IBaseGrid<DockviewGroupPanel> {
     ): DockviewGroupPanelApi | undefined;
     setEdgeGroupVisible(position: EdgeGroupPosition, visible: boolean): void;
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean;
+    removeEdgeGroup(position: EdgeGroupPosition): void;
 }
 
 export class DockviewComponent
@@ -1461,6 +1462,32 @@ export class DockviewComponent
 
     isEdgeGroupVisible(position: EdgeGroupPosition): boolean {
         return this._shellManager!.isEdgeGroupVisible(position);
+    }
+
+    removeEdgeGroup(position: EdgeGroupPosition): void {
+        const group = this._fixedGroups.get(position);
+        if (!group) {
+            throw new Error(
+                `dockview: no edge group exists at position '${position}'`
+            );
+        }
+
+        // Remove panels inside the group first
+        for (const panel of [...group.panels]) {
+            this.removePanel(panel, {
+                removeEmptyGroup: false,
+                skipDispose: false,
+            });
+        }
+
+        // Remove from the shell splitview
+        this._shellManager!.removeEdgeView(position);
+
+        // Clean up group state
+        this._fixedGroups.delete(position);
+        group.dispose();
+        this._groups.delete(group.id);
+        this._onDidRemoveGroup.fire(group);
     }
 
     setFixedGroupCollapsed(

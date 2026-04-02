@@ -289,6 +289,26 @@ class MiddleColumnView implements IView, IDisposable {
         this._bottomIndex = newIndex;
     }
 
+    removeView(position: 'top' | 'bottom'): void {
+        const index =
+            position === 'top' ? this._topIndex : this._bottomIndex;
+        if (index === undefined) {
+            return;
+        }
+        this._splitview.removeView(index);
+        if (position === 'top') {
+            this._topIndex = undefined;
+            // center (and bottom if present) shift down by one
+            this._centerIndex -= 1;
+            if (this._bottomIndex !== undefined) {
+                this._bottomIndex -= 1;
+            }
+        } else {
+            this._bottomIndex = undefined;
+            // center and top are unaffected
+        }
+    }
+
     layout(size: number, orthogonalSize: number): void {
         // Outer horizontal splitview: size = width, orthogonalSize = height
         // Inner vertical splitview: layout(height, width)
@@ -609,6 +629,49 @@ export class ShellManager implements IDisposable {
         if (this._currentWidth > 0 && this._currentHeight > 0) {
             this.layout(this._currentWidth, this._currentHeight);
         }
+    }
+
+    removeEdgeView(position: EdgeGroupPosition): void {
+        const view = this._getView(position);
+        if (!view) {
+            return;
+        }
+
+        switch (position) {
+            case 'left':
+                this._outerSplitview.removeView(this._leftIndex!);
+                this._leftIndex = undefined;
+                this._leftView = undefined;
+                // middle and right shift left by one
+                this._middleIndex -= 1;
+                if (this._rightIndex !== undefined) {
+                    this._rightIndex -= 1;
+                }
+                break;
+            case 'right':
+                this._outerSplitview.removeView(this._rightIndex!);
+                this._rightIndex = undefined;
+                this._rightView = undefined;
+                break;
+            case 'top':
+                this._middleColumn.removeView('top');
+                this._topView = undefined;
+                break;
+            case 'bottom':
+                this._middleColumn.removeView('bottom');
+                this._bottomView = undefined;
+                break;
+        }
+
+        // Deregister before disposing to avoid double-dispose when ShellManager
+        // itself is eventually disposed.
+        this._disposables.removeDisposable(view);
+        view.dispose();
+
+        this._viewConfigs.delete(position);
+
+        // Recalculate gap adjustments for remaining views.
+        this.updateTheme(this._gap, this._defaultCollapsedSize);
     }
 
     hasEdgeGroup(position: EdgeGroupPosition): boolean {

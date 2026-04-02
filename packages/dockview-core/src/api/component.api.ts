@@ -964,6 +964,14 @@ export class DockviewApi implements CommonApi<SerializedDockview> {
         return this.component.isEdgeGroupVisible(position);
     }
 
+    /**
+     * Remove an edge group and reclaim its slot in the layout.
+     * All panels inside the group are disposed. Throws if no group exists at position.
+     */
+    removeEdgeGroup(position: EdgeGroupPosition): void {
+        this.component.removeEdgeGroup(position);
+    }
+
     updateOptions(options: Partial<DockviewComponentOptions>) {
         this.component.updateOptions(options);
     }
