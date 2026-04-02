@@ -357,12 +357,17 @@ describe('droptarget', () => {
             const dt = new Droptarget(smallEl, {
                 canDisplayOverlay: () => true,
                 acceptedTargetZones: ['left', 'right'],
-                overlayModel: { activationSize: { value: 50, type: 'percentage' } },
+                overlayModel: {
+                    activationSize: { value: 50, type: 'percentage' },
+                },
             });
 
             fireEvent.dragEnter(smallEl);
             // left half: clientX=20, x=20, xp=25 < 50 → 'left'
-            fireEvent(smallEl, createOffsetDragOverEvent({ clientX: 20, clientY: 0 }));
+            fireEvent(
+                smallEl,
+                createOffsetDragOverEvent({ clientX: 20, clientY: 0 })
+            );
 
             const selection = smallEl.querySelector(
                 '.dv-drop-target-selection'
@@ -394,7 +399,10 @@ describe('droptarget', () => {
 
             fireEvent.dragEnter(smallEl);
             // left half
-            fireEvent(smallEl, createOffsetDragOverEvent({ clientX: 20, clientY: 0 }));
+            fireEvent(
+                smallEl,
+                createOffsetDragOverEvent({ clientX: 20, clientY: 0 })
+            );
 
             const selection = smallEl.querySelector(
                 '.dv-drop-target-selection'
@@ -408,7 +416,10 @@ describe('droptarget', () => {
             ).toBeFalsy();
 
             // right half
-            fireEvent(smallEl, createOffsetDragOverEvent({ clientX: 60, clientY: 0 }));
+            fireEvent(
+                smallEl,
+                createOffsetDragOverEvent({ clientX: 60, clientY: 0 })
+            );
             expect(dt.state).toBe('right');
             expect(selection.style.width).toBe('50%');
             expect(selection.style.left).toBe('50%');

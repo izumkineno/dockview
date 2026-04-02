@@ -71,7 +71,10 @@ function simulateDropOnTab(
     fireEvent.dragEnter(targetEl);
     fireEvent(
         targetEl,
-        createOffsetDragOverEvent({ clientX: side === 'left' ? 20 : 60, clientY: 0 })
+        createOffsetDragOverEvent({
+            clientX: side === 'left' ? 20 : 60,
+            clientY: 0,
+        })
     );
 
     const dropzone = targetEl.querySelector('.dv-drop-target-dropzone');
@@ -187,7 +190,13 @@ describe('tabs', () => {
             tabs.openPanel(createMockPanel('panel-c'), 2);
 
             LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
-                [new PanelTransfer('test-accessor-id', 'test-group-id', 'panel-c')],
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'test-group-id',
+                        'panel-c'
+                    ),
+                ],
                 PanelTransfer.prototype
             );
 
@@ -204,7 +213,13 @@ describe('tabs', () => {
             tabs.openPanel(createMockPanel('panel-c'), 2);
 
             LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
-                [new PanelTransfer('test-accessor-id', 'test-group-id', 'panel-a')],
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'test-group-id',
+                        'panel-a'
+                    ),
+                ],
                 PanelTransfer.prototype
             );
 
@@ -221,7 +236,13 @@ describe('tabs', () => {
             tabs.openPanel(createMockPanel('panel-c'), 2);
 
             LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
-                [new PanelTransfer('test-accessor-id', 'test-group-id', 'panel-a')],
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'test-group-id',
+                        'panel-a'
+                    ),
+                ],
                 PanelTransfer.prototype
             );
 
@@ -238,7 +259,13 @@ describe('tabs', () => {
             tabs.openPanel(createMockPanel('panel-c'), 2);
 
             LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
-                [new PanelTransfer('test-accessor-id', 'other-group-id', 'panel-x')],
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'other-group-id',
+                        'panel-x'
+                    ),
+                ],
                 PanelTransfer.prototype
             );
 
@@ -255,7 +282,13 @@ describe('tabs', () => {
             tabs.openPanel(createMockPanel('panel-c'), 2);
 
             LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
-                [new PanelTransfer('test-accessor-id', 'other-group-id', 'panel-x')],
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'other-group-id',
+                        'panel-x'
+                    ),
+                ],
                 PanelTransfer.prototype
             );
 

@@ -433,7 +433,8 @@ export class Droptarget extends CompositeDisposable {
         }
 
         const smallWidthBoundary =
-            this.options.overlayModel?.smallWidthBoundary ?? SMALL_WIDTH_BOUNDARY;
+            this.options.overlayModel?.smallWidthBoundary ??
+            SMALL_WIDTH_BOUNDARY;
         const isSmallX = width < smallWidthBoundary;
         const isSmallY = height < SMALL_HEIGHT_BOUNDARY;
 
