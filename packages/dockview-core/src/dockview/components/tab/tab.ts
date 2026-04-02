@@ -94,7 +94,10 @@ export class Tab extends CompositeDisposable {
 
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
-            overlayModel: { activationSize: { value: 50, type: 'percentage' } },
+            overlayModel: {
+                activationSize: { value: 50, type: 'percentage' },
+                smallWidthBoundary: 0,
+            },
             canDisplayOverlay: (event, position) => {
                 if (this.group.locked) {
                     return false;

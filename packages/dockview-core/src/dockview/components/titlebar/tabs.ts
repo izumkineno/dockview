@@ -401,9 +401,11 @@ export class Tabs extends CompositeDisposable {
                 const animState = this._animState;
                 this._animState = null;
 
-                const dropIndex = this._tabs.findIndex((x) => x.value === tab);
+                const tabIndex = this._tabs.findIndex((x) => x.value === tab);
 
                 if (animState) {
+                    const dropIndex =
+                        event.position === 'right' ? tabIndex + 1 : tabIndex;
                     const firstPositions = this.snapshotTabPositions();
                     this.resetTabTransforms();
 
@@ -430,9 +432,26 @@ export class Tabs extends CompositeDisposable {
                             : undefined
                     );
                 } else {
+                    // Compute insertion index based on which half of the tab
+                    // the pointer is over, then adjust for same-group removal:
+                    // when the source tab sits before the insertion point,
+                    // removing it shifts all subsequent indices down by one.
+                    const insertionIndex =
+                        event.position === 'right' ? tabIndex + 1 : tabIndex;
+                    const data = getPanelData();
+                    const sourceIndex = data
+                        ? this._tabs.findIndex(
+                              (x) => x.value.panel.id === data.panelId
+                          )
+                        : -1;
+                    const adjustedIndex =
+                        insertionIndex -
+                        (sourceIndex !== -1 && sourceIndex < insertionIndex
+                            ? 1
+                            : 0);
                     this._onDrop.fire({
                         event: event.nativeEvent,
-                        index: dropIndex,
+                        index: adjustedIndex,
                     });
                 }
             }),

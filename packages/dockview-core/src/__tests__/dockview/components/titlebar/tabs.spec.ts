@@ -2,6 +2,86 @@ import { Tabs } from '../../../../dockview/components/titlebar/tabs';
 import { fromPartial } from '@total-typescript/shoehorn';
 import { DockviewGroupPanel } from '../../../../dockview/dockviewGroupPanel';
 import { DockviewComponent } from '../../../../dockview/dockviewComponent';
+import {
+    LocalSelectionTransfer,
+    PanelTransfer,
+} from '../../../../dnd/dataTransfer';
+import { IDockviewPanel } from '../../../../dockview/dockviewPanel';
+import { ITabRenderer } from '../../../../dockview/types';
+import { IDockviewPanelModel } from '../../../../dockview/dockviewPanelModel';
+import { fireEvent } from '@testing-library/dom';
+import { createOffsetDragOverEvent } from '../../../__test_utils__/utils';
+import { TabDropIndexEvent } from '../../../../dockview/components/titlebar/tabsContainer';
+
+function createMockPanel(id: string): IDockviewPanel {
+    const tabRenderer: ITabRenderer = {
+        element: document.createElement('div'),
+        init: jest.fn(),
+        update: jest.fn(),
+        dispose: jest.fn(),
+    };
+    return fromPartial<IDockviewPanel>({
+        id,
+        view: fromPartial<IDockviewPanelModel>({ tab: tabRenderer }),
+    });
+}
+
+function createTabsForDropTest() {
+    const accessor = fromPartial<DockviewComponent>({
+        id: 'test-accessor-id',
+        options: {}, // tabAnimation: undefined = default (no smooth animation)
+    });
+    const group = fromPartial<DockviewGroupPanel>({
+        id: 'test-group-id',
+        locked: false,
+        model: fromPartial({
+            canDisplayOverlay: jest.fn().mockReturnValue(true),
+            dropTargetContainer: undefined,
+        }),
+    });
+    const tabs = new Tabs(group, accessor, { showTabsOverflowControl: false });
+    return { tabs, accessor, group };
+}
+
+function getTabElements(tabs: Tabs): HTMLElement[] {
+    return (tabs as any)._tabs.map((t: any) => t.value.element);
+}
+
+/**
+ * Simulates dragging over one half of a tab, then dropping.
+ * Returns the index fired on tabs.onDrop, or undefined if no overlay was shown.
+ *
+ * The tab elements are mocked to 80×30px. With activationSize=50%, the
+ * midpoint is at x=40, so clientX=20 → 'left', clientX=60 → 'right'.
+ */
+function simulateDropOnTab(
+    tabs: Tabs,
+    targetTabIndex: number,
+    side: 'left' | 'right'
+): number | undefined {
+    const elements = getTabElements(tabs);
+    const targetEl = elements[targetTabIndex];
+
+    jest.spyOn(targetEl, 'offsetWidth', 'get').mockReturnValue(80);
+    jest.spyOn(targetEl, 'offsetHeight', 'get').mockReturnValue(30);
+
+    const drops: TabDropIndexEvent[] = [];
+    tabs.onDrop((e) => drops.push(e));
+
+    fireEvent.dragEnter(targetEl);
+    fireEvent(
+        targetEl,
+        createOffsetDragOverEvent({ clientX: side === 'left' ? 20 : 60, clientY: 0 })
+    );
+
+    const dropzone = targetEl.querySelector('.dv-drop-target-dropzone');
+    if (!dropzone) {
+        return undefined;
+    }
+
+    fireEvent.drop(dropzone);
+    return drops.length > 0 ? drops[0].index : undefined;
+}
 
 describe('tabs', () => {
     describe('disableCustomScrollbars', () => {
@@ -87,6 +167,100 @@ describe('tabs', () => {
 
             expect(mockTab1.updateDragAndDropState).toHaveBeenCalledTimes(1);
             expect(mockTab2.updateDragAndDropState).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('tab drop index', () => {
+        afterEach(() => {
+            LocalSelectionTransfer.getInstance<PanelTransfer>().clearData(
+                PanelTransfer.prototype
+            );
+            jest.restoreAllMocks();
+        });
+
+        test('same-group: dropping on left half of a tab inserts before it (no source-removal adjustment needed)', () => {
+            // [A(0), B(1), C(2)], drag C over left of A → insertionIndex=0, sourceIndex=2
+            // 2 < 0 is false → adjustedIndex=0 → openPanel at 0 → [C, A, B]
+            const { tabs } = createTabsForDropTest();
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [new PanelTransfer('test-accessor-id', 'test-group-id', 'panel-c')],
+                PanelTransfer.prototype
+            );
+
+            const index = simulateDropOnTab(tabs, 0, 'left');
+            expect(index).toBe(0);
+        });
+
+        test('same-group: dropping on right half adjusts index for source removal', () => {
+            // [A(0), B(1), C(2)], drag A over right of C → insertionIndex=3, sourceIndex=0
+            // 0 < 3 → adjustedIndex=2 → remove A then openPanel at 2 → [B, C, A]
+            const { tabs } = createTabsForDropTest();
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [new PanelTransfer('test-accessor-id', 'test-group-id', 'panel-a')],
+                PanelTransfer.prototype
+            );
+
+            const index = simulateDropOnTab(tabs, 2, 'right');
+            expect(index).toBe(2);
+        });
+
+        test('same-group: dropping on left half also adjusts when source is before target', () => {
+            // [A(0), B(1), C(2)], drag A over left of C → insertionIndex=2, sourceIndex=0
+            // 0 < 2 → adjustedIndex=1 → remove A then openPanel at 1 → [B, A, C]
+            const { tabs } = createTabsForDropTest();
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [new PanelTransfer('test-accessor-id', 'test-group-id', 'panel-a')],
+                PanelTransfer.prototype
+            );
+
+            const index = simulateDropOnTab(tabs, 2, 'left');
+            expect(index).toBe(1);
+        });
+
+        test('cross-group: dropping on left half inserts before target tab', () => {
+            // [A(0), B(1), C(2)], external panel over left of B → insertionIndex=1
+            // sourceIndex=-1 (not in group) → adjustedIndex=1 → openPanel at 1
+            const { tabs } = createTabsForDropTest();
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [new PanelTransfer('test-accessor-id', 'other-group-id', 'panel-x')],
+                PanelTransfer.prototype
+            );
+
+            const index = simulateDropOnTab(tabs, 1, 'left');
+            expect(index).toBe(1);
+        });
+
+        test('cross-group: dropping on right half inserts after target tab', () => {
+            // [A(0), B(1), C(2)], external panel over right of B → insertionIndex=2
+            // sourceIndex=-1 → adjustedIndex=2 → openPanel at 2
+            const { tabs } = createTabsForDropTest();
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [new PanelTransfer('test-accessor-id', 'other-group-id', 'panel-x')],
+                PanelTransfer.prototype
+            );
+
+            const index = simulateDropOnTab(tabs, 1, 'right');
+            expect(index).toBe(2);
         });
     });
 

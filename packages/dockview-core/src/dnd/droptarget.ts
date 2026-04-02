@@ -151,6 +151,12 @@ export type MeasuredValue = { value: number; type: 'pixels' | 'percentage' };
 export type DroptargetOverlayModel = {
     size?: MeasuredValue;
     activationSize?: MeasuredValue;
+    /**
+     * Override the width threshold (in pixels) below which the overlay switches
+     * to a thin-border indicator instead of a half-width highlight. Set to 0 to
+     * always show the half-width overlay regardless of element size.
+     */
+    smallWidthBoundary?: number;
 };
 
 const DEFAULT_ACTIVATION_SIZE: MeasuredValue = {
@@ -426,7 +432,9 @@ export class Droptarget extends CompositeDisposable {
             return;
         }
 
-        const isSmallX = width < SMALL_WIDTH_BOUNDARY;
+        const smallWidthBoundary =
+            this.options.overlayModel?.smallWidthBoundary ?? SMALL_WIDTH_BOUNDARY;
+        const isSmallX = width < smallWidthBoundary;
         const isSmallY = height < SMALL_HEIGHT_BOUNDARY;
 
         const isLeft = quadrant === 'left';
