@@ -17,6 +17,7 @@ import {
 import { DragHandler } from '../../../dnd/abstractDragHandler';
 import { IDockviewPanel } from '../../dockviewPanel';
 import { addGhostImage } from '../../../dnd/ghost';
+import { DockviewHeaderDirection } from '../../options';
 
 class TabDragHandler extends DragHandler {
     private readonly panelTransfer =
@@ -92,11 +93,20 @@ export class Tab extends CompositeDisposable {
             !!this.accessor.options.disableDnd
         );
 
+        // 'line' themes render a 4px insertion strip at the tab edge via the
+        // anchor container's small-boundary path.  'fill' themes render a
+        // half-width highlighted area, so we disable the small-boundary path
+        // entirely (boundary = 0 ⟹ isSmall always false).
+        const useLineIndicator =
+            this.accessor.options.theme?.dndTabIndicator === 'line';
+        const smallBoundary = useLineIndicator ? Number.POSITIVE_INFINITY : 0;
+
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
             overlayModel: {
                 activationSize: { value: 50, type: 'percentage' },
-                smallWidthBoundary: 0,
+                smallWidthBoundary: smallBoundary,
+                smallHeightBoundary: smallBoundary,
             },
             canDisplayOverlay: (event, position) => {
                 if (this.group.locked) {
@@ -194,6 +204,12 @@ export class Tab extends CompositeDisposable {
         }
         this.content = part;
         this._element.appendChild(this.content.element);
+    }
+
+    public setDirection(direction: DockviewHeaderDirection): void {
+        this.dropTarget.setTargetZones(
+            direction === 'vertical' ? ['top', 'bottom'] : ['left', 'right']
+        );
     }
 
     public updateDragAndDropState(): void {

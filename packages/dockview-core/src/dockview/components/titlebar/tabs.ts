@@ -125,6 +125,10 @@ export class Tabs extends CompositeDisposable {
             removeClasses(this._tabsList, 'dv-tabs-container-vertical');
             addClasses(this._tabsList, 'dv-horizontal');
         }
+
+        for (const tab of this._tabs) {
+            tab.value.setDirection(value);
+        }
     }
 
     constructor(
@@ -340,6 +344,9 @@ export class Tabs extends CompositeDisposable {
         }
         const tab = new Tab(panel, this.accessor, this.group);
         tab.setContent(panel.view.tab);
+        if (this._direction !== 'horizontal') {
+            tab.setDirection(this._direction);
+        }
 
         const disposable = new CompositeDisposable(
             tab.onDragStart((event) => {
@@ -436,8 +443,12 @@ export class Tabs extends CompositeDisposable {
                     // the pointer is over, then adjust for same-group removal:
                     // when the source tab sits before the insertion point,
                     // removing it shifts all subsequent indices down by one.
+                    const afterPosition =
+                        this._direction === 'vertical' ? 'bottom' : 'right';
                     const insertionIndex =
-                        event.position === 'right' ? tabIndex + 1 : tabIndex;
+                        event.position === afterPosition
+                            ? tabIndex + 1
+                            : tabIndex;
                     const data = getPanelData();
                     const sourceIndex = data
                         ? this._tabs.findIndex(

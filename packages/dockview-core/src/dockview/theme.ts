@@ -24,6 +24,13 @@ export interface DockviewTheme {
      * When dragging a panel, the overlay can either encompass the panel contents or the entire group including the tab header space.
      */
     dndPanelOverlay?: 'content' | 'group';
+    /**
+     * The style of the drop indicator shown when dragging a tab over another tab.
+     * `'line'` renders a thin 4px insertion strip at the tab edge (suited to bordered/spaced themes).
+     * `'fill'` renders a half-width highlighted area (suited to themes that use a background fill).
+     * Defaults to `'fill'`.
+     */
+    dndTabIndicator?: 'line' | 'fill';
 }
 
 export const themeDark: DockviewTheme = {
@@ -63,6 +70,7 @@ export const themeAbyssSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
 };
 
 export const themeLightSpaced: DockviewTheme = {
@@ -72,6 +80,7 @@ export const themeLightSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
 };
 
 export const themeNord: DockviewTheme = {
@@ -87,6 +96,7 @@ export const themeNordSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
 };
 
 export const themeCatppuccinMocha: DockviewTheme = {
@@ -102,6 +112,7 @@ export const themeCatppuccinMochaSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
 };
 
 export const themeMonokai: DockviewTheme = {
@@ -123,6 +134,7 @@ export const themeSolarizedLightSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
 };
 
 export const themeGithubDark: DockviewTheme = {
@@ -138,6 +150,7 @@ export const themeGithubDarkSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
 };
 
 export const themeGithubLight: DockviewTheme = {
@@ -153,4 +166,5 @@ export const themeGithubLightSpaced: DockviewTheme = {
     gap: 10,
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
+    dndTabIndicator: 'line',
 };

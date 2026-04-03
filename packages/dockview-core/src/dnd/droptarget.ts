@@ -157,6 +157,12 @@ export type DroptargetOverlayModel = {
      * always show the half-width overlay regardless of element size.
      */
     smallWidthBoundary?: number;
+    /**
+     * Override the height threshold (in pixels) below which the overlay switches
+     * to a thin-border indicator instead of a half-height highlight. Set to 0 to
+     * always show the half-height overlay regardless of element size.
+     */
+    smallHeightBoundary?: number;
 };
 
 const DEFAULT_ACTIVATION_SIZE: MeasuredValue = {
@@ -435,8 +441,11 @@ export class Droptarget extends CompositeDisposable {
         const smallWidthBoundary =
             this.options.overlayModel?.smallWidthBoundary ??
             SMALL_WIDTH_BOUNDARY;
+        const smallHeightBoundary =
+            this.options.overlayModel?.smallHeightBoundary ??
+            SMALL_HEIGHT_BOUNDARY;
         const isSmallX = width < smallWidthBoundary;
-        const isSmallY = height < SMALL_HEIGHT_BOUNDARY;
+        const isSmallY = height < smallHeightBoundary;
 
         const isLeft = quadrant === 'left';
         const isRight = quadrant === 'right';
@@ -502,6 +511,13 @@ export class Droptarget extends CompositeDisposable {
             if (isSmallX && isRight) {
                 box.left = rootLeft + width - 4;
                 box.width = 4;
+            }
+            if (isSmallY && isTop) {
+                box.height = 4;
+            }
+            if (isSmallY && isBottom) {
+                box.top = rootTop + height - 4;
+                box.height = 4;
             }
 
             // Use GPU-optimized bounds checking and setting
