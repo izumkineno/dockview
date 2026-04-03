@@ -80,9 +80,12 @@
     margin: var(--dv-tab-margin);
 
     &.dv-tab--shifting {
-        will-change: margin-left;
+        will-change: transform, margin-left, margin-right, margin-top, margin-bottom;
         transition: transform var(--dv-transition-duration, 200ms) ease-out,
-                    margin-left var(--dv-transition-duration, 200ms) ease-out;
+                    margin-left var(--dv-transition-duration, 200ms) ease-out,
+                    margin-right var(--dv-transition-duration, 200ms) ease-out,
+                    margin-top var(--dv-transition-duration, 200ms) ease-out,
+                    margin-bottom var(--dv-transition-duration, 200ms) ease-out;
     }
 
     &.dv-tab--dragging {

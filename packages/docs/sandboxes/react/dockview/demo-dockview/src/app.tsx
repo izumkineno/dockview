@@ -515,6 +515,7 @@ const DockviewDemo = (props: {
                                     >
                                         <DockviewReact
                                             components={components}
+                                            tabAnimation={'smooth'}
                                             defaultTabComponent={
                                                 headerComponents.default
                                             }
