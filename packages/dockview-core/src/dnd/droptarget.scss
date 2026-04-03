@@ -19,10 +19,6 @@
             border: var(--dv-drag-over-border);
             background-color: var(--dv-drag-over-background-color);
 
-            &.dv-drop-target-selection-line {
-                border: 2px solid var(--dv-active-sash-color);
-                background-color: transparent;
-            }
             transition: top var(--dv-transition-duration) ease-out,
                 left var(--dv-transition-duration) ease-out,
                 width var(--dv-transition-duration) ease-out,

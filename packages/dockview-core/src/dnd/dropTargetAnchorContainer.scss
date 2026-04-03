@@ -14,10 +14,6 @@
         border: var(--dv-drag-over-border);
         background-color: var(--dv-drag-over-background-color);
 
-        &.dv-drop-target-anchor-line {
-            border: 2px solid var(--dv-active-sash-color);
-            background-color: transparent;
-        }
         opacity: 1;
         
         /* GPU optimizations */
