@@ -78,6 +78,7 @@ export interface ThemeBuilderState {
     dndOverlayMounting: 'absolute' | 'relative';
     dndPanelOverlay: 'content' | 'group';
     dndTabIndicator: 'line' | 'fill';
+    dndOverlayBorder: string;
     cssOverrides: ThemeCssOverrides;
 }
 
@@ -89,6 +90,7 @@ export function getInitialStateFromTheme(
         dndOverlayMounting: theme.dndOverlayMounting ?? 'relative',
         dndPanelOverlay: theme.dndPanelOverlay ?? 'content',
         dndTabIndicator: theme.dndTabIndicator ?? 'fill',
+        dndOverlayBorder: theme.dndOverlayBorder ?? '',
         cssOverrides: {},
     };
 }
@@ -103,6 +105,7 @@ export function buildEffectiveTheme(
         dndOverlayMounting: state.dndOverlayMounting,
         dndPanelOverlay: state.dndPanelOverlay,
         dndTabIndicator: state.dndTabIndicator,
+        dndOverlayBorder: state.dndOverlayBorder || undefined,
     };
 }
 
@@ -134,6 +137,11 @@ export function generateCodeSnippet(
     }
     if (state.dndTabIndicator !== (baseTheme.dndTabIndicator ?? 'fill')) {
         themeFields.push(`  dndTabIndicator: '${state.dndTabIndicator}',`);
+    }
+    if (state.dndOverlayBorder !== (baseTheme.dndOverlayBorder ?? '')) {
+        themeFields.push(
+            `  dndOverlayBorder: '${state.dndOverlayBorder}',`
+        );
     }
 
     let out = `import { ${importName} } from 'dockview';\n\n`;

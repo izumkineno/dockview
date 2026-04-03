@@ -594,11 +594,11 @@ export const ThemeBuilderModal = (props: {
                 <TextRow
                     label="Drag-over border"
                     varName="--dv-drag-over-border"
-                    value={css['--dv-drag-over-border'] ?? ''}
+                    value={props.state.dndOverlayBorder}
                     containerEl={props.containerEl}
                     themeKey={props.baseTheme.name}
                     onChange={(v) =>
-                        set({ '--dv-drag-over-border': v || undefined })
+                        props.onChange({ dndOverlayBorder: v })
                     }
                 />
             </Section>
