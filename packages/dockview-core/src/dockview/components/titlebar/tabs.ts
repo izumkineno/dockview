@@ -219,10 +219,7 @@ export class Tabs extends CompositeDisposable {
                     // If moving into the broader drop zone (e.g. void container,
                     // left actions), keep _animState alive so the external
                     // dragover listeners can continue the gap animation.
-                    if (
-                        related &&
-                        this._extendedDropZone?.contains(related)
-                    ) {
+                    if (related && this._extendedDropZone?.contains(related)) {
                         this.resetTabTransforms();
                         this._animState.currentInsertionIndex = null;
                         return;
@@ -682,7 +679,9 @@ export class Tabs extends CompositeDisposable {
         const marginLeadCssProp = isVertical ? 'margin-top' : 'margin-left';
         // Trailing margin: applied to the last tab when inserting at the end
         const marginTrailProp = isVertical ? 'marginBottom' : 'marginRight';
-        const marginTrailCssProp = isVertical ? 'margin-bottom' : 'margin-right';
+        const marginTrailCssProp = isVertical
+            ? 'margin-bottom'
+            : 'margin-right';
 
         const insertionIndex = this._animState.currentInsertionIndex;
         const sourceRect = this._animState.tabPositions.get(
@@ -697,7 +696,8 @@ export class Tabs extends CompositeDisposable {
         // When inserting at the end (past the last tab's midpoint), no tab sits
         // after the insertion point, so apply a trailing margin to the last
         // non-source tab instead of a leading margin to a non-existent tab.
-        const insertAtEnd = insertionIndex >= this._tabs.length ||
+        const insertAtEnd =
+            insertionIndex >= this._tabs.length ||
             (insertionIndex === this._tabs.length - 1 &&
                 this._tabs[this._tabs.length - 1]?.value.panel.id ===
                     this._animState.sourceTabId);
