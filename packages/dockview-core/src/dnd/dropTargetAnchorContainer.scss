@@ -13,6 +13,11 @@
         position: relative;
         border: var(--dv-drag-over-border);
         background-color: var(--dv-drag-over-background-color);
+
+        &.dv-drop-target-anchor-line {
+            border: none;
+            background-color: var(--dv-active-sash-color);
+        }
         opacity: 1;
         
         /* GPU optimizations */
