@@ -577,6 +577,19 @@ export const ThemeBuilderModal = (props: {
                         })
                     }
                 />
+                <ToggleRow
+                    label="Tab Indicator"
+                    value={props.state.dndTabIndicator}
+                    options={[
+                        { value: 'fill', label: 'fill' },
+                        { value: 'line', label: 'line' },
+                    ]}
+                    onChange={(v) =>
+                        props.onChange({
+                            dndTabIndicator: v as 'fill' | 'line',
+                        })
+                    }
+                />
             </Section>
 
             {/* Backgrounds */}
