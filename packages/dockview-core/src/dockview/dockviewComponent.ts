@@ -2918,6 +2918,15 @@ export class DockviewComponent
 
         this.gridview.margin = theme.gap ?? 0;
 
+        if (theme.dndOverlayBorder !== undefined) {
+            this.element.style.setProperty(
+                '--dv-drag-over-border',
+                theme.dndOverlayBorder
+            );
+        } else {
+            this.element.style.removeProperty('--dv-drag-over-border');
+        }
+
         switch (theme.dndOverlayMounting) {
             case 'absolute':
                 this.rootDropTargetContainer.disabled = false;

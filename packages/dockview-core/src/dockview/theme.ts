@@ -31,6 +31,12 @@ export interface DockviewTheme {
      * Defaults to `'fill'`.
      */
     dndTabIndicator?: 'line' | 'fill';
+    /**
+     * The CSS value applied to `--dv-drag-over-border` when this theme is active.
+     * For example `'2px solid var(--dv-active-sash-color)'`.
+     * When unset the CSS variable is left to the stylesheet default (`none`).
+     */
+    dndOverlayBorder?: string;
 }
 
 export const themeDark: DockviewTheme = {
@@ -71,6 +77,7 @@ export const themeAbyssSpaced: DockviewTheme = {
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
     dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeLightSpaced: DockviewTheme = {
@@ -81,6 +88,7 @@ export const themeLightSpaced: DockviewTheme = {
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
     dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeNord: DockviewTheme = {
@@ -97,6 +105,7 @@ export const themeNordSpaced: DockviewTheme = {
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
     dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeCatppuccinMocha: DockviewTheme = {
@@ -113,6 +122,7 @@ export const themeCatppuccinMochaSpaced: DockviewTheme = {
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
     dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeMonokai: DockviewTheme = {
@@ -135,6 +145,7 @@ export const themeSolarizedLightSpaced: DockviewTheme = {
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
     dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeGithubDark: DockviewTheme = {
@@ -151,6 +162,7 @@ export const themeGithubDarkSpaced: DockviewTheme = {
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
     dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
 
 export const themeGithubLight: DockviewTheme = {
@@ -167,4 +179,5 @@ export const themeGithubLightSpaced: DockviewTheme = {
     dndOverlayMounting: 'absolute',
     dndPanelOverlay: 'group',
     dndTabIndicator: 'line',
+    dndOverlayBorder: '2px solid var(--dv-active-sash-color)',
 };
