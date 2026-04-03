@@ -13,6 +13,7 @@ import { fromPartial } from '@total-typescript/shoehorn';
 describe('tab', () => {
     test('that empty tab has inactive-tab class', () => {
         const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             options: {},
         });
         const groupMock = jest.fn();
@@ -28,6 +29,7 @@ describe('tab', () => {
 
     test('that active tab has active-tab class', () => {
         const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             options: {},
         });
         const groupMock = jest.fn();
@@ -47,6 +49,7 @@ describe('tab', () => {
 
     test('that an external event does not render a drop target and calls through to the group model', () => {
         const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             id: 'testcomponentid',
             options: {},
         });
@@ -85,6 +88,7 @@ describe('tab', () => {
 
     test('that if you drag over yourself a drop target is shown', () => {
         const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             id: 'testcomponentid',
             options: {},
         });
@@ -128,6 +132,7 @@ describe('tab', () => {
 
     test('that if you drag over another tab a drop target is shown', () => {
         const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             id: 'testcomponentid',
             options: {},
         });
@@ -171,6 +176,7 @@ describe('tab', () => {
 
     test('that dropping on a tab with the same id but from a different component should not render a drop over and call through to the group model', () => {
         const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             id: 'testcomponentid',
             options: {},
         });
@@ -220,6 +226,7 @@ describe('tab', () => {
 
     test('that dropping on a tab from a different component should not render a drop over and call through to the group model', () => {
         const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             id: 'testcomponentid',
             options: {},
         });
@@ -271,6 +278,7 @@ describe('tab', () => {
         test('right-clicking a tab calls contextMenuController.show with the panel and group', () => {
             const showMock = jest.fn();
             const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
                 options: {},
                 contextMenuController: { show: showMock },
             });
@@ -290,6 +298,7 @@ describe('tab', () => {
     describe('disableDnd option', () => {
         test('that tab is draggable by default (disableDnd not set)', () => {
             const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
                 options: {},
             });
             const groupMock = jest.fn();
@@ -305,6 +314,7 @@ describe('tab', () => {
 
         test('that tab is draggable when disableDnd is false', () => {
             const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
                 options: { disableDnd: false },
             });
             const groupMock = jest.fn();
@@ -320,6 +330,7 @@ describe('tab', () => {
 
         test('that tab is not draggable when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
                 options: { disableDnd: true },
             });
             const groupMock = jest.fn();
@@ -337,6 +348,7 @@ describe('tab', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
                 options,
+                onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             });
             const groupMock = jest.fn();
 
@@ -361,6 +373,7 @@ describe('tab', () => {
 
         test('that dragstart is prevented when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
                 options: { disableDnd: true },
             });
             const groupMock = jest.fn();
@@ -381,6 +394,7 @@ describe('tab', () => {
 
         test('that dragstart is not prevented when disableDnd is false', () => {
             const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
                 options: { disableDnd: false },
             });
             const groupMock = jest.fn();
@@ -403,6 +417,7 @@ describe('tab', () => {
             const options = { disableDnd: false };
             const accessor = fromPartial<DockviewComponent>({
                 options,
+                onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
             });
             const groupMock = jest.fn();
 
@@ -439,6 +454,7 @@ describe('tab', () => {
 
         test('that onDragStart is not fired when disableDnd is true', () => {
             const accessor = fromPartial<DockviewComponent>({
+            onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
                 options: { disableDnd: true },
             });
             const groupMock = jest.fn();

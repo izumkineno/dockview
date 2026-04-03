@@ -1326,6 +1326,8 @@ export class DockviewComponent
             }
         }
 
+        this._onDidOptionsChange.fire();
+
         this.layout(this.gridview.width, this.gridview.height, true);
     }
 
