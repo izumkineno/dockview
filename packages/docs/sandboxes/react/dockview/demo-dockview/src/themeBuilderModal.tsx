@@ -590,6 +590,17 @@ export const ThemeBuilderModal = (props: {
                         })
                     }
                 />
+                {colorRow('Drag-over bg', '--dv-drag-over-background-color')}
+                <TextRow
+                    label="Drag-over border"
+                    varName="--dv-drag-over-border"
+                    value={css['--dv-drag-over-border'] ?? ''}
+                    containerEl={props.containerEl}
+                    themeKey={props.baseTheme.name}
+                    onChange={(v) =>
+                        set({ '--dv-drag-over-border': v || undefined })
+                    }
+                />
             </Section>
 
             {/* Backgrounds */}
@@ -653,17 +664,6 @@ export const ThemeBuilderModal = (props: {
             <Section title="Chrome">
                 {colorRow('Tab divider', '--dv-tab-divider-color')}
                 {colorRow('Icon hover bg', '--dv-icon-hover-background-color')}
-                {colorRow('Drag-over bg', '--dv-drag-over-background-color')}
-                <TextRow
-                    label="Drag-over border"
-                    varName="--dv-drag-over-border"
-                    value={css['--dv-drag-over-border'] ?? ''}
-                    containerEl={props.containerEl}
-                    themeKey={props.baseTheme.name}
-                    onChange={(v) =>
-                        set({ '--dv-drag-over-border': v || undefined })
-                    }
-                />
                 {colorRow('Active sash', '--dv-active-sash-color')}
                 {colorRow('Sash', '--dv-sash-color')}
                 {colorRow('Scrollbar', '--dv-scrollbar-background-color')}
