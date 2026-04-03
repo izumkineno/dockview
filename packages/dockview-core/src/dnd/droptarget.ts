@@ -537,6 +537,12 @@ export class Droptarget extends CompositeDisposable {
             toggleClass(overlay, 'dv-drop-target-bottom', isBottom);
             toggleClass(
                 overlay,
+                'dv-drop-target-anchor-line',
+                (isSmallX && (isLeft || isRight)) ||
+                    (isSmallY && (isTop || isBottom))
+            );
+            toggleClass(
+                overlay,
                 'dv-drop-target-center',
                 quadrant === 'center'
             );
