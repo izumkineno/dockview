@@ -30,6 +30,7 @@ function createTabsForDropTest() {
     const accessor = fromPartial<DockviewComponent>({
         id: 'test-accessor-id',
         options: {}, // tabAnimation: undefined = default (no smooth animation)
+        onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
     });
     const group = fromPartial<DockviewGroupPanel>({
         id: 'test-group-id',

@@ -93,21 +93,9 @@ export class Tab extends CompositeDisposable {
             !!this.accessor.options.disableDnd
         );
 
-        // 'line' themes render a 4px insertion strip at the tab edge via the
-        // anchor container's small-boundary path.  'fill' themes render a
-        // half-width highlighted area, so we disable the small-boundary path
-        // entirely (boundary = 0 ⟹ isSmall always false).
-        const useLineIndicator =
-            this.accessor.options.theme?.dndTabIndicator === 'line';
-        const smallBoundary = useLineIndicator ? Number.POSITIVE_INFINITY : 0;
-
         this.dropTarget = new Droptarget(this._element, {
             acceptedTargetZones: ['left', 'right'],
-            overlayModel: {
-                activationSize: { value: 50, type: 'percentage' },
-                smallWidthBoundary: smallBoundary,
-                smallHeightBoundary: smallBoundary,
-            },
+            overlayModel: this._buildOverlayModel(),
             canDisplayOverlay: (event, position) => {
                 if (this.group.locked) {
                     return false;
@@ -141,6 +129,9 @@ export class Tab extends CompositeDisposable {
             this._onDropped,
             this._onDragStart,
             this._onDragEnd,
+            this.accessor.onDidOptionsChange(() => {
+                this.dropTarget.setOverlayModel(this._buildOverlayModel());
+            }),
             this.dragHandler.onDragStart((event) => {
                 if (event.dataTransfer) {
                     const style = getComputedStyle(this.element);
@@ -204,6 +195,22 @@ export class Tab extends CompositeDisposable {
         }
         this.content = part;
         this._element.appendChild(this.content.element);
+    }
+
+    private _buildOverlayModel() {
+        // 'line' themes render a 4px insertion strip at the tab edge via the
+        // anchor container's small-boundary path.  'fill' themes render a
+        // half-width highlighted area, so we disable the small-boundary path
+        // entirely (boundary = 0 ⟹ isSmall always false).
+        const smallBoundary =
+            this.accessor.options.theme?.dndTabIndicator === 'line'
+                ? Number.POSITIVE_INFINITY
+                : 0;
+        return {
+            activationSize: { value: 50, type: 'percentage' as const },
+            smallWidthBoundary: smallBoundary,
+            smallHeightBoundary: smallBoundary,
+        };
     }
 
     public setDirection(direction: DockviewHeaderDirection): void {
