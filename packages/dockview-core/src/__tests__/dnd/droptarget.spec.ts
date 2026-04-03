@@ -348,8 +348,8 @@ describe('droptarget', () => {
     });
 
     describe('smallWidthBoundary', () => {
-        test('element narrower than default threshold renders full-width overlay without smallWidthBoundary', () => {
-            // 80px < SMALL_WIDTH_BOUNDARY (100) → isSmallX = true → full-width overlay
+        test('element narrower than default threshold renders 4px line strip without smallWidthBoundary', () => {
+            // 80px < SMALL_WIDTH_BOUNDARY (100) → isSmallX = true → 4px strip at edge
             const smallEl = document.createElement('div');
             jest.spyOn(smallEl, 'offsetHeight', 'get').mockReturnValue(30);
             jest.spyOn(smallEl, 'offsetWidth', 'get').mockReturnValue(80);
@@ -373,10 +373,13 @@ describe('droptarget', () => {
                 '.dv-drop-target-selection'
             ) as HTMLElement;
             expect(selection).not.toBeNull();
-            // Full-width: no half-sizing applied for small elements
-            expect(selection.style.width).toBe('100%');
+            // 4px strip at left edge
+            expect(selection.style.width).toBe('4px');
             expect(
                 selection.classList.contains('dv-drop-target-small-horizontal')
+            ).toBeTruthy();
+            expect(
+                selection.classList.contains('dv-drop-target-selection-line')
             ).toBeTruthy();
 
             dt.dispose();

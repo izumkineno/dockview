@@ -602,7 +602,26 @@ export class Droptarget extends CompositeDisposable {
             box.height = `${100 * size}%`;
         }
 
+        if (isSmallX && isLeft) {
+            box.width = '4px';
+        }
+        if (isSmallX && isRight) {
+            box.left = `${width - 4}px`;
+            box.width = '4px';
+        }
+        if (isSmallY && isTop) {
+            box.height = '4px';
+        }
+        if (isSmallY && isBottom) {
+            box.top = `${height - 4}px`;
+            box.height = '4px';
+        }
+
         setGPUOptimizedBoundsFromStrings(this.overlayElement, box);
+
+        const isLine =
+            (isSmallX && (isLeft || isRight)) ||
+            (isSmallY && (isTop || isBottom));
 
         toggleClass(
             this.overlayElement,
@@ -614,6 +633,7 @@ export class Droptarget extends CompositeDisposable {
             'dv-drop-target-small-horizontal',
             isSmallX
         );
+        toggleClass(this.overlayElement, 'dv-drop-target-selection-line', isLine);
         toggleClass(this.overlayElement, 'dv-drop-target-left', isLeft);
         toggleClass(this.overlayElement, 'dv-drop-target-right', isRight);
         toggleClass(this.overlayElement, 'dv-drop-target-top', isTop);
