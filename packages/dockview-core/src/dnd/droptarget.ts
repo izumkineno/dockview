@@ -633,7 +633,11 @@ export class Droptarget extends CompositeDisposable {
             'dv-drop-target-small-horizontal',
             isSmallX
         );
-        toggleClass(this.overlayElement, 'dv-drop-target-selection-line', isLine);
+        toggleClass(
+            this.overlayElement,
+            'dv-drop-target-selection-line',
+            isLine
+        );
         toggleClass(this.overlayElement, 'dv-drop-target-left', isLeft);
         toggleClass(this.overlayElement, 'dv-drop-target-right', isRight);
         toggleClass(this.overlayElement, 'dv-drop-target-top', isTop);
