@@ -1380,6 +1380,8 @@ export class DockviewComponent
             }
         }
 
+        this._onDidOptionsChange.fire();
+
         this._layoutFromShell(this.gridview.width, this.gridview.height);
     }
 
@@ -3222,6 +3224,15 @@ export class DockviewComponent
             theme.gap ?? 0,
             theme.edgeGroupCollapsedSize ?? 35
         );
+
+        if (theme.dndOverlayBorder !== undefined) {
+            this.element.style.setProperty(
+                '--dv-drag-over-border',
+                theme.dndOverlayBorder
+            );
+        } else {
+            this.element.style.removeProperty('--dv-drag-over-border');
+        }
 
         switch (theme.dndOverlayMounting) {
             case 'absolute':
