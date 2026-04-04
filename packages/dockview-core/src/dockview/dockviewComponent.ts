@@ -1825,7 +1825,7 @@ export class DockviewComponent
                             | GroupPanelViewState
                             | undefined;
                         const id =
-                            (groupState as any)?.id ?? `${_position}-group`;
+                            groupState?.id ?? `${_position}-group`;
                         this.addEdgeGroup(_position, { id });
                     }
                 }

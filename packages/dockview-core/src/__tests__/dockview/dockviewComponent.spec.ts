@@ -8895,6 +8895,60 @@ describe('dockviewComponent', () => {
             expect(c.childNodes.length).toBe(0);
         });
 
+        test('removeEdgeGroup removes the group and disposes its panels', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left', 'right']);
+
+            // Add a panel into the left edge group
+            dv.addPanel({
+                id: 'panel-1',
+                component: 'default',
+                title: 'Panel 1',
+                position: { referenceGroup: 'left-group' },
+            });
+            expect(dv.panels.find((p) => p.id === 'panel-1')).toBeDefined();
+            expect(dv.getEdgeGroup('left')).toBeDefined();
+
+            const removedGroupEvents: string[] = [];
+            dv.onDidRemoveGroup((g) => removedGroupEvents.push(g.id));
+
+            dv.removeEdgeGroup('left');
+
+            // Group is gone
+            expect(dv.getEdgeGroup('left')).toBeUndefined();
+            // Panel was disposed
+            expect(dv.panels.find((p) => p.id === 'panel-1')).toBeUndefined();
+            // onDidRemoveGroup fired
+            expect(removedGroupEvents).toContain('left-group');
+            // Other edge groups are unaffected
+            expect(dv.getEdgeGroup('right')).toBeDefined();
+
+            dv.dispose();
+        });
+
+        test('removeEdgeGroup throws when position has no group', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+
+            expect(() => dv.removeEdgeGroup('right')).toThrow();
+
+            dv.dispose();
+        });
+
+        test('addEdgeGroup can re-add a position after removeEdgeGroup', () => {
+            const c = document.createElement('div');
+            const dv = createFixedDockview(c, ['left']);
+
+            dv.removeEdgeGroup('left');
+            expect(dv.getEdgeGroup('left')).toBeUndefined();
+
+            const api = dv.addEdgeGroup('left', { id: 'left-group-new' });
+            expect(api).toBeDefined();
+            expect(dv.getEdgeGroup('left')).toBeDefined();
+
+            dv.dispose();
+        });
+
         test('fromJSON auto-creates edge groups from serialized state', () => {
             const c = document.createElement('div');
             // No addEdgeGroup called before fromJSON
