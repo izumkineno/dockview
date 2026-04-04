@@ -475,6 +475,7 @@ const DockviewDemo = (props: {
 
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
+    const [tabAnimation, setTabAnimation] = React.useState<'smooth' | 'default'>('smooth');
 
     return (
         <div
@@ -515,6 +516,7 @@ const DockviewDemo = (props: {
                                     >
                                         <DockviewReact
                                             components={components}
+                                            tabAnimation={tabAnimation}
                                             defaultTabComponent={
                                                 headerComponents.default
                                             }
@@ -658,6 +660,8 @@ const DockviewDemo = (props: {
                 showLogs={showLogs}
                 onToggleShowLogs={() => setShowLogs(!showLogs)}
                 onClearLogs={() => setLogLines([])}
+                tabAnimation={tabAnimation}
+                onToggleTabAnimation={(v) => setTabAnimation(v)}
             />
         </div>
     );

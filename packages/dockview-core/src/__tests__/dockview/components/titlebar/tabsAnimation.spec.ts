@@ -56,6 +56,7 @@ function createTabs(
             tabAnimation: options.tabAnimation,
             disableDnd: options.disableDnd,
         },
+        onDidOptionsChange: jest.fn().mockReturnValue({ dispose: jest.fn() }),
     });
 
     const group = fromPartial<DockviewGroupPanel>({
