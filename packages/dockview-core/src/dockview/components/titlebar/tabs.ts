@@ -200,6 +200,17 @@ export class Tabs extends CompositeDisposable {
                             return;
                         }
                     }
+                    event.preventDefault();
+                    // For intra-group drag (sourceIndex >= 0) the gap
+                    // animation is the sole visual indicator — clear any
+                    // stale anchor overlay that may have been set while the
+                    // cursor was over the panel content area or another zone.
+                    // External drags (sourceIndex === -1) leave the overlay
+                    // to the individual tab Droptargets so cross-group
+                    // animation is not disrupted.
+                    if (this._animState!.sourceIndex !== -1) {
+                        this.group.model.dropTargetContainer?.model?.clear();
+                    }
                     this.handleDragOver(event);
                 },
                 true
@@ -228,7 +239,14 @@ export class Tabs extends CompositeDisposable {
                     if (this._animState) {
                         if (this._animState.sourceIndex === -1) {
                             // External drag left the header entirely — clear
-                            // state (no dragend will fire on this tab list)
+                            // state (no dragend will fire on this tab list).
+                            // Also clear the anchor overlay: the tab-level
+                            // Droptarget onDragLeave does not clear the
+                            // override target, so if the drag re-enters
+                            // another group's header where canDisplayOverlay
+                            // returns false (e.g. same-group smooth mode) the
+                            // overlay would remain stranded here.
+                            this.group.model.dropTargetContainer?.model?.clear();
                             this._animState = null;
                         } else {
                             this._animState.currentInsertionIndex = null;
@@ -256,6 +274,12 @@ export class Tabs extends CompositeDisposable {
 
                     event.stopPropagation();
                     event.preventDefault();
+
+                    // The capturing stopPropagation above prevents the
+                    // individual tab's Droptarget.onDrop from firing, so
+                    // the anchor overlay won't be cleared by that path.
+                    // Clear it explicitly here before processing the drop.
+                    this.group.model.dropTargetContainer?.model?.clear();
 
                     const animState = this._animState;
                     this._animState = null;
@@ -320,7 +344,8 @@ export class Tabs extends CompositeDisposable {
     }
 
     setActivePanel(panel: IDockviewPanel): void {
-        let runningWidth = 0;
+        const isVertical = this._direction === 'vertical';
+        let running = 0;
 
         for (const tab of this._tabs) {
             const isActivePanel = panel.id === tab.value.panel.id;
@@ -330,16 +355,28 @@ export class Tabs extends CompositeDisposable {
                 const element = tab.value.element;
                 const parentElement = element.parentElement!;
 
-                if (
-                    runningWidth < parentElement.scrollLeft ||
-                    runningWidth + element.clientWidth >
-                        parentElement.scrollLeft + parentElement.clientWidth
-                ) {
-                    parentElement.scrollLeft = runningWidth;
+                if (isVertical) {
+                    if (
+                        running < parentElement.scrollTop ||
+                        running + element.clientHeight >
+                            parentElement.scrollTop + parentElement.clientHeight
+                    ) {
+                        parentElement.scrollTop = running;
+                    }
+                } else {
+                    if (
+                        running < parentElement.scrollLeft ||
+                        running + element.clientWidth >
+                            parentElement.scrollLeft + parentElement.clientWidth
+                    ) {
+                        parentElement.scrollLeft = running;
+                    }
                 }
             }
 
-            runningWidth += tab.value.element.clientWidth;
+            running += isVertical
+                ? tab.value.element.clientHeight
+                : tab.value.element.clientWidth;
         }
     }
 
@@ -739,19 +776,12 @@ export class Tabs extends CompositeDisposable {
             }
 
             if (insertAtEnd) {
-                // Clear any leading margin — trailing margin handles the gap
+                // Clear any leading margin — trailing margin handles the gap.
+                // Keep dv-tab--shifting so the margin-to-0 transition plays;
+                // it is removed by resetTabTransforms at drag end.
                 if (tab.element.style[marginLeadProp]) {
                     tab.element.style[marginLeadProp] = '0px';
                     toggleClass(tab.element, 'dv-tab--shifting', true);
-                    const onEnd = (e: TransitionEvent) => {
-                        if (e.propertyName !== marginLeadCssProp) return;
-                        tab.element.style.removeProperty(marginLeadCssProp);
-                        toggleClass(tab.element, 'dv-tab--shifting', false);
-                        tab.element.removeEventListener('transitionend', onEnd);
-                    };
-                    tab.element.addEventListener('transitionend', onEnd);
-                } else {
-                    toggleClass(tab.element, 'dv-tab--shifting', false);
                 }
             } else if (!gapApplied && i >= insertionIndex) {
                 tab.element.style[marginLeadProp] = `${gapSize}px`;
@@ -760,20 +790,11 @@ export class Tabs extends CompositeDisposable {
                 toggleClass(tab.element, 'dv-tab--shifting', true);
                 gapApplied = true;
             } else {
-                // Keep shifting class while margin animates back to 0,
-                // then remove both once the transition ends
+                // Animate lead margin back to 0. Keep dv-tab--shifting so the
+                // transition plays; resetTabTransforms cleans up at drag end.
                 if (tab.element.style[marginLeadProp]) {
                     tab.element.style[marginLeadProp] = '0px';
                     toggleClass(tab.element, 'dv-tab--shifting', true);
-                    const onEnd = (e: TransitionEvent) => {
-                        if (e.propertyName !== marginLeadCssProp) return;
-                        tab.element.style.removeProperty(marginLeadCssProp);
-                        toggleClass(tab.element, 'dv-tab--shifting', false);
-                        tab.element.removeEventListener('transitionend', onEnd);
-                    };
-                    tab.element.addEventListener('transitionend', onEnd);
-                } else {
-                    toggleClass(tab.element, 'dv-tab--shifting', false);
                 }
             }
         }
@@ -790,7 +811,8 @@ export class Tabs extends CompositeDisposable {
                 break;
             }
         } else {
-            // Clear any stale trailing margins
+            // Clear any stale trailing margins. Keep dv-tab--shifting so the
+            // transition plays; resetTabTransforms cleans up at drag end.
             for (const { value: tab } of this._tabs) {
                 if (tab.panel.id === this._animState.sourceTabId) {
                     continue;
@@ -798,13 +820,6 @@ export class Tabs extends CompositeDisposable {
                 if (tab.element.style[marginTrailProp]) {
                     tab.element.style[marginTrailProp] = '0px';
                     toggleClass(tab.element, 'dv-tab--shifting', true);
-                    const onEnd = (e: TransitionEvent) => {
-                        if (e.propertyName !== marginTrailCssProp) return;
-                        tab.element.style.removeProperty(marginTrailCssProp);
-                        toggleClass(tab.element, 'dv-tab--shifting', false);
-                        tab.element.removeEventListener('transitionend', onEnd);
-                    };
-                    tab.element.addEventListener('transitionend', onEnd);
                 }
             }
         }

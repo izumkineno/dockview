@@ -327,6 +327,86 @@ describe('tabs', () => {
         });
     });
 
+    describe('vertical smooth animation drop', () => {
+        afterEach(() => {
+            LocalSelectionTransfer.getInstance<PanelTransfer>().clearData(
+                PanelTransfer.prototype
+            );
+            jest.restoreAllMocks();
+        });
+
+        /**
+         * Regression: after the source tab collapses to height:0 in vertical
+         * smooth mode, the cursor may be over the empty space in _tabsList rather
+         * than over a child tab element. The _tabsList dragover listener must call
+         * event.preventDefault() so the browser treats _tabsList as a valid drop
+         * target; without it the drop event never fires.
+         */
+        test('dragover on tab strip calls preventDefault, enabling drop on empty space', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                id: 'test-accessor-id',
+                options: { tabAnimation: 'smooth' },
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                id: 'test-group-id',
+                locked: false,
+                model: fromPartial({
+                    canDisplayOverlay: jest.fn().mockReturnValue(true),
+                    dropTargetContainer: undefined,
+                }),
+            });
+            const tabs = new Tabs(group, accessor, {
+                showTabsOverflowControl: false,
+            });
+            tabs.direction = 'vertical';
+
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'test-group-id',
+                        'panel-a'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
+
+            // Simulate what dragstart sets up
+            (tabs as any)._animState = {
+                sourceTabId: 'panel-a',
+                sourceIndex: 0,
+                tabPositions: (tabs as any).snapshotTabPositions(),
+                currentInsertionIndex: null,
+            };
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            const drops: TabDropIndexEvent[] = [];
+            tabs.onDrop((e) => drops.push(e));
+
+            // Fire dragover on _tabsList (empty space where source tab collapsed)
+            const dragOverEvent = createOffsetDragOverEvent({
+                clientX: 0,
+                clientY: 5,
+            });
+            tabsList.dispatchEvent(dragOverEvent);
+
+            // The fix: preventDefault must have been called so _tabsList is a
+            // valid drop target even when the cursor is not over a child tab.
+            expect(dragOverEvent.defaultPrevented).toBe(true);
+
+            // drop should now fire and emit the correct index
+            fireEvent.drop(tabsList);
+            expect(drops.length).toBe(1);
+        });
+    });
+
     describe('tab drop index', () => {
         afterEach(() => {
             LocalSelectionTransfer.getInstance<PanelTransfer>().clearData(

@@ -416,6 +416,7 @@ export class ShellManager implements IDisposable {
         this._shellElement.className = 'dv-shell';
         this._shellElement.style.height = '100%';
         this._shellElement.style.width = '100%';
+        this._shellElement.style.position = 'relative';
         container.appendChild(this._shellElement);
 
         const centerView = new CenterView(dockviewElement, layoutGrid);

@@ -473,8 +473,28 @@ export class DockviewComponent
         this._themeClassnames = new Classnames(this.element);
         this._api = new DockviewApi(this);
 
-        this.rootDropTargetContainer = new DropTargetAnchorContainer(
+        // The shell always wraps the dockview element so edge groups can be
+        // added at any time via addEdgeGroup() without re-parenting the DOM.
+        this.disableResizing = true;
+        container.removeChild(this.element);
+
+        this._shellManager = new ShellManager(
+            container,
             this.element,
+            (w, h) => this._layoutFromShell(w, h),
+            options.theme?.gap ?? 0,
+            options.theme?.edgeGroupCollapsedSize
+        );
+        // The shell wraps the dockview element, so move the popup anchor
+        // into the shell so overflow dropdowns in edge groups position correctly
+        this.popupService.updateRoot(this._shellManager.element);
+        this._shellThemeClassnames = new Classnames(this._shellManager.element);
+
+        // Anchor the overlay container to the shell element so that edge groups
+        // (which live outside this.element in the shell layout) are covered when
+        // dndOverlayMounting is 'absolute'.
+        this.rootDropTargetContainer = new DropTargetAnchorContainer(
+            this._shellManager.element,
             { disabled: true }
         );
         this.overlayRenderContainer = new OverlayRenderContainer(
@@ -687,27 +707,6 @@ export class DockviewComponent
             this._rootDropTarget
         );
 
-        // The shell always wraps the dockview element so edge groups can be
-        // added at any time via addEdgeGroup() without re-parenting the DOM.
-        this.disableResizing = true;
-        container.removeChild(this.element);
-
-        this._shellManager = new ShellManager(
-            container,
-            this.element,
-            (w, h) => this._layoutFromShell(w, h),
-            options.theme?.gap ?? 0,
-            options.theme?.edgeGroupCollapsedSize
-        );
-        // The shell wraps the dockview element, so move the popup anchor
-        // into the shell so overflow dropdowns in edge groups position correctly
-        this.popupService.updateRoot(this._shellManager.element);
-        this._shellThemeClassnames = new Classnames(this._shellManager.element);
-        // updateTheme() was already called before the shell was created,
-        // so apply the current theme to the shell element now.
-        this._shellThemeClassnames.setClassNames(
-            (this._options.theme ?? themeAbyss).className
-        );
     }
 
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
@@ -3230,8 +3229,15 @@ export class DockviewComponent
                 '--dv-drag-over-border',
                 theme.dndOverlayBorder
             );
+            this._shellManager?.element.style.setProperty(
+                '--dv-drag-over-border',
+                theme.dndOverlayBorder
+            );
         } else {
             this.element.style.removeProperty('--dv-drag-over-border');
+            this._shellManager?.element.style.removeProperty(
+                '--dv-drag-over-border'
+            );
         }
 
         switch (theme.dndOverlayMounting) {
