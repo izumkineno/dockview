@@ -706,7 +706,6 @@ export class DockviewComponent
             }),
             this._rootDropTarget
         );
-
     }
 
     override setVisible(panel: DockviewGroupPanel, visible: boolean): void {
