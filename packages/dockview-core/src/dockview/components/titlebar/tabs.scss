@@ -112,6 +112,18 @@
 .dv-tabs-container-vertical {
     .dv-tab {
         padding: 0.5rem 0.25rem;
+
+        &.dv-tab--dragging {
+            // In vertical mode the flex main axis is physical height, so
+            // height (not width) must be zeroed to remove the tab from flow.
+            height: 0 !important;
+            min-height: 0 !important;
+            transition: height var(--dv-transition-duration, 200ms) ease-out,
+                        width var(--dv-transition-duration, 200ms) ease-out,
+                        padding var(--dv-transition-duration, 200ms) ease-out,
+                        margin var(--dv-transition-duration, 200ms) ease-out,
+                        opacity var(--dv-transition-duration, 200ms) ease-out;
+        }
     }
 }
 
