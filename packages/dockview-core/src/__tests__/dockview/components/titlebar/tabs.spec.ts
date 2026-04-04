@@ -174,6 +174,239 @@ describe('tabs', () => {
         });
     });
 
+    describe('edge panel tab click behaviour', () => {
+        function makePanel(id: string): IDockviewPanel {
+            return fromPartial<IDockviewPanel>({
+                id,
+                view: {
+                    tab: { element: document.createElement('div') },
+                },
+            });
+        }
+
+        function makeGroup(
+            activePanel: IDockviewPanel,
+            isCollapsedFn: () => boolean,
+            expandMock: jest.Mock,
+            collapseMock: jest.Mock,
+            openPanelMock: jest.Mock
+        ): DockviewGroupPanel {
+            return fromPartial<DockviewGroupPanel>({
+                activePanel,
+                api: {
+                    location: { type: 'fixed' },
+                    isCollapsed: isCollapsedFn,
+                    expand: expandMock,
+                    collapse: collapseMock,
+                },
+                model: {
+                    openPanel: openPanelMock,
+                    canDisplayOverlay: jest.fn(),
+                    dropTargetContainer: undefined,
+                },
+                locked: false,
+            });
+        }
+
+        function makeAccessor(): DockviewComponent {
+            return fromPartial<DockviewComponent>({
+                options: {},
+                doSetGroupActive: jest.fn(),
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+            });
+        }
+
+        test('clicking active tab in collapsed fixed group expands it', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => true,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[0].element);
+
+            expect(expandMock).toHaveBeenCalledTimes(1);
+            expect(collapseMock).not.toHaveBeenCalled();
+            expect(openPanelMock).not.toHaveBeenCalled();
+        });
+
+        test('clicking active tab in expanded fixed group collapses it', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => false,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[0].element);
+
+            expect(collapseMock).toHaveBeenCalledTimes(1);
+            expect(expandMock).not.toHaveBeenCalled();
+            expect(openPanelMock).not.toHaveBeenCalled();
+        });
+
+        test('clicking non-active tab in collapsed fixed group activates panel and expands group', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => true,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[1].element);
+
+            expect(openPanelMock).toHaveBeenCalledWith(panel2);
+            expect(expandMock).toHaveBeenCalledTimes(1);
+            expect(collapseMock).not.toHaveBeenCalled();
+        });
+
+        test('clicking non-active tab in expanded fixed group only activates panel', () => {
+            const panel1 = makePanel('panel1');
+            const panel2 = makePanel('panel2');
+            const expandMock = jest.fn();
+            const collapseMock = jest.fn();
+            const openPanelMock = jest.fn();
+
+            const group = makeGroup(
+                panel1,
+                () => false,
+                expandMock,
+                collapseMock,
+                openPanelMock
+            );
+            const cut = new Tabs(group, makeAccessor(), {
+                showTabsOverflowControl: false,
+            });
+            cut.openPanel(panel1);
+            cut.openPanel(panel2);
+
+            fireEvent.click(cut.tabs[1].element);
+
+            expect(openPanelMock).toHaveBeenCalledWith(panel2);
+            expect(expandMock).not.toHaveBeenCalled();
+            expect(collapseMock).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('vertical smooth animation drop', () => {
+        afterEach(() => {
+            LocalSelectionTransfer.getInstance<PanelTransfer>().clearData(
+                PanelTransfer.prototype
+            );
+            jest.restoreAllMocks();
+        });
+
+        /**
+         * Regression: after the source tab collapses to height:0 in vertical
+         * smooth mode, the cursor may be over the empty space in _tabsList rather
+         * than over a child tab element. The _tabsList dragover listener must call
+         * event.preventDefault() so the browser treats _tabsList as a valid drop
+         * target; without it the drop event never fires.
+         */
+        test('dragover on tab strip calls preventDefault, enabling drop on empty space', () => {
+            const accessor = fromPartial<DockviewComponent>({
+                id: 'test-accessor-id',
+                options: { tabAnimation: 'smooth' },
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
+            });
+            const group = fromPartial<DockviewGroupPanel>({
+                id: 'test-group-id',
+                locked: false,
+                model: fromPartial({
+                    canDisplayOverlay: jest.fn().mockReturnValue(true),
+                    dropTargetContainer: undefined,
+                }),
+            });
+            const tabs = new Tabs(group, accessor, {
+                showTabsOverflowControl: false,
+            });
+            tabs.direction = 'vertical';
+
+            tabs.openPanel(createMockPanel('panel-a'), 0);
+            tabs.openPanel(createMockPanel('panel-b'), 1);
+            tabs.openPanel(createMockPanel('panel-c'), 2);
+
+            LocalSelectionTransfer.getInstance<PanelTransfer>().setData(
+                [
+                    new PanelTransfer(
+                        'test-accessor-id',
+                        'test-group-id',
+                        'panel-a'
+                    ),
+                ],
+                PanelTransfer.prototype
+            );
+
+            // Simulate what dragstart sets up
+            (tabs as any)._animState = {
+                sourceTabId: 'panel-a',
+                sourceIndex: 0,
+                tabPositions: (tabs as any).snapshotTabPositions(),
+                currentInsertionIndex: null,
+            };
+
+            const tabsList = (tabs as any)._tabsList as HTMLElement;
+            const drops: TabDropIndexEvent[] = [];
+            tabs.onDrop((e) => drops.push(e));
+
+            // Fire dragover on _tabsList (empty space where source tab collapsed)
+            const dragOverEvent = createOffsetDragOverEvent({
+                clientX: 0,
+                clientY: 5,
+            });
+            tabsList.dispatchEvent(dragOverEvent);
+
+            // The fix: preventDefault must have been called so _tabsList is a
+            // valid drop target even when the cursor is not over a child tab.
+            expect(dragOverEvent.defaultPrevented).toBe(true);
+
+            // drop should now fire and emit the correct index
+            fireEvent.drop(tabsList);
+            expect(drops.length).toBe(1);
+        });
+    });
+
     describe('tab drop index', () => {
         afterEach(() => {
             LocalSelectionTransfer.getInstance<PanelTransfer>().clearData(

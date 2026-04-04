@@ -51,6 +51,7 @@ export {
     DockviewDidDropEvent,
     DockviewWillDropEvent,
     DockviewGroupChangeEvent,
+    DockviewGroupLocation,
 } from './dockview/dockviewGroupPanelModel';
 export { DockviewWillShowOverlayLocationEvent } from './dockview/events';
 export {
@@ -79,6 +80,11 @@ export {
 } from './dockview/deserializer';
 
 export * from './dockview/dockviewComponent';
+export {
+    EdgeGroupOptions,
+    EdgeGroupPosition,
+    SerializedEdgeGroups,
+} from './dockview/dockviewShell';
 export * from './gridview/gridviewComponent';
 export * from './splitview/splitviewComponent';
 export * from './paneview/paneviewComponent';
@@ -133,6 +139,7 @@ export { ExpansionEvent, PaneviewPanelApi } from './api/paneviewPanelApi';
 export {
     DockviewGroupPanelApi,
     DockviewGroupPanelFloatingChangeEvent,
+    DockviewGroupPanelCollapsedChangeEvent,
     DockviewGroupMoveParams,
 } from './api/dockviewGroupPanelApi';
 export {

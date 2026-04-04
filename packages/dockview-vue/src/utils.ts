@@ -1,5 +1,6 @@
 import type {
     DockviewApi,
+    DockviewGroupLocation,
     DockviewGroupPanel,
     DockviewPanelApi,
     IContentRenderer,
@@ -241,6 +242,9 @@ export class VueHeaderActionsRenderer
             }),
             props.api.onDidActiveChange(() => {
                 this.updateProps();
+            }),
+            props.api.onDidLocationChange((event) => {
+                this.updateLocation(event.location);
             })
         );
 
@@ -266,11 +270,16 @@ export class VueHeaderActionsRenderer
             isGroupActive: this.group.api.isActive,
             group: this.group,
             headerPosition: this.group.model.headerPosition,
+            location: this.group.api.location,
         };
     }
 
     private updateProps(): void {
         this._renderDisposable?.update({ params: this.buildEnrichedProps() });
+    }
+
+    private updateLocation(location: DockviewGroupLocation): void {
+        this._renderDisposable?.update({ params: { location } });
     }
 }
 
