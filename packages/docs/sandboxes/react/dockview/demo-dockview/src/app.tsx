@@ -564,7 +564,9 @@ const DockviewDemo = (props: {
     const [showLogs, setShowLogs] = React.useState<boolean>(false);
     const [debug, setDebug] = React.useState<boolean>(false);
     const [useEdgeGroups, setUseEdgeGroups] = React.useState<boolean>(true);
-    const [tabAnimation, setTabAnimation] = React.useState<'smooth' | 'default'>('smooth');
+    const [tabAnimation, setTabAnimation] = React.useState<
+        'smooth' | 'default'
+    >('default');
 
     return (
         <div
