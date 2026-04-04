@@ -290,8 +290,7 @@ class MiddleColumnView implements IView, IDisposable {
     }
 
     removeView(position: 'top' | 'bottom'): void {
-        const index =
-            position === 'top' ? this._topIndex : this._bottomIndex;
+        const index = position === 'top' ? this._topIndex : this._bottomIndex;
         if (index === undefined) {
             return;
         }
