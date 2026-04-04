@@ -212,6 +212,9 @@ describe('tabs', () => {
             return fromPartial<DockviewComponent>({
                 options: {},
                 doSetGroupActive: jest.fn(),
+                onDidOptionsChange: jest
+                    .fn()
+                    .mockReturnValue({ dispose: jest.fn() }),
             });
         }
 
