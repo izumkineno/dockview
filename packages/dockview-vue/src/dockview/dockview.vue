@@ -18,6 +18,7 @@ import {
 } from 'vue';
 import {
     VueHeaderActionsRenderer,
+    VueContextMenuItemRenderer,
     VueRenderer,
     VueWatermarkRenderer,
     findComponent,
@@ -118,6 +119,13 @@ onMounted(() => {
                   return new VueHeaderActionsRenderer(component!, inst, group);
               }
             : undefined,
+        createContextMenuItemComponent: (options) => {
+            if (!options.component) {
+                return undefined;
+            }
+            const component = findComponent(inst, options.component as string);
+            return new VueContextMenuItemRenderer(component!, inst);
+        },
     };
 
     const api = createDockview(el.value, {

@@ -1,5 +1,6 @@
 import type {
     DockviewApi,
+    DockviewGroupLocation,
     DockviewGroupPanel,
     DockviewPanelApi,
     IContentRenderer,
@@ -10,6 +11,8 @@ import type {
     ITabRenderer,
     IWatermarkPanelProps,
     IWatermarkRenderer,
+    IContextMenuItemRenderer,
+    IContextMenuItemComponentProps,
     PanelUpdateEvent,
     Parameters,
     TabPartInitParameters,
@@ -239,6 +242,9 @@ export class VueHeaderActionsRenderer
             }),
             props.api.onDidActiveChange(() => {
                 this.updateProps();
+            }),
+            props.api.onDidLocationChange((event) => {
+                this.updateLocation(event.location);
             })
         );
 
@@ -264,11 +270,39 @@ export class VueHeaderActionsRenderer
             isGroupActive: this.group.api.isActive,
             group: this.group,
             headerPosition: this.group.model.headerPosition,
+            location: this.group.api.location,
         };
     }
 
     private updateProps(): void {
         this._renderDisposable?.update({ params: this.buildEnrichedProps() });
+    }
+
+    private updateLocation(location: DockviewGroupLocation): void {
+        this._renderDisposable?.update({ params: { location } });
+    }
+}
+
+export class VueContextMenuItemRenderer
+    extends AbstractVueRenderer
+    implements IContextMenuItemRenderer
+{
+    private _renderDisposable:
+        | { update: (props: any) => void; dispose: () => void }
+        | undefined;
+
+    init(props: IContextMenuItemComponentProps): void {
+        this._renderDisposable?.dispose();
+        this._renderDisposable = mountVueComponent(
+            this.component,
+            this.parent,
+            { params: props },
+            this.element
+        );
+    }
+
+    dispose(): void {
+        this._renderDisposable?.dispose();
     }
 }
 

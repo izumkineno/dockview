@@ -4,8 +4,10 @@ import {
     DockviewGroupPanelApi,
     DockviewGroupPanelModel,
     IDockviewPanel,
+    IContextMenuItemComponentProps,
 } from 'dockview-core';
 import {
+    VueContextMenuItemRenderer,
     VueHeaderActionsRenderer,
     VuePart,
     findComponent,
@@ -159,6 +161,7 @@ describe('VueHeaderActionsRenderer', () => {
     let onDidRemovePanel: DockviewEmitter<any>;
     let onDidActivePanelChange: DockviewEmitter<any>;
     let onDidActiveChange: DockviewEmitter<any>;
+    let onDidLocationChange: DockviewEmitter<any>;
     let groupPanel: DockviewGroupPanel;
     let mockParent: any;
     let mockComponent: any;
@@ -171,6 +174,7 @@ describe('VueHeaderActionsRenderer', () => {
         onDidRemovePanel = new DockviewEmitter();
         onDidActivePanelChange = new DockviewEmitter();
         onDidActiveChange = new DockviewEmitter();
+        onDidLocationChange = new DockviewEmitter();
 
         panels = [{ id: 'panel-1' } as IDockviewPanel];
         activePanel = panels[0];
@@ -190,6 +194,8 @@ describe('VueHeaderActionsRenderer', () => {
 
         const groupApi = {
             onDidActiveChange: onDidActiveChange.event,
+            onDidLocationChange: onDidLocationChange.event,
+            location: { type: 'grid' },
             get isActive() {
                 return isGroupActive;
             },
@@ -216,6 +222,7 @@ describe('VueHeaderActionsRenderer', () => {
         onDidRemovePanel.dispose();
         onDidActivePanelChange.dispose();
         onDidActiveChange.dispose();
+        onDidLocationChange.dispose();
         createVNodeMock.mockClear();
         vueRenderMock.mockClear();
         (cloneVNode as jest.Mock).mockClear();
@@ -426,7 +433,7 @@ describe('VueHeaderActionsRenderer', () => {
         expect(() => renderer.dispose()).not.toThrow();
     });
 
-    test('should subscribe to all four group events', () => {
+    test('should subscribe to all five group events', () => {
         const renderer = new VueHeaderActionsRenderer(
             mockComponent,
             mockParent,
@@ -453,6 +460,11 @@ describe('VueHeaderActionsRenderer', () => {
 
         onDidActiveChange.fire(undefined);
         expect(vueRenderMock).toHaveBeenCalledTimes(4);
+
+        onDidLocationChange.fire({
+            location: { type: 'fixed', position: 'left' },
+        });
+        expect(vueRenderMock).toHaveBeenCalledTimes(5);
 
         renderer.dispose();
     });
@@ -493,5 +505,99 @@ describe('VueHeaderActionsRenderer', () => {
         );
 
         renderer.dispose();
+    });
+});
+
+describe('VueContextMenuItemRenderer', () => {
+    let mockParent: any;
+    let mockComponent: any;
+
+    beforeEach(() => {
+        mockParent = {
+            appContext: { components: {}, provides: {} },
+            provides: {},
+        };
+        mockComponent = { template: '<div>menu item</div>', props: ['params'] };
+        createVNodeMock.mockClear();
+        vueRenderMock.mockClear();
+        (cloneVNode as jest.Mock).mockClear();
+    });
+
+    test('element has class dv-vue-part with full dimensions', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+
+        expect(renderer.element.className).toBe('dv-vue-part');
+        expect(renderer.element.style.height).toBe('100%');
+        expect(renderer.element.style.width).toBe('100%');
+    });
+
+    test('init mounts the component with props', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+        const props = {
+            panel: {} as IDockviewPanel,
+            group: {} as DockviewGroupPanel,
+            api: {} as any,
+            close: jest.fn(),
+        } as IContextMenuItemComponentProps;
+
+        renderer.init(props);
+
+        expect(createVNodeMock).toHaveBeenCalledTimes(1);
+        const passedProps = createVNodeMock.mock.calls[0][1];
+        expect(passedProps.params).toBe(props);
+    });
+
+    test('componentProps is accessible as params.componentProps', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+        const componentProps = { foo: 'bar' };
+        const props: IContextMenuItemComponentProps = {
+            panel: {} as IDockviewPanel,
+            group: {} as DockviewGroupPanel,
+            api: {} as any,
+            close: jest.fn(),
+            componentProps,
+        };
+
+        renderer.init(props);
+
+        const passedProps = createVNodeMock.mock.calls[0][1];
+        expect(passedProps.params.componentProps).toBe(componentProps);
+    });
+
+    test('dispose unmounts the component', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+
+        renderer.init({
+            panel: {} as IDockviewPanel,
+            group: {} as DockviewGroupPanel,
+            api: {} as any,
+            close: jest.fn(),
+        } as IContextMenuItemComponentProps);
+
+        vueRenderMock.mockClear();
+        renderer.dispose();
+
+        // render(null, element) is called to unmount
+        expect(vueRenderMock).toHaveBeenCalledWith(null, renderer.element);
+    });
+
+    test('dispose before init does not throw', () => {
+        const renderer = new VueContextMenuItemRenderer(
+            mockComponent,
+            mockParent
+        );
+        expect(() => renderer.dispose()).not.toThrow();
     });
 });
